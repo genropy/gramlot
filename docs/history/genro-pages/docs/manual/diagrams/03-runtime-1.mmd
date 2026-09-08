@@ -1,0 +1,9 @@
+flowchart LR
+  Data[Data Bag: main.record.name] -->|runtimeValues| Source[Source node: value pointer]
+  Source -->|targetId| Host[Widget host element]
+  Host --> Shadow[Shadow root]
+  Shadow --> Input[Native input]
+  Input -->|composed change| Host
+  Host -->|Application mutation| Data
+  Source --> Meta[Recipe attributes and nodeTag]
+  Host --> Local[UI-only state]

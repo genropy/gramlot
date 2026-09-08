@@ -1,0 +1,67 @@
+[
+  {
+    "slug": "first-pages",
+    "thread_id": "01a070d8-8319-7d53-96aa-2996546bdd77",
+    "title": "Avviare prima chat Genro Pages",
+    "messages": 1186,
+    "user_messages": 414,
+    "assistant_messages": 772,
+    "attachment_blocks_not_exported": 11,
+    "first_timestamp": "2026-09-05T09:13:59.737Z",
+    "last_timestamp": "2026-09-08T07:48:03.075Z",
+    "json_sha256": "00259bb5ca3814eb6252933ddad084177ad0b1ca2452b02af599dfcba4780617",
+    "injected_document_records": 19
+  },
+  {
+    "slug": "coordination",
+    "thread_id": "01a08003-5fc5-7723-b719-5f40380ca254",
+    "title": "genro-pages-coordinatore",
+    "messages": 193,
+    "user_messages": 59,
+    "assistant_messages": 134,
+    "attachment_blocks_not_exported": 3,
+    "first_timestamp": "2026-09-08T07:55:05.469Z",
+    "last_timestamp": "2026-09-08T17:28:27.265Z",
+    "json_sha256": "f8344d5a965bb656ca89b797377c506b58e1d62e18df326d2d3283e415c331ce",
+    "injected_document_records": 1
+  },
+  {
+    "slug": "forms",
+    "thread_id": "01a08110-ecaf-72f1-bf65-63bf1d2015fb",
+    "title": "genro-pages-labeled-form-validazione",
+    "messages": 76,
+    "user_messages": 22,
+    "assistant_messages": 54,
+    "attachment_blocks_not_exported": 0,
+    "first_timestamp": "2026-09-08T12:49:27.677Z",
+    "last_timestamp": "2026-09-08T17:57:44.162Z",
+    "json_sha256": "d18278ecfd2d0d884c98113d04304a45f3e94423ba73aa95738c453cc11b8bd5",
+    "injected_document_records": 1
+  },
+  {
+    "slug": "manual",
+    "thread_id": "01a0812b-6ec2-7a80-9c08-56e1da3c0458",
+    "title": "genro-pages-documentazione-interna",
+    "messages": 66,
+    "user_messages": 16,
+    "assistant_messages": 50,
+    "attachment_blocks_not_exported": 0,
+    "first_timestamp": "2026-09-08T13:18:24.526Z",
+    "last_timestamp": "2026-09-08T20:33:03.872Z",
+    "json_sha256": "b05403881359a75f2905e301d508a679216ff167cf9d72256b0929d95e065128",
+    "injected_document_records": 1
+  },
+  {
+    "slug": "rosetta",
+    "thread_id": "01a07fe7-14f9-7602-833a-4d84b56d585b",
+    "title": "genro-pages-Demo Rosetta",
+    "messages": 287,
+    "user_messages": 90,
+    "assistant_messages": 197,
+    "attachment_blocks_not_exported": 3,
+    "first_timestamp": "2026-09-08T07:26:15.988Z",
+    "last_timestamp": "2026-09-08T18:21:49.539Z",
+    "json_sha256": "10fbb218b90075d1d4e8d3a404a5dadba9a1bc8a940ba762448e314e786879a6",
+    "injected_document_records": 1
+  }
+]

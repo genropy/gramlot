@@ -1,0 +1,9 @@
+flowchart TD
+  Input[Native input edit] --> Event[Host change or input event]
+  Event --> Resolve[Application resolves source identity]
+  Resolve --> Write[Write data with origin reason]
+  Write --> Notify[Bag notification]
+  Notify --> Readers[Handler pointerMap readers]
+  Readers --> Other[Render other readers]
+  Readers --> Origin[Skip originating source node]
+  Other --> Patch[DomTarget partial patches]

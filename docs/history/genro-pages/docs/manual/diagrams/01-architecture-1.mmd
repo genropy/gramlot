@@ -1,0 +1,11 @@
+flowchart TB
+  Host[Python WebpageApplication] --> Document[PageDocument: HTML shell and startup]
+  Host --> Recipe[WebPage and Builders: SourceBag recipe]
+  Recipe --> Wire[TYTX over HTTP or WSX]
+  Document --> Bootstrap[Browser bootstrap and PageApplication]
+  Wire --> Bootstrap
+  Bootstrap --> Runtime[DOM builder, handler and source]
+  Runtime --> Render[Renderer and DomTarget]
+  Render --> DOM[DOM and Web Components]
+  DOM -->|write-back| Data[Page Data Bag]
+  Data -->|notifications| Runtime

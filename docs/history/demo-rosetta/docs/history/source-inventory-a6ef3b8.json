@@ -1,0 +1,153 @@
+{
+  "react_application": {
+    "files": [
+      {
+        "file": "frontends/react/src/App.jsx",
+        "nonblank_lines": 188,
+        "bytes": 6797
+      },
+      {
+        "file": "frontends/react/src/main.jsx",
+        "nonblank_lines": 8,
+        "bytes": 208
+      }
+    ],
+    "nonblank_lines": 196,
+    "bytes": 7005
+  },
+  "vue_application": {
+    "files": [
+      {
+        "file": "frontends/vue/src/App.vue",
+        "nonblank_lines": 231,
+        "bytes": 6553
+      },
+      {
+        "file": "frontends/vue/src/main.js",
+        "nonblank_lines": 3,
+        "bytes": 90
+      }
+    ],
+    "nonblank_lines": 234,
+    "bytes": 6643
+  },
+  "pages_recipe": {
+    "files": [
+      {
+        "file": "frontends/pages/recipe.py",
+        "nonblank_lines": 84,
+        "bytes": 3763
+      }
+    ],
+    "nonblank_lines": 84,
+    "bytes": 3763
+  },
+  "pages_client": {
+    "files": [
+      {
+        "file": "frontends/pages/app.js",
+        "nonblank_lines": 160,
+        "bytes": 6351
+      }
+    ],
+    "nonblank_lines": 160,
+    "bytes": 6351
+  },
+  "pages_host_adapter": {
+    "files": [
+      {
+        "file": "backend/pages_host.py",
+        "nonblank_lines": 67,
+        "bytes": 3321
+      }
+    ],
+    "nonblank_lines": 67,
+    "bytes": 3321
+  },
+  "pages_browser_adapter": {
+    "files": [
+      {
+        "file": "frontends/pages/module.js",
+        "nonblank_lines": 11,
+        "bytes": 504
+      }
+    ],
+    "nonblank_lines": 11,
+    "bytes": 504
+  },
+  "shared_backend": {
+    "files": [
+      {
+        "file": "backend/app.py",
+        "nonblank_lines": 80,
+        "bytes": 4033
+      }
+    ],
+    "nonblank_lines": 80,
+    "bytes": 4033
+  },
+  "shared_style": {
+    "files": [
+      {
+        "file": "shared/style.css",
+        "nonblank_lines": 25,
+        "bytes": 1696
+      }
+    ],
+    "nonblank_lines": 25,
+    "bytes": 1696
+  },
+  "react_setup": {
+    "files": [
+      {
+        "file": "frontends/react/index.html",
+        "nonblank_lines": 13,
+        "bytes": 360
+      },
+      {
+        "file": "frontends/react/vite.config.js",
+        "nonblank_lines": 12,
+        "bytes": 270
+      },
+      {
+        "file": "frontends/react/package.json",
+        "nonblank_lines": 19,
+        "bytes": 351
+      }
+    ],
+    "nonblank_lines": 44,
+    "bytes": 981
+  },
+  "vue_setup": {
+    "files": [
+      {
+        "file": "frontends/vue/index.html",
+        "nonblank_lines": 13,
+        "bytes": 356
+      },
+      {
+        "file": "frontends/vue/vite.config.js",
+        "nonblank_lines": 12,
+        "bytes": 262
+      },
+      {
+        "file": "frontends/vue/package.json",
+        "nonblank_lines": 18,
+        "bytes": 318
+      }
+    ],
+    "nonblank_lines": 43,
+    "bytes": 936
+  },
+  "pages_setup": {
+    "files": [
+      {
+        "file": "frontends/pages/index.html",
+        "nonblank_lines": 15,
+        "bytes": 492
+      }
+    ],
+    "nonblank_lines": 15,
+    "bytes": 492
+  }
+}

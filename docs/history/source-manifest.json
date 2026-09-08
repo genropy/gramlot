@@ -1,0 +1,662 @@
+[
+  {
+    "path": "docs/context/conversations.md",
+    "origin": "current conversation synthesis",
+    "sha256": "f40cb39136077657ff33aa04573baf120a0e598cdf62530d9c1f1ee270ec0f79",
+    "bytes": 19973
+  },
+  {
+    "path": "docs/context/open-work.md",
+    "origin": "current conversation synthesis",
+    "sha256": "e9d6a346c57b9f80fff7cb476c050ee985bb3b727f02b2c0b7961ff490444c0c",
+    "bytes": 6502
+  },
+  {
+    "path": "docs/context/README.md",
+    "origin": "current conversation synthesis",
+    "sha256": "ef0f25872b868c31a7de6909cf580c7c7d4ec9be8a4b05cd7724b4ba286eba9b",
+    "bytes": 5258
+  },
+  {
+    "path": "docs/context/first-version.md",
+    "origin": "current conversation synthesis",
+    "sha256": "641ac86b968475551cc734ddc21a695945bd6c49e3bc00e24279a11696994f0c",
+    "bytes": 3236
+  },
+  {
+    "path": "docs/context/decisions.md",
+    "origin": "current conversation synthesis",
+    "sha256": "fa37e9ec2c3969ed23a29cfc6620c61e5cb78c4dc38a582035eb6ed3cd15273b",
+    "bytes": 11885
+  },
+  {
+    "path": "docs/history/genro-pages/workflows/done/page-owned-runtime/notes.md",
+    "origin": "genro-pages:.phased/done/page-owned-runtime/notes.md",
+    "sha256": "39c5545133d221458c67c192ed367814dce79e7e4a841fa9ae97a92b134aaeb1",
+    "bytes": 5737
+  },
+  {
+    "path": "docs/history/genro-pages/workflows/done/page-owned-runtime/plan.md",
+    "origin": "genro-pages:.phased/done/page-owned-runtime/plan.md",
+    "sha256": "df11ca94ea662a0a67f343aba1d1960de61e3cd86cee913d823aeda8cf061258",
+    "bytes": 8853
+  },
+  {
+    "path": "docs/history/genro-pages/workflows/done/python-page-bootstrap/notes.md",
+    "origin": "genro-pages:.phased/done/python-page-bootstrap/notes.md",
+    "sha256": "e84cdedbe65ad3c61d5bf7a3c17e9401f4766245e1db79981db5d3b0e86add6f",
+    "bytes": 7176
+  },
+  {
+    "path": "docs/history/genro-pages/workflows/done/python-page-bootstrap/plan.md",
+    "origin": "genro-pages:.phased/done/python-page-bootstrap/plan.md",
+    "sha256": "ba21e37365f29a656e09dae670f302d399ad27be65092aa2ba0fef69c0848460",
+    "bytes": 8757
+  },
+  {
+    "path": "docs/history/genro-pages/workflows/done/registered-page-startup/notes.md",
+    "origin": "genro-pages:.phased/done/registered-page-startup/notes.md",
+    "sha256": "4fdaeae3d23b7a4be2379d65b4f19081b4eb319e0c5b9d3e3fce8add2f53de4f",
+    "bytes": 20959
+  },
+  {
+    "path": "docs/history/genro-pages/workflows/done/registered-page-startup/plan.md",
+    "origin": "genro-pages:.phased/done/registered-page-startup/plan.md",
+    "sha256": "231c18dbd3632fcd7b8ab4dcd0c779d3f8e425d1ce191165637e21154286ef16",
+    "bytes": 11727
+  },
+  {
+    "path": "docs/history/genro-pages/workflows/done/runtime-contract/notes.md",
+    "origin": "genro-pages:.phased/done/runtime-contract/notes.md",
+    "sha256": "07e8d1b88428b4903ad5dfe695297d153f6ba210277127dee5e0f64520b4c3e6",
+    "bytes": 8934
+  },
+  {
+    "path": "docs/history/genro-pages/workflows/done/runtime-contract/plan.md",
+    "origin": "genro-pages:.phased/done/runtime-contract/plan.md",
+    "sha256": "32d14ea27ed8307e3b9fb06bf99af72d37fe96cdc316966c25ce055c71262763",
+    "bytes": 6347
+  },
+  {
+    "path": "docs/history/genro-pages/workflows/roadmap.md",
+    "origin": "genro-pages:.phased/roadmap.md",
+    "sha256": "79df817d30fee1bb579950c2745f3ee8e0982d61c2975ebd1f7e7a8f601304f7",
+    "bytes": 13513
+  },
+  {
+    "path": "docs/history/genro-pages/LICENSE",
+    "origin": "genro-pages:LICENSE",
+    "sha256": "01e785bc0e773a3a94fa2c410ad4196f6ae450d9916922cb78376e18e55ec394",
+    "bytes": 1084
+  },
+  {
+    "path": "docs/history/genro-pages/NOTICE",
+    "origin": "genro-pages:NOTICE",
+    "sha256": "05eaf0c3e8e8e4bfd48c93105113dc077a3a8241cf407012ccdcb3c3f41c6df0",
+    "bytes": 241
+  },
+  {
+    "path": "docs/history/genro-pages/README.md",
+    "origin": "genro-pages:README.md",
+    "sha256": "bd0f90d23f84921fd76c51121184ab42ec4d417786ebf0550436d7a98ed361db",
+    "bytes": 9383
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/configuration.md",
+    "origin": "genro-pages:docs/architecture/configuration.md",
+    "sha256": "ca2d770ced3ebf23e1b0714a3677453c0f950a14f32637af28805a57082fc943",
+    "bytes": 7134
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/decisions.md",
+    "origin": "genro-pages:docs/architecture/decisions.md",
+    "sha256": "e3e6095e1b0639b1fbd822c65d66968905019369ea208e82db3982562681a6fd",
+    "bytes": 5272
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/handoff.md",
+    "origin": "genro-pages:docs/architecture/handoff.md",
+    "sha256": "40408b1ec69ac0aab22c682720a3522039a4d9fa73385dbf33d68e7acab0ff94",
+    "bytes": 8090
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/index.md",
+    "origin": "genro-pages:docs/architecture/index.md",
+    "sha256": "4a40d9c573d6f9cd4eca8e1eb934f942cf70ad2dcb838621f4a271f0c89115ea",
+    "bytes": 1800
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/legacy-lifecycle-audit.md",
+    "origin": "genro-pages:docs/architecture/legacy-lifecycle-audit.md",
+    "sha256": "ca3908d53547f5d90375dcccb957b9a36e7b6f1dae80f3437e00214a45b3ee7c",
+    "bytes": 9675
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/legacy-reference.md",
+    "origin": "genro-pages:docs/architecture/legacy-reference.md",
+    "sha256": "1c237aeff75582a4b7617f91650cf236b48c869878a79616971e5505a5b7363b",
+    "bytes": 16027
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/poc-inventory.md",
+    "origin": "genro-pages:docs/architecture/poc-inventory.md",
+    "sha256": "8194123a778aec51442c223c358499552590a6957462a4f5e7bb855b8d1e522a",
+    "bytes": 8651
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/runtime-contract.json",
+    "origin": "genro-pages:docs/architecture/runtime-contract.json",
+    "sha256": "fbcffcf0d655059ed6da5c8216cfc0701b23255ca6bc7ccb5357a53e855995d0",
+    "bytes": 24545
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/runtime-legacy-contract.md",
+    "origin": "genro-pages:docs/architecture/runtime-legacy-contract.md",
+    "sha256": "b0d04da205fde7b0a3945f520bfbb77034d9d76a8c32e85a52ce6cc2382c986e",
+    "bytes": 9503
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/runtime-reorganization-plan.md",
+    "origin": "genro-pages:docs/architecture/runtime-reorganization-plan.md",
+    "sha256": "653e5d1cd0e9173b4f33893100cf7f1325747ebcc7381d108a805e5aa1133f14",
+    "bytes": 9912
+  },
+  {
+    "path": "docs/history/genro-pages/docs/architecture/server-gui.md",
+    "origin": "genro-pages:docs/architecture/server-gui.md",
+    "sha256": "e8d9d35d0dd66a7f2e6691bc1aa17b297d0f90efe15be09c4066326294b83fe1",
+    "bytes": 4397
+  },
+  {
+    "path": "docs/history/genro-pages/docs/collaborator-preview.md",
+    "origin": "genro-pages:docs/collaborator-preview.md",
+    "sha256": "dc5ef8f3da4d3a7fc97ee2c82e2271f7272d3a4d337b666c01538b0a29d0f157",
+    "bytes": 3477
+  },
+  {
+    "path": "docs/history/genro-pages/docs/dependency-consolidation.md",
+    "origin": "genro-pages:docs/dependency-consolidation.md",
+    "sha256": "e2a3040089d8e55b1a79992c3047e407ca88dad4e259c1929c61a2813b6dbdbd",
+    "bytes": 19003
+  },
+  {
+    "path": "docs/history/genro-pages/docs/development-checkout.md",
+    "origin": "genro-pages:docs/development-checkout.md",
+    "sha256": "1547c9276b638d051ba7d78c824e3106060358b1e79c33f7c9d3d21cc467df9f",
+    "bytes": 10720
+  },
+  {
+    "path": "docs/history/genro-pages/docs/gui-2.0-guide.md",
+    "origin": "genro-pages:docs/gui-2.0-guide.md",
+    "sha256": "4d69295d85be6c79e8bd531c8641351663473496361d14f6682caed175deff7c",
+    "bytes": 27725
+  },
+  {
+    "path": "docs/history/genro-pages/docs/hello-world.md",
+    "origin": "genro-pages:docs/hello-world.md",
+    "sha256": "c8fd82337b05f3e9cf262e2ea394b8f203ab20f6e74a21630bdf42595fc4c92d",
+    "bytes": 11623
+  },
+  {
+    "path": "docs/history/genro-pages/docs/index.md",
+    "origin": "genro-pages:docs/index.md",
+    "sha256": "0e681b0a48462020790c661387bbe7e4e317e36d2147910c891521f465482b95",
+    "bytes": 413
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/01-architecture.md",
+    "origin": "genro-pages:docs/manual/01-architecture.md",
+    "sha256": "9d15a6cc9eb90ba34c3957c3c99ddfc8001c6d28a2a9a499e9ffefb48b9e9012",
+    "bytes": 9185
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/02-source-atlas.md",
+    "origin": "genro-pages:docs/manual/02-source-atlas.md",
+    "sha256": "df8b1aced3a108f94b1e9035054584e7cf444da65bdb9f09d919016158ca55ca",
+    "bytes": 18074
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/03-runtime.md",
+    "origin": "genro-pages:docs/manual/03-runtime.md",
+    "sha256": "064c19d4a9696efa2f9237c2686a2cd7d7bb0c491ad7326063a18563d3b7e01c",
+    "bytes": 30034
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/04-maintenance.md",
+    "origin": "genro-pages:docs/manual/04-maintenance.md",
+    "sha256": "03e349c7d8641d14c789af77849e5ef3691959e81f90da8fac7d65a9124f9c16",
+    "bytes": 20802
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/05-proposal.md",
+    "origin": "genro-pages:docs/manual/05-proposal.md",
+    "sha256": "0c64c6161a8c9323f7117bd7fa79b7dfb3b295c065e2d2c7c57e8f61ed1106ec",
+    "bytes": 28372
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/06-reference.md",
+    "origin": "genro-pages:docs/manual/06-reference.md",
+    "sha256": "f5f7097ec8101de0a795ef0ac024901647e188be8e58dab35e02638c9ceade75",
+    "bytes": 14410
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/07-concurrent-work.md",
+    "origin": "genro-pages:docs/manual/07-concurrent-work.md",
+    "sha256": "0c2062e01024831320378a251e4ea5dec482e3b1e4a7b957cdd7ab4cd87cd610",
+    "bytes": 7946
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/README.md",
+    "origin": "genro-pages:docs/manual/README.md",
+    "sha256": "6f848522dc6d1227f83e002a611740af06b6807e730c31c8c6ef307b19d56c57",
+    "bytes": 5621
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/closing-state.json",
+    "origin": "genro-pages:docs/manual/closing-state.json",
+    "sha256": "b87cbabc04c021c7fe0976a9dd96ec721e822ecf74b621a4166aa3405ea78d73",
+    "bytes": 24702
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/01-architecture-1.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/01-architecture-1.mmd",
+    "sha256": "53e355505c9b99e7630a4303163bd8e28b1047e9d55f190f8d854e1921ea3483",
+    "bytes": 501
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/01-architecture-1.svg",
+    "origin": "genro-pages:docs/manual/diagrams/01-architecture-1.svg",
+    "sha256": "c3727877901d58f63a9b0aeaaa66b1a78330c346697b7af522e25285ed542f96",
+    "bytes": 20991
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/01-architecture-2.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/01-architecture-2.mmd",
+    "sha256": "edbbb3132edced2a6e6c173f2d2bc09f27b17567a3c68a298b008e27c16a7fb1",
+    "bytes": 384
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/01-architecture-2.svg",
+    "origin": "genro-pages:docs/manual/diagrams/01-architecture-2.svg",
+    "sha256": "d03d1f05152ba695ce4c4f972c81ede74a42bf5c80e8fc1800083383bd8ec1e3",
+    "bytes": 23803
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-1.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-1.mmd",
+    "sha256": "0ed35c4b6b659a0bc588126d54e23119748a19cd0675340d6d8d7ca65255efc7",
+    "bytes": 368
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-1.svg",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-1.svg",
+    "sha256": "e897e9709baf0b5768ae032953926ba675c47106318ac2887ac9b4ffa20b7b42",
+    "bytes": 17787
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-2.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-2.mmd",
+    "sha256": "c35d304ea3d974b553bde68eda7234e7a8b037ba6a068033d0dc574695ddcbba",
+    "bytes": 855
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-2.svg",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-2.svg",
+    "sha256": "7267d8127991266fd71f9509108897e274ab824835879e0a505f9afcbff8a29c",
+    "bytes": 28245
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-3.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-3.mmd",
+    "sha256": "8afec9add87d1cbfab1d772b2380863ae5ea1c0b57e4a1998786e71f14f3d0d0",
+    "bytes": 394
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-3.svg",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-3.svg",
+    "sha256": "a7666ebd27d4b940d1b9e789bf412b12af2dd99ba6ab3b345b2b25e42830cb79",
+    "bytes": 18270
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-4.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-4.mmd",
+    "sha256": "07e9ade73f97ba0567c1589e0e7424fba41fcb0b4701038aa3caae03b4bbea2f",
+    "bytes": 411
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-4.svg",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-4.svg",
+    "sha256": "27d20da0e92ad8b4f6c0380d186b98f1e10287e36cd42bf9f96d0469306cf157",
+    "bytes": 18288
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-5.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-5.mmd",
+    "sha256": "7f6fab972acdc5c6102a408060cab166866218ef173844955c1d942e8af3a3ff",
+    "bytes": 556
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-5.svg",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-5.svg",
+    "sha256": "8f6f7a22884f5682480af66e7b29ed08f721602a3a31d5bf3c70291b4ad6fd85",
+    "bytes": 26032
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-6.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-6.mmd",
+    "sha256": "71c15d53e8a6b9906204946e505cf37314d59e1f414558e0785f883ae6ba91a6",
+    "bytes": 400
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-6.svg",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-6.svg",
+    "sha256": "ae958c0ba12584e8372d2adcc6d85dae566490e586a1a211e203e22453ab4518",
+    "bytes": 16286
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-7.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-7.mmd",
+    "sha256": "df35004e833dd489c6f973f15190813615b8b5032d43535ba8c7c48de4d8e84f",
+    "bytes": 469
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/03-runtime-7.svg",
+    "origin": "genro-pages:docs/manual/diagrams/03-runtime-7.svg",
+    "sha256": "482ea84f3616e5a3aabd38e1baa5d9b39d11d526dc6d83aaf41855cd56a62bee",
+    "bytes": 19812
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/05-proposal-1.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/05-proposal-1.mmd",
+    "sha256": "604b6096a2c9bfebded12edf7c811dd8c1f34b28e53517ec01140a47b3c4a3ca",
+    "bytes": 412
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/05-proposal-1.svg",
+    "origin": "genro-pages:docs/manual/diagrams/05-proposal-1.svg",
+    "sha256": "d013907a5b49d52407d6ca358c78288db632a44d88bdb9d631c11dd016a7ce59",
+    "bytes": 21500
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/05-proposal-2.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/05-proposal-2.mmd",
+    "sha256": "71adcd67789b8a8cdc0c524f7fe27db29ea38ef4e0c71d8257d75beface4d3bc",
+    "bytes": 681
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/05-proposal-2.svg",
+    "origin": "genro-pages:docs/manual/diagrams/05-proposal-2.svg",
+    "sha256": "27e92b2954c9f97d4098b6c4cfe567676c0614a0024efe1ae584da6bbc7d7a8f",
+    "bytes": 20558
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/05-proposal-3.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/05-proposal-3.mmd",
+    "sha256": "fb7a61563a849f1422f9da6ebcbfe6101769cb5bff3b70b56a56c5ff54fb62c8",
+    "bytes": 661
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/05-proposal-3.svg",
+    "origin": "genro-pages:docs/manual/diagrams/05-proposal-3.svg",
+    "sha256": "cc2ce4cf2c7fd0c855077f93dd87e87c4fc0ffddcc8c839e805698c6725cd9e0",
+    "bytes": 24821
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/05-proposal-4.mmd",
+    "origin": "genro-pages:docs/manual/diagrams/05-proposal-4.mmd",
+    "sha256": "58b9da662cb22906c658546b1e3f776c9f9b22a537c42d1fdd7f75bad88e092a",
+    "bytes": 417
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/05-proposal-4.svg",
+    "origin": "genro-pages:docs/manual/diagrams/05-proposal-4.svg",
+    "sha256": "1e84ce2b150ba63e97c1e5528e153c046cfe36dfc8a126ef2c2809fcf9d3dbee",
+    "bytes": 16415
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/README.md",
+    "origin": "genro-pages:docs/manual/diagrams/README.md",
+    "sha256": "babc386134dc077d1c20760024aa10651188f26afbb1cbd9b20dd7e7f9d34603",
+    "bytes": 2215
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/repository-separated.svg",
+    "origin": "genro-pages:docs/manual/diagrams/repository-separated.svg",
+    "sha256": "4624e583f4b2fd18865707a98faf99f43fa362f61314a6be13361b31861eb7f2",
+    "bytes": 3370
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/diagrams/repository-unified.svg",
+    "origin": "genro-pages:docs/manual/diagrams/repository-unified.svg",
+    "sha256": "3b99a212615f1fb9d3db82b1f7697edbc2a4a64e6d42dccd481eb02a6b0cdca3",
+    "bytes": 3775
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/observed-state.json",
+    "origin": "genro-pages:docs/manual/observed-state.json",
+    "sha256": "8c2d065cc6b27f8c0fe5aac0e7d466851aac9685c82bb33471b90b764019747d",
+    "bytes": 23007
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/repository-maps.md",
+    "origin": "genro-pages:docs/manual/repository-maps.md",
+    "sha256": "b2e4ec5cc13aaf5e8bd991355b686f38237086834f7096480eeae20c88d4bcd2",
+    "bytes": 5892
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/source-symbol-index.md",
+    "origin": "genro-pages:docs/manual/source-symbol-index.md",
+    "sha256": "6225b3816cf95752abcace1c2b73aa2265809465ccf76ab8eae749f8376638e2",
+    "bytes": 39632
+  },
+  {
+    "path": "docs/history/genro-pages/docs/manual/verification.md",
+    "origin": "genro-pages:docs/manual/verification.md",
+    "sha256": "04643046dd79df3cac07abdf04dbd2a2b36693087f50bd8df526f70448b5282b",
+    "bytes": 6384
+  },
+  {
+    "path": "docs/history/genro-dom-js/LICENSE",
+    "origin": "genro-dom-js:LICENSE",
+    "sha256": "7f0f022815d9ffe57a2b9a717d49893f77bfed052f16af179dcb99dbbb6f6ab8",
+    "bytes": 10177
+  },
+  {
+    "path": "docs/history/genro-dom-js/NOTICE",
+    "origin": "genro-dom-js:NOTICE",
+    "sha256": "2bf589e99e645b61a9a933750be6adb0de4c9c6e7ce90cb506167ade547455a3",
+    "bytes": 182
+  },
+  {
+    "path": "docs/history/genro-dom-js/README.md",
+    "origin": "genro-dom-js:README.md",
+    "sha256": "5d896ef3bbc6a2458f8dbbd558800a9439d74b7555d0a6c27ee375bed129779c",
+    "bytes": 14279
+  },
+  {
+    "path": "docs/history/genro-dom-js/docs/architecture.md",
+    "origin": "genro-dom-js:docs/architecture.md",
+    "sha256": "c421774c0e3874314d5fa635b10b5a4c688ad17a76469e56ed2a01fb0b014cb4",
+    "bytes": 5849
+  },
+  {
+    "path": "docs/history/genro-dom-js/docs/components.md",
+    "origin": "genro-dom-js:docs/components.md",
+    "sha256": "900bdbd8b031cd573bc2d6b9358d3cc14bde8514cfcb6cccc75dc70aff6f18d7",
+    "bytes": 3407
+  },
+  {
+    "path": "docs/history/genro-dom-js/docs/concepts.md",
+    "origin": "genro-dom-js:docs/concepts.md",
+    "sha256": "a5fbd690e05e4b2a8f1cfacecc20605d461138a37cb48d45c41137566d3b8627",
+    "bytes": 3424
+  },
+  {
+    "path": "docs/history/genro-dom-js/docs/for-react-developers.md",
+    "origin": "genro-dom-js:docs/for-react-developers.md",
+    "sha256": "4010a79aa25238d8117e5e88c8cf16f5657cfec8573389a2ba0bfc685f6c5ef7",
+    "bytes": 6377
+  },
+  {
+    "path": "docs/history/genro-dom-js/docs/for-vue-developers.md",
+    "origin": "genro-dom-js:docs/for-vue-developers.md",
+    "sha256": "4d8705d9c88f603a1789b8adecf30cddf726f5d688489c5d02467a54e6f7685f",
+    "bytes": 6871
+  },
+  {
+    "path": "docs/history/genro-dom-js/docs/grammar.md",
+    "origin": "genro-dom-js:docs/grammar.md",
+    "sha256": "c7073a1615e0b9113c689315653a2fe1fe26f2a526840218661d8005c9308d2c",
+    "bytes": 3620
+  },
+  {
+    "path": "docs/history/genro-dom-js/docs/index.md",
+    "origin": "genro-dom-js:docs/index.md",
+    "sha256": "150b563695867d9d375817bd329a8620956d79fdf4bd29b3251ba278595d0b74",
+    "bytes": 1500
+  },
+  {
+    "path": "docs/history/genro-dom-js/docs/reactivity.md",
+    "origin": "genro-dom-js:docs/reactivity.md",
+    "sha256": "acadbd386069ee87b7e8943d516cf046749e6a7d173fe09e7d702219458a8a7e",
+    "bytes": 4938
+  },
+  {
+    "path": "docs/history/demo-rosetta/README.md",
+    "origin": "demo-rosetta:README.md",
+    "sha256": "869d6005ccccdc801b5bd527dc89a3ebed1fa88e5dd5e29b653ebf2a34af0fcb",
+    "bytes": 5428
+  },
+  {
+    "path": "docs/history/demo-rosetta/SPEC.md",
+    "origin": "demo-rosetta:SPEC.md",
+    "sha256": "d51853c1057a3dd43ffac402543de7cb3f21e4dd74ae77983dcba5b742145955",
+    "bytes": 9378
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/COMPARISON.md",
+    "origin": "demo-rosetta:docs/COMPARISON.md",
+    "sha256": "888f424f2c16389197c6a5394c7cd37caa62b5ba2d8205ca7bdc5f83f0f04250",
+    "bytes": 3628
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/EVOLUTION.md",
+    "origin": "demo-rosetta:docs/EVOLUTION.md",
+    "sha256": "782c975ee944cd2ffe23b992c754ccf6229d0373ee0d079f706b32c91f124ea9",
+    "bytes": 2963
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/STATUS.md",
+    "origin": "demo-rosetta:docs/STATUS.md",
+    "sha256": "6e0156dc18f4cd83b8f1314bae3866b8ef77d19ad80f9722da8a43bd8804f545",
+    "bytes": 2279
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/dependency-baseline.json",
+    "origin": "demo-rosetta:docs/dependency-baseline.json",
+    "sha256": "734233b54f09323bcc16486f93b0e43e23351d02ed3640be702c649de5680763",
+    "bytes": 1452
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/guida-installazione-it.md",
+    "origin": "demo-rosetta:docs/guida-installazione-it.md",
+    "sha256": "c1198c3a60a3a6a57be2fb3158129f4898dc5370b50b1ccd084fa87a6a25cf9c",
+    "bytes": 17698
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/history/comparison-a6ef3b8.md",
+    "origin": "demo-rosetta:docs/history/comparison-a6ef3b8.md",
+    "sha256": "3f6f6959dafd54f8d18d9e115bc6ee0800947d53e0932000fcb2061cf0624c0e",
+    "bytes": 6060
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/history/source-inventory-a6ef3b8.json",
+    "origin": "demo-rosetta:docs/history/source-inventory-a6ef3b8.json",
+    "sha256": "b9d0e9e75569ed4ba9d2e036aa04fe664cc12de830267deac5958a3c52614440",
+    "bytes": 2931
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/pages.md",
+    "origin": "demo-rosetta:docs/pages.md",
+    "sha256": "4b17570ea10e8bed896b9498defa7d3bba71cde8f3bce1a1eac4c21b733d154a",
+    "bytes": 1041
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/react.md",
+    "origin": "demo-rosetta:docs/react.md",
+    "sha256": "8ed301ab743a9a4de66ae3e42ddbe67772fca446b5363d8f927f63c440e1804a",
+    "bytes": 493
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/source-inventory.json",
+    "origin": "demo-rosetta:docs/source-inventory.json",
+    "sha256": "5c0d5887130b5a6d4c067389864abf863b1ab852b5b821f35b5ac5f167685a49",
+    "bytes": 12693
+  },
+  {
+    "path": "docs/history/demo-rosetta/docs/vue.md",
+    "origin": "demo-rosetta:docs/vue.md",
+    "sha256": "1f00f8a4ad7f24eedf19fab0a46322381b1ab73608c7258466b9b606602c65b0",
+    "bytes": 483
+  },
+  {
+    "path": "docs/history/genro-pages/notes/handoff-pages-dom-js-2026-09-08.md",
+    "origin": "untracked Pages draft:handoff-pages-dom-js-2026-09-08.md",
+    "sha256": "72c0bfe9339fbc7474111f39df3b3214ff316f095025fa5c74b2b06894c1f5bc",
+    "bytes": 17451
+  },
+  {
+    "path": "docs/history/genro-pages/notes/inspector-focusout-20260908.md",
+    "origin": "untracked Pages draft:inspector-focusout-20260908.md",
+    "sha256": "c77ff15ab36e5f907b0b535d8b38db1323e9ad8f8a64d59c96bf3923006b37be",
+    "bytes": 1332
+  },
+  {
+    "path": "docs/history/genro-pages/notes/labeled-box-validation-form-contract-proposal-20260908.md",
+    "origin": "untracked Pages draft:labeled-box-validation-form-contract-proposal-20260908.md",
+    "sha256": "2b8af52cb0ed75af55b81cd2f886a60304fb050f4b6f651e463c48e90ab82fee",
+    "bytes": 34605
+  },
+  {
+    "path": "docs/history/genro-pages/notes/labeled-box-validation-form-review-20260908.md",
+    "origin": "untracked Pages draft:labeled-box-validation-form-review-20260908.md",
+    "sha256": "afe2bc762f108435fd055a3aeeba958f7207b9b4521c5ba907f020776923c7b3",
+    "bytes": 14908
+  },
+  {
+    "path": "docs/history/genro-pages/notes/pages-builder-organic-review.md",
+    "origin": "untracked Pages draft:pages-builder-organic-review.md",
+    "sha256": "8ca108405a3dc816642cb46ab1720130a5c26ad1da9a7ea3f580e4ffdcb14457",
+    "bytes": 29622
+  },
+  {
+    "path": "docs/history/genro-pages/notes/pages-documentation-course-notes-20260908.md",
+    "origin": "untracked Pages draft:pages-documentation-course-notes-20260908.md",
+    "sha256": "69608e8c2f9fc0cb00b6a9638c11e5bc6651cd925beeb52dc60695559f69aa7f",
+    "bytes": 8176
+  },
+  {
+    "path": "docs/history/genro-pages/notes/pages-stack-boundary.md",
+    "origin": "untracked Pages draft:pages-stack-boundary.md",
+    "sha256": "aa1520a8a276b5929d304f16d532a226dd357f6085c60d13485a588ca12d6535",
+    "bytes": 8284
+  },
+  {
+    "path": "docs/history/genro-pages/notes/relocation-20260907.md",
+    "origin": "untracked Pages draft:relocation-20260907.md",
+    "sha256": "fd3059de7f68de012026079117d2519df5d85609716087d0f9f572b01a86a7c6",
+    "bytes": 2946
+  },
+  {
+    "path": "docs/history/genro-pages/notes/forms-20260908/implementation.md",
+    "origin": "untracked Pages implementation report:forms-20260908/implementation.md",
+    "sha256": "6a05dc563132cab601a3a6143d82c0c244352f28d284146d3ebe87c0e5646e90",
+    "bytes": 14939
+  },
+  {
+    "path": "docs/history/genro-pages/notes/forms-20260908/formlet.md",
+    "origin": "untracked Pages implementation report:forms-20260908/formlet.md",
+    "sha256": "a6ce3526e95882233e1046c201bacdd2d40e876bd377012938aee046431666a5",
+    "bytes": 3397
+  }
+]

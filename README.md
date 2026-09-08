@@ -9,3 +9,5 @@ Gramlot is a declarative web UI framework where interfaces are described in Pyth
 An independent project built on the experience and technology developed in Genro.
 
 https://gramlot.com
+
+[Project context and decisions](docs/context/README.md)

@@ -1,0 +1,15 @@
+sequenceDiagram
+  participant User
+  participant Button
+  participant App as Application
+  participant Runtime as RecipeRuntime
+  participant Data as Data Bag
+  participant Target as DomTarget
+  User->>Button: click
+  Button->>App: Delegated event
+  App->>App: Resolve command node and current disabled/hidden
+  App->>Runtime: run(node, action, event)
+  Runtime->>Runtime: runtimeValues, ordinary Function.call(node)
+  Runtime->>Data: this.SET path and value inside live
+  Data-->>App: Notify handler and queue readers
+  App->>Target: Flush render patches

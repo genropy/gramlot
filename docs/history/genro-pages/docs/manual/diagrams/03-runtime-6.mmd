@@ -1,0 +1,8 @@
+flowchart TD
+  Created[Created Application] -->|mountBuilder| Mounted[Mounting builder]
+  Mounted -->|create, render, subscribe| Active[Active runtime]
+  Active --> Changes[Live data and source batches]
+  Changes --> Active
+  Mounted -->|mount failure| Disposed[Disposed: repeated dispose is harmless]
+  Active -->|Application.dispose| Disposed
+  Disposed --> Retained[Caller host and Bags retained]

@@ -1,0 +1,12 @@
+flowchart TD
+  Repo[Proposed genro-gui repository] --> Py[packages/pages-python]
+  Repo --> DOM[packages/dom-js]
+  Repo --> JS[packages/pages-js]
+  Repo --> Adapters[adapters]
+  Repo --> Contracts[contracts and integration tests]
+  Repo --> Docs[docs and examples]
+  Repo --> Tools[tools and release manifest]
+  JS --> DOM
+  Adapters --> Py
+  Py --> Artifacts[Generated packaged resources]
+  Tools --> Artifacts

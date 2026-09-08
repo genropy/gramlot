@@ -1,0 +1,9 @@
+flowchart TD
+  Python[Python WebPage.main] --> Wire[TYTX recipe]
+  Wire --> Import[JS loadSource]
+  Import --> Copy[Copy into owned SourceBag]
+  JS[JS Builder.main] --> Native[Proxy grammar creates SourceBag]
+  Copy --> Create[Defaults and startup data logic]
+  Native --> Create
+  Create --> Render[Shared render and activation]
+  Render --> Reactive[Shared data and source mutation pipeline]

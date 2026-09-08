@@ -1,0 +1,10 @@
+flowchart TD
+  Dispose[PageApplication.dispose] --> RPC[Reject pending RPC and close socket]
+  Dispose --> App[Application.dispose]
+  App --> Listeners[Remove delegated listeners]
+  App --> Tools[Dispose inspector and playground]
+  App --> Topics[Unsubscribe topic handles]
+  App --> Handler[Handler and builder unsubscribe]
+  Handler --> Queues[Clear maps and queues]
+  App --> Remove[Remove owned DOM children]
+  Remove --> Widgets[Custom-element disconnect cleanup]

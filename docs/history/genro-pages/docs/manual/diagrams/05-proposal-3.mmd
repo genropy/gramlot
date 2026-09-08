@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant Client as GUI browser
+  participant Host as Host middleware/router
+  participant Adapter as GUI adapter
+  participant Service as Application service
+  Client->>Host: Optional typed action request
+  Host->>Host: Existing session/authentication
+  Host->>Adapter: Request with identity and public URL context
+  Adapter->>Adapter: Validate action, parameters and capability
+  Adapter->>Service: Authorized invocation with cancellation context
+  Service-->>Adapter: Typed result or domain error
+  Adapter-->>Host: Encoded result/status/correlation
+  Host-->>Client: Response
+  Client->>Client: Check operation generation and update Bag

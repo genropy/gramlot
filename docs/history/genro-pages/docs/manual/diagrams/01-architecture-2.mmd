@@ -1,0 +1,13 @@
+flowchart TD
+  P[Pages Python] --> B[Builders Python]
+  P --> BP[Bag Python]
+  P --> TP[TYTX Python]
+  P --> A[Genro ASGI 0.43.1]
+  P --> T[Toolbox and route infrastructure]
+  PJ[Pages JavaScript integration] --> D[DOM JS]
+  PJ --> TJ[TYTX JS]
+  D --> BJ[Bag JS]
+  D --> TJ
+  BJ --> TJ
+  TP -. typed wire contract .-> TJ
+  D -. renders without .-> Optional[Python or server services]

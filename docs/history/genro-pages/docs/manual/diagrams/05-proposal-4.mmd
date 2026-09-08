@@ -1,0 +1,8 @@
+flowchart TD
+  Audit[Freeze source and dependency evidence] --> Contracts[Lock observable contracts]
+  Contracts --> Portable[Extract portable document and recipe behavior]
+  Portable --> Hosts[Add optional host adapters]
+  Hosts --> Assets[Build reproducible assets and packages]
+  Assets --> Dual[Test old and new imports]
+  Dual --> Move[Move source after approval]
+  Move --> Release[Release and staged adoption]

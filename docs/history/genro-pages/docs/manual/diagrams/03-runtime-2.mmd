@@ -1,0 +1,21 @@
+sequenceDiagram
+  participant Browser
+  participant Host as WebpageApplication
+  participant Doc as PageDocument
+  participant Boot as bootstrap.js
+  participant RPC as RpcService
+  participant Builder as JS Builder
+  Browser->>Host: GET document with page selection
+  Host->>Host: Validate page and register identity if worker-backed
+  Host->>Doc: Create startup Bag and render HTML
+  Doc-->>Browser: Import map, startup script, empty root
+  Browser->>Boot: Load ESM entry
+  Boot->>RPC: Create PageApplication, openChannel if pageId
+  RPC-->>Boot: Channel ready
+  Boot->>RPC: remoteCall main endpoint
+  RPC->>Host: Typed request with page identity
+  Host->>Host: Fresh Python builder, page.main(source)
+  Host-->>RPC: TYTX SourceBag
+  RPC-->>Boot: Decoded source
+  Boot->>Builder: loadSource(source), then mountBuilder
+  Builder-->>Browser: Rendered DOM

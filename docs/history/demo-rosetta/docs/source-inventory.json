@@ -1,0 +1,624 @@
+{
+  "react_application": {
+    "files": [
+      {
+        "file": "frontends/react/src/App.jsx",
+        "nonblank_lines": 11,
+        "bytes": 359
+      }
+    ],
+    "nonblank_lines": 11,
+    "bytes": 359
+  },
+  "vue_application": {
+    "files": [
+      {
+        "file": "frontends/vue/src/App.vue",
+        "nonblank_lines": 6,
+        "bytes": 299
+      }
+    ],
+    "nonblank_lines": 6,
+    "bytes": 299
+  },
+  "pages_js_recipe": {
+    "files": [
+      {
+        "file": "frontends/pages-js/recipe.js",
+        "nonblank_lines": 4,
+        "bytes": 284
+      }
+    ],
+    "nonblank_lines": 4,
+    "bytes": 284
+  },
+  "pages_js_bootstrap": {
+    "files": [
+      {
+        "file": "frontends/pages-js/app.js",
+        "nonblank_lines": 35,
+        "bytes": 1592
+      }
+    ],
+    "nonblank_lines": 35,
+    "bytes": 1592
+  },
+  "shared_pages_builder": {
+    "files": [
+      {
+        "file": "frontends/pages-common/builder.js",
+        "nonblank_lines": 6,
+        "bytes": 310
+      }
+    ],
+    "nonblank_lines": 6,
+    "bytes": 310
+  },
+  "shared_pages_tools": {
+    "files": [
+      {
+        "file": "frontends/pages-common/tools.js",
+        "nonblank_lines": 37,
+        "bytes": 1533
+      }
+    ],
+    "nonblank_lines": 37,
+    "bytes": 1533
+  },
+  "shared_live_editor": {
+    "files": [
+      {
+        "file": "shared/editor/editor.js",
+        "nonblank_lines": 57,
+        "bytes": 2577
+      }
+    ],
+    "nonblank_lines": 57,
+    "bytes": 2577
+  },
+  "pages_recipe": {
+    "files": [
+      {
+        "file": "frontends/pages/recipe.py",
+        "nonblank_lines": 9,
+        "bytes": 507
+      }
+    ],
+    "nonblank_lines": 9,
+    "bytes": 507
+  },
+  "pages_bootstrap": {
+    "files": [
+      {
+        "file": "frontends/pages/app.js",
+        "nonblank_lines": 22,
+        "bytes": 974
+      }
+    ],
+    "nonblank_lines": 22,
+    "bytes": 974
+  },
+  "pages_host_adapter": {
+    "files": [
+      {
+        "file": "backend/pages_host.py",
+        "nonblank_lines": 117,
+        "bytes": 6448
+      }
+    ],
+    "nonblank_lines": 117,
+    "bytes": 6448
+  },
+  "pages_browser_adapter": {
+    "files": [
+      {
+        "file": "frontends/pages/module.js",
+        "nonblank_lines": 11,
+        "bytes": 504
+      }
+    ],
+    "nonblank_lines": 11,
+    "bytes": 504
+  },
+  "shared_backend": {
+    "files": [
+      {
+        "file": "backend/app.py",
+        "nonblank_lines": 66,
+        "bytes": 3813
+      }
+    ],
+    "nonblank_lines": 66,
+    "bytes": 3813
+  },
+  "shared_frame": {
+    "files": [
+      {
+        "file": "backend/templates/frame.html",
+        "nonblank_lines": 42,
+        "bytes": 1551
+      },
+      {
+        "file": "shared/frame.css",
+        "nonblank_lines": 16,
+        "bytes": 1387
+      }
+    ],
+    "nonblank_lines": 58,
+    "bytes": 2938
+  },
+  "shared_style": {
+    "files": [
+      {
+        "file": "shared/style.css",
+        "nonblank_lines": 12,
+        "bytes": 591
+      },
+      {
+        "file": "shared/example.css",
+        "nonblank_lines": 46,
+        "bytes": 3146
+      }
+    ],
+    "nonblank_lines": 58,
+    "bytes": 3737
+  },
+  "shared_source_viewer": {
+    "files": [
+      {
+        "file": "backend/source_browser.py",
+        "nonblank_lines": 112,
+        "bytes": 6163
+      },
+      {
+        "file": "backend/templates/sources.html",
+        "nonblank_lines": 23,
+        "bytes": 814
+      },
+      {
+        "file": "shared/sources.css",
+        "nonblank_lines": 10,
+        "bytes": 732
+      }
+    ],
+    "nonblank_lines": 145,
+    "bytes": 7709
+  },
+  "react_setup": {
+    "files": [
+      {
+        "file": "frontends/react/src/main.jsx",
+        "nonblank_lines": 29,
+        "bytes": 1054
+      },
+      {
+        "file": "frontends/react/index.html",
+        "nonblank_lines": 13,
+        "bytes": 364
+      },
+      {
+        "file": "frontends/react/vite.config.js",
+        "nonblank_lines": 11,
+        "bytes": 240
+      },
+      {
+        "file": "frontends/react/package.json",
+        "nonblank_lines": 19,
+        "bytes": 351
+      }
+    ],
+    "nonblank_lines": 72,
+    "bytes": 2009
+  },
+  "vue_setup": {
+    "files": [
+      {
+        "file": "frontends/vue/src/main.js",
+        "nonblank_lines": 24,
+        "bytes": 936
+      },
+      {
+        "file": "frontends/vue/index.html",
+        "nonblank_lines": 13,
+        "bytes": 360
+      },
+      {
+        "file": "frontends/vue/vite.config.js",
+        "nonblank_lines": 11,
+        "bytes": 232
+      },
+      {
+        "file": "frontends/vue/package.json",
+        "nonblank_lines": 18,
+        "bytes": 318
+      }
+    ],
+    "nonblank_lines": 66,
+    "bytes": 1846
+  },
+  "pages_setup": {
+    "files": [
+      {
+        "file": "frontends/pages/index.html",
+        "nonblank_lines": 15,
+        "bytes": 493
+      }
+    ],
+    "nonblank_lines": 15,
+    "bytes": 493
+  },
+  "react_background-color_page": {
+    "files": [
+      {
+        "file": "frontends/react/src/examples/background-color.jsx",
+        "nonblank_lines": 23,
+        "bytes": 1226
+      }
+    ],
+    "nonblank_lines": 23,
+    "bytes": 1226
+  },
+  "react_editable-text_page": {
+    "files": [
+      {
+        "file": "frontends/react/src/examples/editable-text.jsx",
+        "nonblank_lines": 17,
+        "bytes": 652
+      }
+    ],
+    "nonblank_lines": 17,
+    "bytes": 652
+  },
+  "react_font-family_page": {
+    "files": [
+      {
+        "file": "frontends/react/src/examples/font-family.jsx",
+        "nonblank_lines": 33,
+        "bytes": 1881
+      }
+    ],
+    "nonblank_lines": 33,
+    "bytes": 1881
+  },
+  "react_font-size_page": {
+    "files": [
+      {
+        "file": "frontends/react/src/examples/font-size.jsx",
+        "nonblank_lines": 26,
+        "bytes": 1471
+      }
+    ],
+    "nonblank_lines": 26,
+    "bytes": 1471
+  },
+  "react_font-style_page": {
+    "files": [
+      {
+        "file": "frontends/react/src/examples/font-style.jsx",
+        "nonblank_lines": 37,
+        "bytes": 2316
+      }
+    ],
+    "nonblank_lines": 37,
+    "bytes": 2316
+  },
+  "react_local-scope_page": {
+    "files": [
+      {
+        "file": "frontends/react/src/examples/local-scope.jsx",
+        "nonblank_lines": 35,
+        "bytes": 2411
+      }
+    ],
+    "nonblank_lines": 35,
+    "bytes": 2411
+  },
+  "react_repeated-panels_page": {
+    "files": [
+      {
+        "file": "frontends/react/src/examples/repeated-panels.jsx",
+        "nonblank_lines": 50,
+        "bytes": 3227
+      }
+    ],
+    "nonblank_lines": 50,
+    "bytes": 3227
+  },
+  "react_text-color_page": {
+    "files": [
+      {
+        "file": "frontends/react/src/examples/text-color.jsx",
+        "nonblank_lines": 20,
+        "bytes": 908
+      }
+    ],
+    "nonblank_lines": 20,
+    "bytes": 908
+  },
+  "vue_background-color_page": {
+    "files": [
+      {
+        "file": "frontends/vue/src/examples/background-color.vue",
+        "nonblank_lines": 21,
+        "bytes": 962
+      }
+    ],
+    "nonblank_lines": 21,
+    "bytes": 962
+  },
+  "vue_editable-text_page": {
+    "files": [
+      {
+        "file": "frontends/vue/src/examples/editable-text.vue",
+        "nonblank_lines": 15,
+        "bytes": 492
+      }
+    ],
+    "nonblank_lines": 15,
+    "bytes": 492
+  },
+  "vue_font-family_page": {
+    "files": [
+      {
+        "file": "frontends/vue/src/examples/font-family.vue",
+        "nonblank_lines": 31,
+        "bytes": 1493
+      }
+    ],
+    "nonblank_lines": 31,
+    "bytes": 1493
+  },
+  "vue_font-size_page": {
+    "files": [
+      {
+        "file": "frontends/vue/src/examples/font-size.vue",
+        "nonblank_lines": 24,
+        "bytes": 1191
+      }
+    ],
+    "nonblank_lines": 24,
+    "bytes": 1191
+  },
+  "vue_font-style_page": {
+    "files": [
+      {
+        "file": "frontends/vue/src/examples/font-style.vue",
+        "nonblank_lines": 35,
+        "bytes": 1773
+      }
+    ],
+    "nonblank_lines": 35,
+    "bytes": 1773
+  },
+  "vue_local-scope_page": {
+    "files": [
+      {
+        "file": "frontends/vue/src/examples/local-scope.vue",
+        "nonblank_lines": 33,
+        "bytes": 1895
+      }
+    ],
+    "nonblank_lines": 33,
+    "bytes": 1895
+  },
+  "vue_repeated-panel_page": {
+    "files": [
+      {
+        "file": "frontends/vue/src/examples/repeated-panel.vue",
+        "nonblank_lines": 34,
+        "bytes": 1933
+      }
+    ],
+    "nonblank_lines": 34,
+    "bytes": 1933
+  },
+  "vue_repeated-panels_page": {
+    "files": [
+      {
+        "file": "frontends/vue/src/examples/repeated-panels.vue",
+        "nonblank_lines": 16,
+        "bytes": 761
+      }
+    ],
+    "nonblank_lines": 16,
+    "bytes": 761
+  },
+  "vue_text-color_page": {
+    "files": [
+      {
+        "file": "frontends/vue/src/examples/text-color.vue",
+        "nonblank_lines": 18,
+        "bytes": 704
+      }
+    ],
+    "nonblank_lines": 18,
+    "bytes": 704
+  },
+  "pages_background-color_page": {
+    "files": [
+      {
+        "file": "frontends/pages/examples/background-color.py",
+        "nonblank_lines": 13,
+        "bytes": 887
+      }
+    ],
+    "nonblank_lines": 13,
+    "bytes": 887
+  },
+  "pages_editable-text_page": {
+    "files": [
+      {
+        "file": "frontends/pages/examples/editable-text.py",
+        "nonblank_lines": 11,
+        "bytes": 629
+      }
+    ],
+    "nonblank_lines": 11,
+    "bytes": 629
+  },
+  "pages_font-family_page": {
+    "files": [
+      {
+        "file": "frontends/pages/examples/font-family.py",
+        "nonblank_lines": 17,
+        "bytes": 1319
+      }
+    ],
+    "nonblank_lines": 17,
+    "bytes": 1319
+  },
+  "pages_font-size_page": {
+    "files": [
+      {
+        "file": "frontends/pages/examples/font-size.py",
+        "nonblank_lines": 16,
+        "bytes": 1155
+      }
+    ],
+    "nonblank_lines": 16,
+    "bytes": 1155
+  },
+  "pages_font-style_page": {
+    "files": [
+      {
+        "file": "frontends/pages/examples/font-style.py",
+        "nonblank_lines": 21,
+        "bytes": 1766
+      }
+    ],
+    "nonblank_lines": 21,
+    "bytes": 1766
+  },
+  "pages_local-scope_page": {
+    "files": [
+      {
+        "file": "frontends/pages/examples/local-scope.py",
+        "nonblank_lines": 24,
+        "bytes": 2115
+      }
+    ],
+    "nonblank_lines": 24,
+    "bytes": 2115
+  },
+  "pages_repeated-panels_page": {
+    "files": [
+      {
+        "file": "frontends/pages/examples/repeated-panels.py",
+        "nonblank_lines": 32,
+        "bytes": 3032
+      }
+    ],
+    "nonblank_lines": 32,
+    "bytes": 3032
+  },
+  "pages_text-color_page": {
+    "files": [
+      {
+        "file": "frontends/pages/examples/text-color.py",
+        "nonblank_lines": 12,
+        "bytes": 736
+      }
+    ],
+    "nonblank_lines": 12,
+    "bytes": 736
+  },
+  "pages-js_background-color_page": {
+    "files": [
+      {
+        "file": "frontends/pages-js/examples/background-color.js",
+        "nonblank_lines": 8,
+        "bytes": 696
+      }
+    ],
+    "nonblank_lines": 8,
+    "bytes": 696
+  },
+  "pages-js_editable-text_page": {
+    "files": [
+      {
+        "file": "frontends/pages-js/examples/editable-text.js",
+        "nonblank_lines": 6,
+        "bytes": 421
+      }
+    ],
+    "nonblank_lines": 6,
+    "bytes": 421
+  },
+  "pages-js_font-family_page": {
+    "files": [
+      {
+        "file": "frontends/pages-js/examples/font-family.js",
+        "nonblank_lines": 12,
+        "bytes": 1114
+      }
+    ],
+    "nonblank_lines": 12,
+    "bytes": 1114
+  },
+  "pages-js_font-size_page": {
+    "files": [
+      {
+        "file": "frontends/pages-js/examples/font-size.js",
+        "nonblank_lines": 11,
+        "bytes": 939
+      }
+    ],
+    "nonblank_lines": 11,
+    "bytes": 939
+  },
+  "pages-js_font-style_page": {
+    "files": [
+      {
+        "file": "frontends/pages-js/examples/font-style.js",
+        "nonblank_lines": 16,
+        "bytes": 1569
+      }
+    ],
+    "nonblank_lines": 16,
+    "bytes": 1569
+  },
+  "pages-js_local-scope_page": {
+    "files": [
+      {
+        "file": "frontends/pages-js/examples/local-scope.js",
+        "nonblank_lines": 19,
+        "bytes": 1943
+      }
+    ],
+    "nonblank_lines": 19,
+    "bytes": 1943
+  },
+  "pages-js_repeated-panels_page": {
+    "files": [
+      {
+        "file": "frontends/pages-js/examples/repeated-panels.js",
+        "nonblank_lines": 29,
+        "bytes": 2844
+      }
+    ],
+    "nonblank_lines": 29,
+    "bytes": 2844
+  },
+  "pages-js_text-color_page": {
+    "files": [
+      {
+        "file": "frontends/pages-js/examples/text-color.js",
+        "nonblank_lines": 7,
+        "bytes": 538
+      }
+    ],
+    "nonblank_lines": 7,
+    "bytes": 538
+  },
+  "shared_example_catalog": {
+    "files": [
+      {
+        "file": "backend/examples.py",
+        "nonblank_lines": 12,
+        "bytes": 413
+      }
+    ],
+    "nonblank_lines": 12,
+    "bytes": 413
+  }
+}

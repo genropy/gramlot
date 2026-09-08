@@ -1,0 +1,25 @@
+flowchart LR
+  subgraph GUI[Reusable GUI core]
+    Recipe[Page recipe construction]
+    Startup[Startup and asset description]
+    Browser[DOM runtime and page bootstrap]
+  end
+  subgraph Adapter[Optional host adapter]
+    HTTP[HTTP and static response translation]
+    Context[Request context mapping]
+    Remote[Optional remote action transport]
+  end
+  subgraph Host[Application host]
+    Router[Routes and mount prefix]
+    Auth[Existing auth and session]
+    Services[Business services]
+    Life[Process lifecycle]
+  end
+  Router --> HTTP
+  Auth --> Context
+  HTTP --> Recipe
+  Context --> Recipe
+  Startup --> HTTP
+  Remote --> Services
+  Life --> Adapter
+  HTTP --> Browser

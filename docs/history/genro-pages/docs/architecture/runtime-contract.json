@@ -1,0 +1,463 @@
+{
+  "version": "1.0",
+  "status": "accepted for implementation trial; public signatures and detailed timing remain proposals",
+  "repositories": {
+    "legacy": {
+      "root": "/Users/gporcari/Sviluppo/Genropy/genropy",
+      "head": "919a3a572acf89b4e016b2b32fd5ec556a269533",
+      "state": "working tree; evidence file SHA256 is authoritative"
+    },
+    "pages": {
+      "root": "/Users/gporcari/Sviluppo/genro_ng/meta-genro-modules/sub-projects/genro-pages",
+      "head": "9f0c0bf4026d1f188b8a91d365bbd8be55889326",
+      "state": "working tree; evidence file SHA256 is authoritative"
+    },
+    "dom": {
+      "root": "/Users/gporcari/Documents/ChatGPT/genro-pages/worktrees/genro-dom-js",
+      "head": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a",
+      "state": "working tree; evidence file SHA256 is authoritative"
+    }
+  },
+  "scenarios": {
+    "bootstrap_readiness": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro.js",
+          "symbol": "genro.fireEvent('gnr.onStart')",
+          "line": 790,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "0021b374f4208bc0bbc2e7966523e32eaa6ecc091452a014203d85071270c03e",
+          "finding": "Page start is fired inside a delayed callback after startup; timer is mechanism, not readiness contract."
+        },
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro_src.js",
+          "symbol": "if(onBuilt){",
+          "line": 703,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "4a14943802dfbcc4afc7c7927036fa47e6731e1b9a9b066c4d1716018803a41a",
+          "finding": "Numeric _onBuilt schedules a timeout from an after-build callback; its execution is not a page-readiness barrier."
+        },
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/gnrdomsource.js",
+          "symbol": "if (this.attr._lazyBuild){",
+          "line": 1102,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "338bc733fe80b0a2854c4b89726b4e286f3061768acb50b58495ce02e308fd78",
+          "finding": "Lazy children wait for visibility or _buildNow before lazyBuildFinalize; page startup need not await them."
+        }
+      ],
+      "current": [
+        {
+          "repository": "pages",
+          "path": "src/genro_pages/resources/bootstrap.js",
+          "symbol": "renderPage",
+          "line": 9,
+          "revision": "9f0c0bf4026d1f188b8a91d365bbd8be55889326 + working tree",
+          "sha256": "ddad41619bd3d483055f185622bb15ac134d9c0710ed50218187bbdbbaf67764",
+          "finding": "Fetch, loadSource and Application construction precede inspector setup; no unified ready lifecycle."
+        }
+      ],
+      "expected": "Page startup must distinguish initial non-lazy construction and after-build scheduling from delayed provider execution and lazy subtree construction. Delayed _onBuilt callbacks and initially hidden lazy children must not block global startup. Exact readiness participation and public hook timing are Macro 2 planning decisions; the legacy fixed timer is not the new contract.",
+      "disposition": "adapt",
+      "reason": "Replace the historical fixed delay with explicit completion.",
+      "verification": "Record initial construction, immediate and delayed _onBuilt callbacks, and page onStart separately. Include an _onBuilt delay longer than startup and an initially hidden lazy child: startup must not wait for either; revealing the child builds its subtree without repeating page startup. Settle exact immediate-hook ordering in Macro 2 before implementation.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "source_callback_context": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/gnrdomsource.js",
+          "symbol": "onCreated",
+          "line": 1061,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "338bc733fe80b0a2854c4b89726b4e286f3061768acb50b58495ce02e308fd78",
+          "finding": "Construction callback is extracted from node attributes; recipe context is distinct from widget methods."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "src/services/recipe-runtime.js",
+          "symbol": ".call(node",
+          "line": 11,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "69fa01a99f816c292315ce62dd41f99185e2e2a794e0243cf4517ca1b2968dca",
+          "finding": "Actions execute with the source node as this; provider engine uses a separate path."
+        }
+      ],
+      "expected": "Action and supported provider callbacks receive their source node and freshly evaluated parameters.",
+      "disposition": "preserve",
+      "reason": "",
+      "verification": "Invoke an action and controller after changing a bound parameter; record this, resolved values and relative writes.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "relative_paths": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/gnrdomsource.js",
+          "symbol": "getRelativeData:",
+          "line": 544,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "338bc733fe80b0a2854c4b89726b4e286f3061768acb50b58495ce02e308fd78",
+          "finding": "Reads resolve through absDatapath; legacy getRelativeData includes autocreate and default arguments."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "src/source-bag.js",
+          "symbol": "getRelativeData(path",
+          "line": 242,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "5a974739ec59c1b1a6ea1b5ed8bc3a2e062fbec762274633fe4f562ea027518a",
+          "finding": "Relative resolution exists, but the second argument is defaultValue, not legacy autocreate."
+        }
+      ],
+      "expected": "Preserve relative authoring paths; enumerate unsupported anchors and argument differences before exposing aliases.",
+      "disposition": "adapt",
+      "reason": "Keep options explicit internally; compatibility adapters must not reinterpret positional arguments silently.",
+      "verification": "Test nested datapaths, absolute paths, attribute paths and supported anchors; compare missing-anchor behavior.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "get_set_put_fire": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/gnrlang.js",
+          "symbol": "macroExpand_PUT",
+          "line": 1670,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "cd7c367e853b1b6c7818fe575fc5b4ec63a341e75b474ccf3484798db7dfb2b8",
+          "finding": "PUT expands to setRelativeData with reason false; GET/SET/FIRE have separate expansions."
+        },
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/gnrbag.js",
+          "symbol": "fireItem:function",
+          "line": 1709,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "757477d92414dc4a864967286813d5dc11eb87846dd3fe40fafa49c1227c8538",
+          "finding": "Fired write is followed by a null write with doTrigger false."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "src/source-bag.js",
+          "symbol": "PUT(path",
+          "line": 266,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "5a974739ec59c1b1a6ea1b5ed8bc3a2e062fbec762274633fe4f562ea027518a",
+          "finding": "Methods exist; RecipeRuntime does not compile legacy statement macros."
+        }
+      ],
+      "expected": "GET reads, SET notifies, PUT writes silently, FIRE emits then resets silently; strings/comments stay literal.",
+      "disposition": "adapt",
+      "reason": "Use token-aware compilation instead of legacy regular expressions.",
+      "verification": "Count notifications for repeated FIRE including false and zero; verify reset and PUT silence; include macro text in strings and comments.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "method_and_dom_connections": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/gnrdomsource.js",
+          "symbol": "connect: function",
+          "line": 824,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "338bc733fe80b0a2854c4b89726b4e286f3061768acb50b58495ce02e308fd78",
+          "finding": "Widget methods are connected when present, otherwise target.domNode is used."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "src/application.js",
+          "symbol": "_enableCommands",
+          "line": 44,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "79cd56d58be4f17fc25af641430dd2f0160f23e432e09d56b367d2dbb44280bf",
+          "finding": "Current command delegation handles button actions; it is not generic legacy connect."
+        }
+      ],
+      "expected": "Distinguish native event listening from widget method observation; callback owner and disconnect are explicit.",
+      "disposition": "adapt",
+      "reason": "Avoid prototype patching; preserve observable ordering through tested widget adapters.",
+      "verification": "Observe one DOM event and one widget method with arguments; disconnect and destroy owner; assert no later callback.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "owned_topics": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/gnrdomsource.js",
+          "symbol": "subscribe:function",
+          "line": 1315,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "338bc733fe80b0a2854c4b89726b4e286f3061768acb50b58495ce02e308fd78",
+          "finding": "Node topics are prefixed; subscription callback context and subscriber ownership may differ."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "src/services/topics.js",
+          "symbol": "subscribe(topic",
+          "line": 6,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "55cf867a8235a8c3d02a0af6b4bead90034aa7a07582da7208a573876f50b3e1",
+          "finding": "Local listeners support unsubscribe and AbortSignal; declarative subscribers are walked from live source."
+        }
+      ],
+      "expected": "Keep genro publish/subscribe and distinguish global page topics from node-prefixed topics and lifetime owner.",
+      "disposition": "adapt",
+      "reason": "Centralize owner cleanup rather than rely on detached DOM removal.",
+      "verification": "Use two pages and two node owners with identical topic names; remove one owner and ensure only its subscriptions stop.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "recursive_deletion": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro_src.js",
+          "symbol": "_trigger_del:function",
+          "line": 320,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "4a14943802dfbcc4afc7c7927036fa47e6731e1b9a9b066c4d1716018803a41a",
+          "finding": "Deletion invokes hooks, removes widgets/external widgets and recursively cleans subscriptions."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "src/application.js",
+          "symbol": "class Application",
+          "line": 29,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "79cd56d58be4f17fc25af641430dd2f0160f23e432e09d56b367d2dbb44280bf",
+          "finding": "Application has no unified dispose method; component disconnect and inspector cleanup are local."
+        }
+      ],
+      "expected": "Source deletion cleans descendants once; DOM replacement retaining a source node is not source disposal.",
+      "disposition": "adapt",
+      "reason": "Make ownership explicit and cleanup idempotent.",
+      "verification": "Delete parent source, count descendant cleanup, publish afterward, and repeat disposal without duplicate callbacks.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "node_id_reuse": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro_src.js",
+          "symbol": "_cleanupNodeSubscriptions:function",
+          "line": 366,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "4a14943802dfbcc4afc7c7927036fa47e6731e1b9a9b066c4d1716018803a41a",
+          "finding": "Legacy index entry is removed only when it still points to the deleting node."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "src/builder-base.js",
+          "symbol": "nodeById(nodeId)",
+          "line": 214,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "7ebc21c68d0f5e76027ab0df01d84b89541c4422dbed5621e19c7a0029f9f5f9",
+          "finding": "Lookup walks current source by node_id and throws when missing."
+        }
+      ],
+      "expected": "Reusing a node ID resolves to the new live node; old cleanup cannot remove new ownership.",
+      "disposition": "preserve",
+      "reason": "",
+      "verification": "Remove a node, insert another with the same ID, complete old deferred cleanup and verify lookup and event target.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "pending_callback_cleanup": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/gnrdomsource.js",
+          "symbol": "setRelativeData: function",
+          "line": 575,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "338bc733fe80b0a2854c4b89726b4e286f3061768acb50b58495ce02e308fd78",
+          "finding": "Delayed writes use setTimeout bound to the node; this path does not cancel itself on removal."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "src/collections/clipboard.js",
+          "symbol": "disconnectedCallback",
+          "line": 25,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "fc94d4f3a370dc7568bcc71f99c33273e701f2e317001b9b8e55f2dbe1993b04",
+          "finding": "Clipboard clears its timer and increments a generation to ignore stale async completion."
+        }
+      ],
+      "expected": "Destroyed owners cannot apply late results; distinguish cancellation from ignoring an already running operation.",
+      "disposition": "adapt",
+      "reason": "This strengthens legacy lifetime safety and extends the existing clipboard guard to owned services.",
+      "verification": "Start deferred write/result, destroy owner, resolve it, and assert no data/DOM/topic side effect on a replacement.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "page_instance_isolation": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro.js",
+          "symbol": "notifyPageClosing:function",
+          "line": 365,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "0021b374f4208bc0bbc2e7966523e32eaa6ecc091452a014203d85071270c03e",
+          "finding": "Each child window has its own genro, traversed by parent close notification."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "tests/actions.test.js",
+          "symbol": "genro event service isolates",
+          "line": 36,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "74856ec3033d4822c5c39ee92bc7eaf7399a45d8639ef3f3fa123ff18aa38a60",
+          "finding": "Existing test constructs two Applications and verifies topic and relative-data isolation."
+        }
+      ],
+      "expected": "Each page owns independent data, source and services; internal code receives owner rather than window.genro.",
+      "disposition": "preserve",
+      "reason": "",
+      "verification": "Construct two runtimes in one document; mutate and publish in one; verify the other is unchanged and survives first disposal.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "typed_source_data_transport": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/gnrbag.js",
+          "symbol": "fromXmlDoc: function",
+          "line": 2022,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "757477d92414dc4a864967286813d5dc11eb87846dd3fe40fafa49c1227c8538",
+          "finding": "XML decoding converts typed text with convertFromText and recursively constructs nested Bags using the supplied class dictionary."
+        },
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro.js",
+          "symbol": "this.clsdict =",
+          "line": 259,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "0021b374f4208bc0bbc2e7966523e32eaa6ecc091452a014203d85071270c03e",
+          "finding": "The class dictionary maps domsource to GnrDomSource and bag to GnrBag; this distinguishes reconstructed source and ordinary Bags."
+        },
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro_rpc.js",
+          "symbol": "resultHandler: function(response, ioArgs, currentAttr)",
+          "line": 596,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "a28733c2124ca60ee485ac192bbbb243a588bb5390d8eb849beddbc14e23b857",
+          "finding": "RPC responses are decoded into a Bag envelope with fromXmlDoc(response, genro.clsdict). This is legacy XML evidence, not TYTX compatibility evidence."
+        }
+      ],
+      "current": [
+        {
+          "repository": "pages",
+          "path": "tests/test_typed_envelope.py",
+          "symbol": "test_source_data_and_raw_cross_javascript",
+          "line": 23,
+          "revision": "9f0c0bf4026d1f188b8a91d365bbd8be55889326 + working tree",
+          "sha256": "a8b9af24af4f54b123aa19fbd51a05c4c4e197058d20c3816e3cc53c2be9d96f",
+          "finding": "Existing codec bridge asserts SourceBag, ordinary Bag, Decimal, date, attributes and bytes; no real socket is tested."
+        }
+      ],
+      "expected": "Source and data remain distinct typed trees through JSON and MessagePack; inspector reads live Bags.",
+      "disposition": "adapt",
+      "reason": "Use TYTX rather than legacy XML transport while preserving types and structure.",
+      "verification": "Run Python-to-JS rendering in both transports and typed-envelope test; assert subtree type, order, attributes and data edits.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "page_close_and_nested_frames": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro.js",
+          "symbol": "notifyPageClosing:function",
+          "line": 365,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "0021b374f4208bc0bbc2e7966523e32eaa6ecc091452a014203d85071270c03e",
+          "finding": "Close recursively notifies child genro, conditionally sends beacon and publishes onClosePage."
+        }
+      ],
+      "current": [
+        {
+          "repository": "pages",
+          "path": "src/genro_pages/resources/bootstrap.js",
+          "symbol": "window.genro =",
+          "line": 30,
+          "revision": "9f0c0bf4026d1f188b8a91d365bbd8be55889326 + working tree",
+          "sha256": "ddad41619bd3d483055f185622bb15ac134d9c0710ed50218187bbdbbaf67764",
+          "finding": "Current bootstrap exposes one Application; no root/child transport or registered identity lifecycle."
+        }
+      ],
+      "expected": "Root alone owns physical socket; each child owns identity/lifetime; close notification is best-effort and server expiry remains necessary.",
+      "disposition": "defer",
+      "reason": "Requires approved ASGI identity/channel lifecycle; do not invent handshake or registry semantics.",
+      "verification": "With approved transport seam, close one nested child then root; assert channel cleanup, origin validation and surviving siblings.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    },
+    "mobile_handles_and_cancellation": {
+      "legacy": [
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro_mobile.js",
+          "symbol": "patch_moveable",
+          "line": 169,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "92314c030c99f0f34e12038e0e59671f63b3028a6a22654fcf8fef204eda323b",
+          "finding": "Legacy patches Dojo moveables for touch and uses explicit handles."
+        },
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro_grid.js",
+          "symbol": "drag_handle",
+          "line": 2040,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "7a3e905bb8291cfc6de1ffe67afed11dce16e4ddf41bf6de8e7c452431d0a504",
+          "finding": "Mobile draggable rows insert a 23px handle column; fillDragInfo routes it as row drag."
+        },
+        {
+          "repository": "legacy",
+          "path": "gnrjs/gnr_d11/js/genro_dom.js",
+          "symbol": "onDrop_standard",
+          "line": 1194,
+          "revision": "919a3a572acf89b4e016b2b32fd5ec556a269533 + working tree",
+          "sha256": "050363fbb9d65a84a7c03f6166e79dd2777daa6fe92bd11c1b46873190917d0f",
+          "finding": "Drop callbacks run in source-node scope; inspected drag callbacks do not uniformly bind it."
+        }
+      ],
+      "current": [
+        {
+          "repository": "dom",
+          "path": "src/collections/palette.js",
+          "symbol": "pointercancel",
+          "line": 33,
+          "revision": "e5540e0ca5baa7d18cfdd18c9b416a501ef5b99a + working tree",
+          "sha256": "006a014ef10cb6bd32a82f7725c7b38ffbd91d3faa6b5cd001ff024c75cf6d21",
+          "finding": "Palette has pointer cancellation handling; device parity must be checked beyond source inspection."
+        }
+      ],
+      "expected": "Touch handles, keyboard alternatives and scroll/zoom remain usable; cancelled gestures release ownership.",
+      "disposition": "adapt",
+      "reason": "Use capability-driven pointer handling rather than touch-device globals and prototype patches.",
+      "verification": "On hybrid and touch devices drag/resize from handle, scroll body, cancel pointer, rotate and use keyboard; assert no stuck drag or lost scrolling. Include second pointer, lost capture, removal during drag, typed internal drop and native file drop as distinct cases.",
+      "validation": "Source inspection only; verification describes future conformance checks unless explicitly recorded elsewhere."
+    }
+  }
+}
