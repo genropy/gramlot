@@ -25,16 +25,27 @@ upload (or a publisher in project settings once the project exists):
 - GitHub owner: `genropy`
 - Repository: `gramlot`
 - Workflow filename: `publish.yml`
-- GitHub environment: `pypi`
+- GitHub environment: `release`
 
 No long-lived PyPI token is needed. The release workflow requests a short-lived
 OIDC credential in its publish job. Both the trusted publisher and the GitHub
 environment must exist before publishing a release.
 
-Create a GitHub release with tag `v<version>` matching pyproject.toml exactly.
-For the first alpha this is `v0.1.0a1`; mark it as a prerelease. The publish
-workflow runs the entire CI workflow, downloads its verified distributions,
-checks the tag and uploads to PyPI. Never reuse an uploaded version filename.
+Use the same release convention as Genro Bag: push a version tag matching
+pyproject.toml, for example:
+
+```sh
+git tag v0.1.0a1
+git push origin v0.1.0a1
+```
+
+The tag triggers publish.yml. It runs the full CI, checks the tag against the
+package version, then uploads its verified distributions through Trusted
+Publishing using the `release` environment. Only after a successful PyPI upload
+does it create the GitHub release and attach the files. An existing draft is
+published at that point. Alpha/beta/RC tags produce GitHub prereleases.
+Manual workflow dispatch from main runs verification without publishing; select
+a version tag to publish manually. Never reuse an uploaded version filename.
 
 Confirm the Actions run, PyPI release files and installation from PyPI before
 reporting a release as published. A successful Git push alone does not activate
