@@ -1,23 +1,21 @@
 Your first three pages
 ======================
 
-Install the local alpha
------------------------
+Install Gramlot
+---------------
 
-Use Python 3.11 or newer and a virtual environment. This alpha is not published
-on PyPI yet; obtain a wheel built with the FastAPI adapter from the maintainer.
-Replace the sample wheel path with its actual location.
+Use Python 3.11 or newer and a virtual environment. The first alpha is available
+on PyPI. Pin its version explicitly because it is a prerelease:
 
 .. code-block:: console
 
    python3 -m venv .venv
    source .venv/bin/activate
-   python -m pip install '/path/to/gramlot-0.1.0a1-py3-none-any.whl[fastapi]'
+   python -m pip install 'gramlot[fastapi]==0.1.0a1'
 
 On Windows, activate the environment with ``.venv\Scripts\activate`` instead.
-Once a release is published, the corresponding installation will be
-``python -m pip install 'gramlot[fastapi]'``. The wheel includes browser assets;
-these Python examples do not require Node or an application frontend build.
+The wheel includes browser assets; these Python examples do not require Node
+or an application frontend build.
 
 Create the application directory
 --------------------------------
@@ -84,7 +82,7 @@ The files above are also runnable directly from a Gramlot checkout:
 If startup fails
 ----------------
 
-* **Missing optional dependencies:** install the wheel with ``[fastapi]`` in
+* **Missing optional dependencies:** install ``gramlot[fastapi]==0.1.0a1`` in
   the same environment that provides the ``gramlot`` command.
 * **Pages directory not found:** pass the parent of ``pages/``, not ``pages/``
   itself. With no argument, the current working directory is used.

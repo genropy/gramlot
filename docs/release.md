@@ -1,7 +1,14 @@
 # Gramlot release status
 
-Candidate: **0.1.0a1**, first alpha. Publication is being configured; do not assume
-this candidate is available on PyPI until the upload is verified.
+**0.1.0a1**, first alpha, published on PyPI on 2026-09-09.
+
+The tag-triggered workflow passed CI and uploaded the wheel and source archive.
+A fresh environment installed `gramlot[fastapi]==0.1.0a1` from PyPI successfully.
+
+- [PyPI release](https://pypi.org/project/gramlot/0.1.0a1/)
+- [Publishing run](https://github.com/genropy/gramlot/actions/runs/34339515923)
+
+Read the Docs configuration is committed; external project activation is pending.
 
 The candidate includes Python authoring, typed Source transport, browser runtime,
 widgets, inspector APIs, optional FastAPI integration and an English Sphinx manual.

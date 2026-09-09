@@ -24,9 +24,10 @@ class Page(WebPage):
         root.h1("Hello World")
 ```
 
-With Gramlot and its FastAPI extra installed:
+Install the alpha and start the application:
 
 ```sh
+python -m pip install 'gramlot[fastapi]==0.1.0a1'
 gramlot fastapi serve /path/to/my_app
 ```
 
@@ -41,8 +42,7 @@ For custom servers, use `GramlotApplication` or `mount_gramlot` from
 - [Pages and reserved metadata](docs/source/reference/pages.rst)
 - [Documentation development](docs/development/building-docs.rst)
 
-Alpha candidate `0.1.0a1` is prepared for its first release. For local installation,
-build a wheel and install it with the `[fastapi]` extra. See
+[Gramlot 0.1.0a1 is available on PyPI](https://pypi.org/project/gramlot/0.1.0a1/). See
 [build and release instructions](docs/release.md).
 
 ## Development
