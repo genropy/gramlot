@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 180" role="img" aria-labelledby="title desc">
+<title id="title">From a Python recipe to the browser</title><desc id="desc">The browser requests HTML and then a recipe. The server runs Python main, returns Source as TYTX, and the browser mounts the interface.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#52677c"/></marker></defs>
+<g fill="#eef4fa" stroke="#9eb4c8"><rect x="5" y="35" width="245" height="95" rx="8"/><rect x="300" y="35" width="245" height="95" rx="8"/><rect x="595" y="35" width="245" height="95" rx="8"/></g>
+<g font-family="sans-serif" text-anchor="middle" fill="#20354a"><text x="127" y="65" font-size="19">Browser startup</text><text x="127" y="96" font-size="15">HTML → recipe request</text><text x="422" y="65" font-size="19">Python on server</text><text x="422" y="96" font-size="15">Page.main → Source → TYTX</text><text x="717" y="65" font-size="19">Browser runtime</text><text x="717" y="96" font-size="15">Decode → mount → DOM</text></g>
+<g stroke="#52677c" stroke-width="2" marker-end="url(#arrow)"><path d="M255 82H292"/><path d="M550 82H588"/></g></svg>

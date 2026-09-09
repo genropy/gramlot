@@ -1,0 +1,9 @@
+/* Gramlot identity; layout, navigation and theme switching belong to Furo. */
+.sidebar-brand { gap: .7rem; }
+.sidebar-logo { width: 108px; height: 108px; object-fit: contain;
+  background: white; border-radius: 20px; }
+.sidebar-brand-text { font-weight: 750; letter-spacing: -.03em; }
+h1 { letter-spacing: -.035em; }
+.content p, .content li { line-height: 1.7; }
+article img { max-width: 100%; height: auto; }
+.highlight { border-radius: 8px; }

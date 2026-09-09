@@ -26,7 +26,12 @@ are recovery material, not alternative development targets.
 
 ## Server boundary
 
-Gramlot has no ASGI dependency or optional ASGI extra. Server-specific integration
-belongs in a separate application repository. The extraction under
+Gramlot has no Genro ASGI dependency or optional Genro ASGI extra. Genro ASGI
+integration belongs in a separate application repository.
+
+Owner clarification in the current session: an optional FastAPI adapter is
+authorized in gramlot.contrib.fastapi, with gramlot[fastapi] dependencies and
+`gramlot fastapi serve [directory]`. Discover pages/ without requiring main.py
+or application.json. Core imports and installations must remain server-independent. The extraction under
 docs/history/asgi-extraction-20260909 is preserved evidence, not active package
 code; do not restore it into src or browser assets as a convenience.

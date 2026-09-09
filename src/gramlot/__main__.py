@@ -1,5 +1,5 @@
 # Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
-"""Serve a local HTML manual; application hosting belongs to consumers."""
+"""Serve documentation or pages through an optional server adapter."""
 import argparse
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -12,13 +12,37 @@ class Cli:
 
     def run(self):
         parser = argparse.ArgumentParser(description=__doc__)
-        parser.add_argument("command", choices=("manual",),
-                            help="Serve the local HTML technical manual")
-        parser.add_argument("--directory", type=Path, help="HTML manual directory")
-        parser.add_argument("--host", default="127.0.0.1")
-        parser.add_argument("--port", type=int, help="Port (default: 8037)")
+        commands = parser.add_subparsers(dest="command", required=True)
+        manual = commands.add_parser("manual", help="Serve the local HTML manual")
+        manual.add_argument("--directory", type=Path)
+        manual.add_argument("--host", default="127.0.0.1")
+        manual.add_argument("--port", type=int)
+        fastapi = commands.add_parser("fastapi", help="Optional FastAPI adapter")
+        actions = fastapi.add_subparsers(dest="action", required=True)
+        serve = actions.add_parser("serve", help="Discover pages and start FastAPI")
+        serve.add_argument("directory", nargs="?", type=Path, default=Path.cwd())
+        serve.add_argument("--host", default="127.0.0.1")
+        serve.add_argument("--port", type=int, default=8000)
+        serve.add_argument("--prefix", default="/page")
         options = parser.parse_args()
-        self.serve_manual(parser, options)
+        if options.command == "manual":
+            self.serve_manual(parser, options)
+        else:
+            self.serve_fastapi(parser, options)
+
+    def serve_fastapi(self, parser, options):
+        try:
+            import uvicorn
+            from gramlot.contrib.fastapi import GramlotApplication
+        except ModuleNotFoundError as error:
+            if error.name not in {"fastapi", "uvicorn", "starlette"}:
+                raise
+            parser.error("FastAPI support is optional; install 'gramlot[fastapi]'.")
+        try:
+            app = GramlotApplication(directory=options.directory, prefix=options.prefix)
+        except (ValueError, OSError) as error:
+            parser.error(str(error))
+        uvicorn.run(app, host=options.host, port=options.port)
 
 
     def serve_manual(self, parser, options):

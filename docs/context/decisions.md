@@ -88,3 +88,21 @@ Rosetta retains the shared **plain HTML frame**, independent iframe examples, se
 ## Development transition checkpoint — 2026-09-09
 
 The owner requested that current findings be retained in Gramlot and that readiness to continue there be assessed. The [transition handoff](transition-to-gramlot.md) recommends using the unified repository now; public dependency independence, Rosetta verification and old-worktree deletion remain distinct gates. The parent/facade proof does not settle data naming or authorize changes to generic node ownership.
+
+## Optional FastAPI adapter — subsequent owner decision, 2026-09-09
+
+The owner approved gramlot.contrib.fastapi and `gramlot fastapi serve [directory]`.
+The directory defaults to the current working directory. Discover public Python
+files in pages/ at startup; each defines Page(WebPage), optionally with title.
+No main.py or application.json is required. GramlotApplication subclasses FastAPI
+for custom applications; mount_gramlot supports existing applications. FastAPI
+and Uvicorn are optional dependencies. This supersedes the earlier blanket
+server-adapter restriction only for FastAPI; Genro ASGI remains excluded.
+
+## English Sphinx manual and metadata — 2026-09-09
+
+The owner requested the general guide, FastAPI guide and reserved metadata
+reference in an English Sphinx manual in Gramlot. Use genro_toolbox.metadata
+(already available in 0.14.0); do not duplicate the decorator. It sets class
+attributes directly. Only title is currently interpreted as page metadata.
+Docstrings describe pages but are not rendered by the current adapter.

@@ -1,20 +1,60 @@
 # Gramlot
 
-<img src="https://raw.githubusercontent.com/genropy/gramlot/main/assets/gramlot-logo.png" alt="Gramlot logo" width="240">
+<img src="https://raw.githubusercontent.com/genropy/gramlot/main/assets/gramlot-logo.png" alt="Gramlot logo" width="180">
 
 **GRAMmar for Live Object Trees**
 
-Gramlot is a declarative web UI framework where interfaces are described in Python as Live Object Trees.
+Describe interfaces in Python and render them with the Gramlot JavaScript runtime.
+The first alpha includes typed Source transport, widgets and an optional FastAPI
+integration with automatic page discovery.
 
-An independent project built on the experience and technology developed in Genro.
+## FastAPI integration
 
-https://gramlot.com
+Create `pages/hello.py` in your application directory:
 
-[Project context and decisions](https://github.com/genropy/gramlot/blob/main/docs/context/README.md)
+```python
+from genro_toolbox import metadata
+from gramlot.page import WebPage
 
-Alpha candidate `0.1.0a1` is being prepared; it is not yet published.
-[Build and release status](https://github.com/genropy/gramlot/blob/main/docs/release.md).
+@metadata(title="Hello")
+class Page(WebPage):
+    """Display a greeting."""
 
-[GramlotBuilder API and verified public dependency baseline](docs/context/gramlot-builder.md). Python recipes use `builder.root`; serialize `builder.source` with `gramlot.transport.to_tytx`.
+    def main(self, root):
+        root.h1("Hello World")
+```
 
-Gramlot has no ASGI dependency or extra. Application hosting belongs to separate consumers; `gramlot manual --directory PATH` only serves HTML documentation. See [the server boundary](docs/context/decisions.md#server-independence--owner-decision-2026-09-09).
+With Gramlot and its FastAPI extra installed:
+
+```sh
+gramlot fastapi serve /path/to/my_app
+```
+
+Open `http://127.0.0.1:8000/page/`. No `main.py` or JSON registry is required.
+For custom servers, use `GramlotApplication` or `mount_gramlot` from
+`gramlot.contrib.fastapi`. More integrations coming soon.
+
+## Documentation
+
+- [Getting started](docs/source/guide/first-page.rst)
+- [FastAPI integration](docs/source/guide/fastapi.rst)
+- [Pages and reserved metadata](docs/source/reference/pages.rst)
+- [Documentation development](docs/development/building-docs.rst)
+
+Alpha candidate `0.1.0a1` is prepared for its first release. For local installation,
+build a wheel and install it with the `[fastapi]` extra. See
+[build and release instructions](docs/release.md).
+
+## Development
+
+```sh
+npm --prefix js/dom ci --ignore-scripts
+python scripts/prepare_assets.py
+python scripts/prepare_test_client.py
+python -m pip install '.[test,fastapi]' httpx
+GRAMLOT_CLIENT_MODULES="$PWD/build/test-client" python -m pytest -q
+npm --prefix js/dom test
+```
+
+Documentation builds independently from runtime packages. See `docs/requirements.txt`.
+Gramlot is licensed under Apache 2.0.

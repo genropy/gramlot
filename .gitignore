@@ -26,3 +26,6 @@ htmlcov/
 
 # Prepared browser assets (included explicitly in distributions)
 src/gramlot/resources/
+
+# Generated Sphinx documentation
+docs/_build/

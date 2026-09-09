@@ -12,7 +12,7 @@ See the [legacy data and remote service inventory](legacy-data-remote-services.m
 
 Read [development transition and next-task handoff](transition-to-gramlot.md) to continue directly in Gramlot while keeping release and cleanup gates separate.
 
-Read the latest **Server independence** decision in [decisions](decisions.md): no ASGI dependency or extra belongs in Gramlot. The old integration is archived for a separate application repository.
+Read the latest **Server independence** decision in [decisions](decisions.md): no Genro ASGI dependency or extra belongs in Gramlot; the later optional FastAPI decision is separate. The old integration is archived for a separate application repository.
 
 ## Current direction
 
@@ -53,3 +53,10 @@ Coverage is the five identified local Pages tasks, September 5–8, 2026. This i
 - Historical commands and absolute paths describe the former environment. Use them as provenance, not current installation instructions.
 - Distinguish an implemented prototype, a historical test report, an accepted requirement, an open design decision and a suggested enhancement.
 - Keep the source repositories and local archives intact. No historical task is resumed, messaged or delegated merely because its instructions were copied into this memory.
+
+## FastAPI adapter update — 2026-09-09
+
+The optional FastAPI adapter and `gramlot fastapi serve [directory]` are now
+implemented. This supersedes earlier statements that all server adapters are
+external or that the CLI only serves manuals. Genro ASGI remains excluded.
+See [FastAPI guide](../fastapi.md).

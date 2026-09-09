@@ -21,7 +21,7 @@ dependencies = [
     "genro-builders>=0.23.2",
     "genro-bag>=0.21.1,<0.22",
     "genro-tytx[msgpack]>=0.15.0",
-    "genro-toolbox",
+    "genro-toolbox>=0.14.0",
 ]
 
 [project.urls]
@@ -33,6 +33,7 @@ Issues = "https://github.com/genropy/gramlot/issues"
 gramlot = "gramlot.__main__:main"
 
 [project.optional-dependencies]
+fastapi = ["fastapi>=0.115", "uvicorn>=0.30"]
 test = ["pytest>=7.0", "pytest-asyncio>=0.23"]
 
 [tool.hatch.build.hooks.custom]
@@ -42,7 +43,7 @@ packages = ["src/gramlot"]
 artifacts = ["src/gramlot/resources/**"]
 
 [tool.hatch.build.targets.sdist]
-only-include = ["src", "js/dom/src", "js/dom/package.json", "js/dom/package-lock.json", "js/pages/src", "scripts", "hatch_build.py", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
+only-include = ["src", "js/dom/src", "js/dom/package.json", "js/dom/package-lock.json", "js/pages/src", "scripts", "docs/source", "docs/examples", "docs/requirements.txt", "assets", "hatch_build.py", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
 artifacts = ["src/gramlot/resources/**"]
 
 [tool.pytest.ini_options]
