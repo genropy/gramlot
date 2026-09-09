@@ -37,6 +37,8 @@ For custom servers, use `GramlotApplication` or `mount_gramlot` from
 
 ## Documentation
 
+[Read the English manual](https://gramlot.readthedocs.io/en/latest/).
+
 - [Getting started](docs/source/guide/first-page.rst)
 - [FastAPI integration](docs/source/guide/fastapi.rst)
 - [Pages and reserved metadata](docs/source/reference/pages.rst)

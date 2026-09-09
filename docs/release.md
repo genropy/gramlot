@@ -8,7 +8,8 @@ A fresh environment installed `gramlot[fastapi]==0.1.0a1` from PyPI successfully
 - [PyPI release](https://pypi.org/project/gramlot/0.1.0a1/)
 - [Publishing run](https://github.com/genropy/gramlot/actions/runs/34339515923)
 
-Read the Docs configuration is committed; external project activation is pending.
+Read the Docs is active: [English manual](https://gramlot.readthedocs.io/en/latest/).
+The first successful build (34468533) published commit a924e2b.
 
 The candidate includes Python authoring, typed Source transport, browser runtime,
 widgets, inspector APIs, optional FastAPI integration and an English Sphinx manual.
