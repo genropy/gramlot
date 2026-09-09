@@ -7,24 +7,20 @@ import subprocess
 import textwrap
 
 import pytest
-from gramlot.transport import to_tytx
-import os
+from genro_asgi import AsgiServer
+from gramlot.demo import DemoApplication
 from gramlot.pages.widgets import WIDGET_PAGES
+from tests.test_hello_world import RequestSupport
 
 
-class TestWidgetPages:
-    @property
-    def modules(self):
-        return Path(os.environ["GRAMLOT_CLIENT_MODULES"])
-
+class TestWidgetPages(RequestSupport):
     @pytest.mark.parametrize("path,page", WIDGET_PAGES.items())
     @pytest.mark.parametrize("transport", ["json", "msgpack"])
     @pytest.mark.asyncio
     async def test_real_widget_mounts_from_page_recipe(self, path, page, transport):
-        builder = page.source_builder('test')
-        page().main(builder.root)
-        wire = to_tytx(builder.source, transport=transport)
-        body = wire.encode() if isinstance(wire, str) else wire
+        server = AsgiServer(applications=[DemoApplication(client_modules=self.modules)])
+        response, body = await self.request(server, "/main", query=f"page={path}&transport={transport}".encode())
+        assert response["status"] == 200
         result = subprocess.run(
             ["node", str(Path(__file__).with_name("render_widget.mjs")),
              str(self.modules), transport, page.widget_tag,

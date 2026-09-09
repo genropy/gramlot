@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 import subprocess
 
-from genro_tytx import to_tytx, from_tytx
+from gramlot.transport import to_tytx
+from genro_tytx import from_tytx
 from gramlot.demo import DemoApplication
 from tests.test_page_bootstrap import BootstrapChecks
 from tests.test_registered_page import registered_pages as registered_pages

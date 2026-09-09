@@ -12,11 +12,12 @@ from pathlib import Path
 import subprocess
 
 from genro_bag import Bag
-from genro_builders.contrib.html.html_builder import HtmlBuilder
-from genro_tytx import from_tytx, to_tytx
+from gramlot.builder import GramlotBuilder
+from genro_tytx import from_tytx
+from gramlot.transport import to_tytx
 
 from gramlot.pages.hello_world import HelloWorldPage
-from genro_builders.builder import SourceBag
+from gramlot.transport import SourceSnapshot
 
 
 class TestTypedEnvelope:
@@ -30,8 +31,8 @@ class TestTypedEnvelope:
         data.set_item("record.empty", None)
         data.set_item("record.branch", Bag())
         data.set_item("record.text", '"quoted"\nbackslash\\ è')
-        builder = HtmlBuilder("main")
-        HelloWorldPage().main(builder.source)
+        builder = GramlotBuilder("main")
+        HelloWorldPage().main(builder.root)
         builder.source.set_item("seed", Bag({"phone": "0123"}), node_tag="dataSetter",
                                 _attributes={"destination": "seed", "value": "ready"})
         payload = {"source": builder.source, "data": data,
@@ -49,8 +50,8 @@ class TestTypedEnvelope:
         reply = from_tytx(envelope["data"], "json")
         returned = reply["data"]
         source = reply["source"]
-        assert type(source) is SourceBag
-        assert type(source["div_0"]) is SourceBag
+        assert type(source) is SourceSnapshot
+        assert type(source["div_0"]) is SourceSnapshot
         assert type(source["seed"]) is Bag
         assert source["seed.phone"] == "0123"
         assert isinstance(returned, Bag)

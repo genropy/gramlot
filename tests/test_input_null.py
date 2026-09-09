@@ -4,17 +4,17 @@ from pathlib import Path
 import subprocess
 
 from genro_bag import Bag
-from genro_tytx import to_tytx
-from gramlot.widget_test_builder import WidgetTestBuilder
+from gramlot.transport import to_tytx
+from gramlot.builder import GramlotBuilder
 
 
 def test_python_null_inputs():
-    builder = WidgetTestBuilder("main")
+    builder = GramlotBuilder("main")
     tags = ("textBox", "numberTextBox", "checkbox", "dateTextBox", "timeTextBox",
                 "passwordbox", "comboBox", "filteringSelect", "horizontalSlider",
                 "verticalSlider", "colorpicker")
-    builder.source.data("sample", Bag(dict.fromkeys(tags)))
-    pane = builder.source.div(datapath="sample")
+    builder.root.data("sample", Bag(dict.fromkeys(tags)))
+    pane = builder.root.div(datapath="sample")
     for tag in tags:
         getattr(pane, tag)(value=f"^.{tag}", lbl=tag)
     folder = Path(__file__).parent

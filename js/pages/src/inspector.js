@@ -2,7 +2,7 @@
 /** Mount a Python recipe and attach real page Bags without reparenting/copying. */
 import {Application} from 'gramlot-dom';
 import {Bag} from 'genro-bag-js';
-import {GalleryBuilder} from './gallery.js';
+import {GramlotBuilder} from './builder.js';
 import {DeveloperTools} from './dev.js';
 import {Shortcuts} from './shortcuts.js';
 import {InspectorEditor} from './inspector-editor.js';
@@ -11,7 +11,7 @@ export function mountInspector(host, source, page) {
     if (page._disposed || page.dev?.disposed) return null;
     page.dev ||= new DeveloperTools();
     page.dev.inspector?.dispose();
-    const builder = new GalleryBuilder('inspector');
+    const builder = new GramlotBuilder('inspector');
     builder.loadSource(source);
     const mount = document.createElement('div');
     const stylesheet = document.createElement('link');

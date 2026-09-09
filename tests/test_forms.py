@@ -7,15 +7,15 @@ import subprocess
 
 import pytest
 from genro_bag import Bag
-from genro_tytx import to_tytx
-from gramlot.widget_test_builder import WidgetTestBuilder
+from gramlot.transport import to_tytx
+from gramlot.builder import GramlotBuilder
 
 
 class TestForms:
     @pytest.mark.parametrize("transport", ["json", "msgpack"])
     def test_python_recipe_uses_shared_form_runtime(self, transport):
-        builder = WidgetTestBuilder("main")
-        root = builder.source
+        builder = GramlotBuilder("main")
+        root = builder.root
         root.data("draft", Bag(dict(name="Alice", age=20, raw=None)))
         form = root.form(formId="contact", datapath="draft", controllerPath="forms.contact", blankIsNull=True)
         fields = form.formlet(columns=2, node_id="fields", gap="8px", item_lbl_color="blue")

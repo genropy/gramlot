@@ -3,16 +3,16 @@
 from pathlib import Path
 import subprocess
 
-from genro_tytx import to_tytx
-from gramlot.widget_test_builder import WidgetTestBuilder
+from gramlot.transport import to_tytx
+from gramlot.builder import GramlotBuilder
 
 
 def test_python_formula_runs_in_browser_runtime():
-    builder = WidgetTestBuilder("main")
-    builder.source.data("size", 14)
-    builder.source.dataFormula(destination="css", formula="({size}) => size + 'px'",
+    builder = GramlotBuilder("main")
+    builder.root.data("size", 14)
+    builder.root.dataFormula(destination="css", formula="({size}) => size + 'px'",
                                size="^size", _on_start=True)
-    builder.source.div("^css")
+    builder.root.div("^css")
     folder = Path(__file__).parent
     result = subprocess.run(
         ["node", "--experimental-loader", str(folder / "lab_loader.mjs"),

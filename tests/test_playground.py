@@ -3,14 +3,14 @@
 from pathlib import Path
 import subprocess
 from gramlot.pages.playground import PlaygroundPage
-from gramlot.widget_test_builder import WidgetTestBuilder
-from genro_tytx import to_tytx
+from gramlot.builder import GramlotBuilder
+from gramlot.transport import to_tytx
 
 
 def test_playground_session():
     folder = Path(__file__).parent
-    builder = WidgetTestBuilder("main")
-    PlaygroundPage().main(builder.source)
+    builder = GramlotBuilder("main")
+    PlaygroundPage().main(builder.root)
     result = subprocess.run(
         ['node', '--experimental-loader', str(folder / 'lab_loader.mjs'),
          str(folder / 'playground.mjs')], capture_output=True, text=True,

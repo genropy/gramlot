@@ -2,11 +2,19 @@
 
 Updated: 2026-09-08. Sources: the [five conversation summaries](conversations.md), preserved project documents, and the current Gramlot conversation. Message references identify the local historical archive; statements below do not establish untested implementation claims.
 
+## Server independence — owner decision, 2026-09-09
+
+Gramlot must not depend on Genro ASGI, including through an optional extra. A future separate application repository will combine Gramlot and Genro ASGI for business applications. This supersedes earlier suggestions for gramlot[asgi] or an optional in-package host adapter.
+
+The integration has been extracted from the Python package and browser assets: application/routes, worker, server configuration, host-specific startup document, WSX/RPC client and bootstrap. Exact originals and associated host tests are preserved under docs/history/asgi-extraction-20260909 with a SHA-256 manifest, excluded from wheels and source distributions. They are recovery material for the future repository, not an active integration maintained inside Gramlot.
+
+Gramlot retains the builder, typed transport, browser runtime, widgets, inspector, recipes and host-independent tests. The CLI only serves local HTML documentation via the Python standard library; it no longer launches an application server. Rosetta owns its FastAPI integration and now installs the Gramlot wheel normally, without --no-deps. No server framework is required by Gramlot.
+
 ## Identity, ownership and first delivery
 
 - Gramlot is an autonomous project, not a GenroPy subpackage. It unifies the work in Pages and DOM JS. Homepage: https://gramlot.com. Keep the supplied logo and the tagline **GRAMmar for Live Object Trees**.
 - Rosetta becomes **Gramlot Rosetta**, in a separate repository, because it is a FastAPI application consuming the library.
-- The GitHub `gramlot` organization is being considered; creation/transfer has not been confirmed.
+- Owner decision on 2026-09-09: remain under `genropy`. The separate `gramlot` organization proposal is withdrawn. Keep the existing remotes `genropy/gramlot` and `genropy/demo-rosetta`; no transfer or rename is authorized by this choice.
 - Apache 2.0 is the intended license, including Pages. The owner says the old MIT file was erroneous. Preserve authorship and third-party attribution.
 - Prioritize an initial working version; record unfinished research without silently adding it to the first delivery. Preserve originals and migrate by copy. The existing instruction for this work is to use `main`, without a development branch.
 - Do not publish to PyPI/npm, add new features, or create elaborate CI as an incidental part of naming and migration.
@@ -24,6 +32,10 @@ Preserve meaningful GET/SET/PUT/FIRE behavior, relative paths and source-node ca
 Mobile is a first-class requirement: pointer/touch behavior, usable handles, cancellation, keyboard operation, scrolling and zoom all matter. Browser automation is not equivalent to verification on a real mobile device. Palette keyboard manipulation was requested as optional because always-on movement could confuse users. [First Pages: 399–407, 520–522.]
 
 **Native widgets, CSS and themes remain the chosen direction. Tailwind and Bootstrap were explicitly discarded.** Earlier optional-theme brainstorming is superseded. The theme should be compact, coherent and readable, with restrained control sizes. [Coordination: 161–171; First Pages: 390–399.]
+
+## GramlotBuilder dialect ownership — owner decision, 2026-09-09
+
+The owner approved the basis described in [GramlotBuilder](gramlot-builder.md): Python and JS counterparts owned by Gramlot, extending HTML authoring and sharing the browser-runtime contract. SVG grammar composition is to be verified; a standalone SVG variant is optional. Generic data-element removal remains an evaluation under Builders #43. This later decision takes precedence over older statements that generic Builders must adopt Gramlot's parameter names. Precise signatures and datastore-access naming still require an explicit contract.
 
 ## Authoring and state
 
@@ -72,3 +84,7 @@ Earlier owner constraints on routing still matter: a path identifies a stable cl
 Keep `httpMethod='WSK'` as the WebSocket RPC convention and make the default configurable. One physical WebSocket on the root page with separate logical iframe identities is a target; do not claim complete multiplexing from a simpler registered-channel test. `dataRpc` accepting a Python exposed method means serializing an allowed route reference, not transporting an executable callable. [First Pages: 150–189, 901–905, 1036–1041.]
 
 Rosetta retains the shared **plain HTML frame**, independent iframe examples, separate Page/Boilerplate/Common source categories, live JS recipe editing in Manual/Live/Focus out modes, and the inspector outside the recipe. Keep React and Vue idiomatic and behaviorally comparable. Evaluate semantic authoring differences and visible shared costs, not contrived line-count victories. Orders remains in standby until explicitly requested. [Rosetta: 52–108, 113–159.]
+
+## Development transition checkpoint — 2026-09-09
+
+The owner requested that current findings be retained in Gramlot and that readiness to continue there be assessed. The [transition handoff](transition-to-gramlot.md) recommends using the unified repository now; public dependency independence, Rosetta verification and old-worktree deletion remain distinct gates. The parent/facade proof does not settle data naming or authorize changes to generic node ownership.

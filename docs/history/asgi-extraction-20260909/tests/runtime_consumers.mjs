@@ -89,5 +89,46 @@ class Checks {
         assert.equal(mountInspector(host, decode(payload.inspector), page), null);
         peer.dispose();
     }
+    async bootstrap() {
+        document.open(); document.write(payload.html); document.close();
+        // Bootstrap's inspector endpoint is JSON, independently of page transport.
+        const response = value => ({ok: true, text: async () => value,
+            arrayBuffer: async () => Uint8Array.from(Buffer.from(value, 'base64')).buffer});
+        let pendingTools = null, delayTools = false;
+        globalThis.fetch = async url => {
+            if (url.startsWith('/main')) return response(payload.page);
+            if (url.startsWith('/menu')) return {status: 404};
+            if (delayTools) return new Promise(resolve => { pendingTools = resolve; });
+            return response(payload.inspectorJson);
+        };
+        const {renderPage} = await import('../js/pages/src/bootstrap.js');
+        const initial = window.genro;
+        delayTools = true;
+        const stale = renderPage(payload.transport);
+        // Wait on observable arrival of the deferred tool request, not a timeout.
+        while (!pendingTools) await new Promise(resolve => setImmediate(resolve));
+        const abandoned = window.genro;
+        assert.equal(initial._disposed, true);
+        const finishStale = pendingTools;
+        delayTools = false;
+        await renderPage(payload.transport);
+        const current = window.genro;
+        assert.equal(abandoned._disposed, true);
+        finishStale(response(payload.inspectorJson));
+        await stale;
+        assert.equal(window.genro, current);
+        assert.equal(document.querySelectorAll('[data-inspector="toggle"]').length, 1);
+        assert.equal(abandoned.dev, undefined);
+        assert.equal(current.dev.playground.session.app._disposed, false);
+        // Explicit disposal while waiting must also suppress late tool setup.
+        delayTools = true; pendingTools = null;
+        const closing = renderPage(payload.transport);
+        while (!pendingTools) await new Promise(resolve => setImmediate(resolve));
+        window.genro.dispose();
+        pendingTools(response(payload.inspectorJson));
+        await closing;
+        assert.equal(document.getElementById('developer-tools').childNodes.length, 0);
+        assert.equal(document.getElementById('root').childNodes.length, 0);
+    }
 }
 await new Checks()[process.argv[2]]();

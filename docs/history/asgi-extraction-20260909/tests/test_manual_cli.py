@@ -3,8 +3,10 @@
 import signal
 import subprocess
 import sys
+from unittest.mock import Mock
 from urllib.request import urlopen
 
+from gramlot import __main__ as cli
 
 
 def test_manual_serves_html_from_another_directory(tmp_path):
@@ -40,3 +42,15 @@ def test_manual_missing_directory(tmp_path):
         capture_output=True, text=True, timeout=10)
     assert result.returncode == 2
     assert "index.html not found" in result.stderr
+
+
+def test_existing_page_launch(monkeypatch):
+    configuration = Mock()
+    server = Mock()
+    monkeypatch.setattr(cli, "PageConfiguration", configuration)
+    monkeypatch.setattr(cli, "AsgiServer", server)
+    monkeypatch.setattr(sys, "argv", ["gramlot", "--modules", "/client"])
+    cli.main()
+    configuration.assert_called_once_with(
+        "/client", "/tmp/gramlot-8000", rpc_http_method="WSK")
+    server.return_value.serve.assert_called_once_with(host="127.0.0.1", port=8000)

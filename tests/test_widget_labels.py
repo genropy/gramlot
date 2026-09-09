@@ -6,18 +6,18 @@ from pathlib import Path
 import subprocess
 
 import pytest
-from genro_tytx import to_tytx
-from gramlot.widget_test_builder import WidgetTestBuilder
+from gramlot.transport import to_tytx
+from gramlot.builder import GramlotBuilder
 
 
 class TestWidgetLabels:
     @pytest.mark.parametrize("transport", ["json", "msgpack"])
     def test_python_recipe_uses_the_standalone_widget_label_runtime(self, transport):
-        builder = WidgetTestBuilder("main")
-        field = builder.source.textBox(value="Hello World", readonly=True, lbl="^caption",
+        builder = GramlotBuilder("main")
+        field = builder.root.textBox(value="Hello World", readonly=True, lbl="^caption",
                                        lbl_position="^position", lbl_color="gray",
                                        box_border="1px solid silver", box_padding="8px")
-        builder.source.colorpicker(value="#336699", lbl="Color", lbl_position="TC")
+        builder.root.colorpicker(value="#336699", lbl="Color", lbl_position="TC")
         assert field.node_tag == "textBox"
         assert field.get_attr("lbl") == "^caption"
         assert len(builder.source) == 2  # No wrapper nodes inserted by Python.

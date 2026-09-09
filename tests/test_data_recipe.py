@@ -2,13 +2,13 @@
 """Contract: GUI data spelling seeds recipes without changing generic datastore access."""
 from genro_bag import Bag
 from genro_builders.contrib.html.html_builder import HtmlBuilder
-from gramlot.widget_test_builder import WidgetTestBuilder
+from gramlot.builder import GramlotBuilder
 
 
 def test_gui_data_alias():
-    builder = WidgetTestBuilder("main")
-    builder.source.data("initial", "hello")
-    pane = builder.source.div(datapath="demo")
+    builder = GramlotBuilder("main")
+    builder.root.data("initial", "hello")
+    pane = builder.root.div(datapath="demo")
     pane.data(".record", Bag(dict(name="Astra", count=2)))
     nodes = list(builder.source)
     assert nodes[0].node_tag == "dataSetter"

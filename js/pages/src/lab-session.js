@@ -1,7 +1,7 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 import {Application} from 'gramlot-dom';
 import {Bag} from 'genro-bag-js';
-import {GalleryBuilder} from './gallery.js';
+import {GramlotBuilder} from './builder.js';
 
 export const INITIAL_CODE = `data.setItem('demo.title', 'Hello Genro');
 const pane = root.div({datapath: 'demo'});
@@ -12,7 +12,7 @@ pane.p('Edit the field and move focus: the title updates.');`;
 export const CHANGE_CODE = `data.setItem('demo.title', 'Hello Astra');
 root.p('This node was added to the SourceBag by JavaScript.');`;
 
-class EmptyPage extends GalleryBuilder {
+class EmptyPage extends GramlotBuilder {
     main(root) {}
 }
 

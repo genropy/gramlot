@@ -12,10 +12,10 @@ from genro_asgi import HTTPBadRequest, HTTPForbidden, HTTPNotFound, Response, Ro
 from genro_asgi.applications.spa_app import SPA_CONNECTION_ID_COOKIE
 from genro_asgi.middleware.base import cookie_value
 from genro_toolbox import get_uuid
-from genro_builders.contrib.html.html_builder import HtmlBuilder
+from .builder import GramlotBuilder
 from genro_bag import Bag
 from genro_routes import route
-from genro_tytx import to_tytx
+from gramlot.transport import to_tytx
 
 from .page import WebPage
 from .page_document import PageDocument
@@ -69,13 +69,13 @@ class WebpageApplication(RoutedApplication):
             page_class = self.pages.get(page if page is not None else self.default_page)
             if page_class is None:
                 raise HTTPNotFound("Unknown page")
-            builder = getattr(page_class, "source_builder", HtmlBuilder)("main")
-            page_class().main(builder.source)
+            builder = getattr(page_class, "source_builder", GramlotBuilder)("main")
+            page_class().main(builder.root)
         else:
-            builder = HtmlBuilder("main")
+            builder = GramlotBuilder("main")
             if page is not None:
                 raise HTTPNotFound("Unknown page")
-            self.main(builder.source)
+            self.main(builder.root)
         return self.result_wrapper(
             to_tytx(builder.source, transport=transport),
             media_type=f"application/vnd.tytx+{transport}",
@@ -100,9 +100,9 @@ class WebpageApplication(RoutedApplication):
         if self.worker is not None:
             self.get_registered_page(_request, page_id)
         from .inspector import build_inspector
-        from .widget_test_builder import WidgetTestBuilder
-        builder = WidgetTestBuilder("inspector")
-        build_inspector(builder.source)
+        from .builder import GramlotBuilder
+        builder = GramlotBuilder("inspector")
+        build_inspector(builder.root)
         return self.result_wrapper(to_tytx(builder.source, transport="json"),
                                    media_type="application/vnd.tytx+json")
 

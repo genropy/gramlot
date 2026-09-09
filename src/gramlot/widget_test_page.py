@@ -8,12 +8,12 @@ import inspect
 import textwrap
 
 from .page import WebPage
-from .widget_test_builder import WidgetTestBuilder
+from .builder import GramlotBuilder
 
 
 class WidgetTestPage(WebPage):
-    source_builder = WidgetTestBuilder
-    client_builder = ("/_assets/pages/gallery.js", "GalleryBuilder")
+    source_builder = GramlotBuilder
+    client_builder = ("/_assets/pages/builder.js", "GramlotBuilder")
     widget_tag = ""
     collection = ""
 

@@ -12,14 +12,14 @@ const collections = ['inputs', 'layout', 'colorpicker', 'storeTree', 'palette', 
 for (const name of collections) {
     await import(new URL(`gramlot-dom/src/collections/${name.toLowerCase()}.js`, base));
 }
-class GalleryBuilder extends HtmlBuilder { static wc_requires = collections; }
+class GramlotBuilder extends HtmlBuilder { static wc_requires = collections; }
 const transport = process.argv[3];
 const tag = process.argv[4];
 assert.ok(tag === 'button' || collections.some(name => getCollection(name).grammar.elements[tag]));
 const source = fromTytx(transport === 'msgpack' ? readFileSync(0) : readFileSync(0, 'utf8'), transport);
 const root = document.createElement('div');
 document.body.appendChild(root);
-const builder = new GalleryBuilder('main');
+const builder = new GramlotBuilder('main');
 builder.loadSource(source);
 new Application(root, builder);
 assert.equal(root.querySelectorAll('.widget-test-card').length, 2);

@@ -12,7 +12,8 @@ from tempfile import TemporaryDirectory
 import httpx
 import pytest
 import websockets
-from genro_tytx import to_tytx, from_tytx
+from gramlot.transport import to_tytx
+from genro_tytx import from_tytx
 
 from tests.test_registered_page import RegisteredPageChecks
 

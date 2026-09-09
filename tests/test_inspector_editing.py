@@ -7,24 +7,24 @@ import os
 import pytest
 
 from gramlot.inspector import build_inspector
-from gramlot.widget_test_builder import WidgetTestBuilder
-from genro_tytx import to_tytx
+from gramlot.builder import GramlotBuilder
+from gramlot.transport import to_tytx
 
 
 @pytest.mark.parametrize("authoring", ["javascript", "python"])
 def test_inspector_editing(authoring):
     folder = Path(__file__).parent
-    builder = WidgetTestBuilder("main")
-    build_inspector(builder.source)
+    builder = GramlotBuilder("main")
+    build_inspector(builder.root)
     env = dict(os.environ)
     env.pop("INSPECTOR_PAGE_SOURCE", None)
     if authoring == "python":
-        page = WidgetTestBuilder("page")
-        page.source.data("amount", 12.5)
-        page.source.data("color", "red")
-        page.source.div("^amount", color="^color")
+        page = GramlotBuilder("page")
+        page.root.data("amount", 12.5)
+        page.root.data("color", "red")
+        page.root.div("^amount", color="^color")
         page.source.input(value="^amount", type="number")
-        page.source.textBox(value="^amount", lbl="Amount", lbl_position="TL")
+        page.root.textBox(value="^amount", lbl="Amount", lbl_position="TL")
         env["INSPECTOR_PAGE_SOURCE"] = to_tytx(page.source, transport="json")
     result = subprocess.run(
         ["node", "--experimental-loader", str(folder / "lab_loader.mjs"),

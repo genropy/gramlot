@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import {setupDom} from '../../gramlot-dom/tests/dom.js';
 setupDom();
 const {Application} = await import('gramlot-dom');
-const {GalleryBuilder} = await import('../js/pages/src/gallery.js');
-class Page extends GalleryBuilder {
+const {GramlotBuilder} = await import('../js/pages/src/builder.js');
+class Page extends GramlotBuilder {
     main(root) {
         root.data('title', 'Hello');
         const pane = root.div({datapath:'nested'});

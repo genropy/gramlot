@@ -9,7 +9,7 @@ import json
 from urllib.parse import urlencode
 
 from genro_builders.contrib.html.html_builder import HtmlBuilder
-from genro_tytx import to_tytx
+from gramlot.transport import to_tytx
 
 
 class PageDocument(HtmlBuilder):

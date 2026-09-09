@@ -8,8 +8,8 @@ const {fromTytx} = await import('genro-tytx');
 const {Bag} = await import('genro-bag-js');
 const {Application} = await import('gramlot-dom');
 const {mountInspector} = await import('../js/pages/src/inspector.js');
-const {GalleryBuilder} = await import('../js/pages/src/gallery.js');
-class Example extends GalleryBuilder {
+const {GramlotBuilder} = await import('../js/pages/src/builder.js');
+class Example extends GramlotBuilder {
     setup() { this.setData('amount', 12.5); this.setData('color', 'red'); }
     main(root) {
         root.div('^amount', {color:'^color'});
@@ -20,7 +20,7 @@ class Example extends GalleryBuilder {
 const pageHost = document.createElement('div');
 const host = document.createElement('div');
 document.body.append(pageHost, host);
-const builder = process.env.INSPECTOR_PAGE_SOURCE ? new GalleryBuilder('page') : new Example('page');
+const builder = process.env.INSPECTOR_PAGE_SOURCE ? new GramlotBuilder('page') : new Example('page');
 if (process.env.INSPECTOR_PAGE_SOURCE) builder.loadSource(fromTytx(process.env.INSPECTOR_PAGE_SOURCE, 'json'));
 const page = new Application(pageHost, builder);
 page.live(() => { builder.data.setItem('amount', 12.5); builder.data.setItem('color', 'red'); });

@@ -1,24 +1,42 @@
 # Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
-"""Serve a local HTML manual; application hosting belongs to consumers."""
+"""Run the Gramlot page laboratory or serve the HTML manual (manual)."""
 import argparse
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from genro_asgi import AsgiServer
+
+from .server_configuration import PageConfiguration
 
 
 class Cli:
-    """Serve documentation with the Python standard library."""
+    """Launch the minimal page server with explicit client source locations."""
 
     def run(self):
         parser = argparse.ArgumentParser(description=__doc__)
-        parser.add_argument("command", choices=("manual",),
+        parser.add_argument("command", nargs="?", choices=("manual",),
                             help="Serve the local HTML technical manual")
         parser.add_argument("--directory", type=Path, help="HTML manual directory")
+        parser.add_argument("--modules")
         parser.add_argument("--host", default="127.0.0.1")
-        parser.add_argument("--port", type=int, help="Port (default: 8037)")
+        parser.add_argument("--port", type=int, help="Port (manual: 8037; pages: 8000)")
+        parser.add_argument("--state-dir", help="Worker state directory (default: /tmp/gramlot-PORT)")
+        parser.add_argument("--rpc-http-method", choices=("WSK", "POST", "GET"), default="WSK",
+                            help="Default RPC transport; individual calls may override it")
         options = parser.parse_args()
-        self.serve_manual(parser, options)
+        if options.command == "manual":
+            self.serve_manual(parser, options)
+            return
+        if not options.modules:
+            options.modules = str(Path(__file__).parent / "resources")
+        if options.directory:
+            parser.error("--directory requires the manual command")
+        options.port = 8000 if options.port is None else options.port
+        configuration = PageConfiguration(options.modules, options.state_dir or f"/tmp/gramlot-{options.port}",
+                                          rpc_http_method=options.rpc_http_method)
+        server = AsgiServer(config=configuration)
+        server.serve(host=options.host, port=options.port)
 
 
     def serve_manual(self, parser, options):
@@ -49,7 +67,7 @@ class Cli:
 
 
 def main():
-    """Console entry point for the technical manual."""
+    """Console entry point for the page server and technical manual."""
     Cli().run()
 
 

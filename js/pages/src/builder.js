@@ -8,7 +8,8 @@ import '/_assets/dom/collections/storetree.js';
 import '/_assets/dom/collections/palette.js';
 import '/_assets/dom/collections/clipboard.js';
 
-export class GalleryBuilder extends HtmlBuilder {
+export class GramlotBuilder extends HtmlBuilder {
+    get root() { return this.source; }
     static data_recipe_alias = true;
     static wc_requires = ['inputs', 'layout', 'colorpicker', 'storeTree', 'palette', 'clipboard'];
 }

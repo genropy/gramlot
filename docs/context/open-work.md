@@ -24,6 +24,12 @@ Updated: 2026-09-08. These entries preserve discussion; they are not an automati
 | Legacy coexistence | Optional legacy DB, mixed old/new application resources and package/v2 conventions | The initial standalone ASGI/FastAPI use must not be blocked on hybrid legacy hosting |
 | Mobile/accessibility | Real pointer/touch checks, handles, scrolling, zoom, cancellation and keyboard behavior | Automated desktop emulation is not complete device validation |
 
+## GramlotBuilder preparation — 2026-09-09
+
+The [approved architectural basis](gramlot-builder.md) supersedes a generic Builders rename as the default approach. Before implementation, verify public-wheel extension hooks and browser-only execution, resolve node.data versus datastore access, specify Source transport identity and settle the loader entry boundary. SVG embedding needs a conformance check; a standalone SVG builder is not required yet.
+
+Builders #43 now evaluates ownership/removal of all three generic data-elements. Earlier summaries describing it solely as a completed formula rename are historical.
+
 ## Specific continuity details
 
 The forms task explicitly requested a substantial legacy-store study. Inventory both `GnrStoreBag/Grid/Query` and `gnr.stores._Collection` families (`BagRows`, `ValuesBagRows`, `AttributesBagRows`, `Selection`, `VirtualSelection`, `RpcBase`, `FileSystem`). Inspect `_identifier`/`identifier`, label, application key, node identity, filtered views and partial loading separately. This is preserved in the historical roadmap and forms conversation; it is not implemented here.
@@ -41,3 +47,29 @@ The old manual recorded a `storeTree` retained-callback diagnostic after disposa
 - Bag JS `faf6bef3badb389d25ea4cb3b35c5369cb7ffd8a`, TYTX `6b9bf3a486014d92812caa3b06674083e646c5cd` and Builders `25ae61950717afae10e1d43d8318f272122202ac` belong to the recorded preview. Source overrides must not hide a changed dependency baseline.
 
 The historical `runtime-contract`, `page-owned-runtime`, `python-page-bootstrap` and `registered-page-startup` workflows were completed and archived. They are retained as evidence, not active Gramlot workflows. Earlier prompts requesting agents, messages or releases belong to those tasks and do not authorize repeating them now.
+
+## Verified extension gaps — 2026-09-09
+
+[GramlotBuilder probes](gramlot-builder-verification.md) identified inherited data-element signature replacement as a generic blocker. Hard-coded root/expansion Source construction requires an extension hook only if specialized Source types are selected; a minimal authoring facade already resolves nested data without replacing generic nodes. Python/JS XS transport passed in isolation; full facade conformance and JS HTML/SVG grammar switching remain explicit follow-ups. Parent-driven construction passed without changing ownership; the constructor has no parent argument. No preview dependency was removed.
+
+The [legacy remote/service inventory](legacy-data-remote-services.md) separates RPC, lazy Data, remote Source and optional database helpers. The [contract draft](gramlot-builder.md#contract-draft-01--parent-data-and-service-boundaries) records parent semantics and both data alternatives without selecting one prematurely.
+
+## Continue in Gramlot — verified checkpoint
+
+[Transition handoff](transition-to-gramlot.md): 106 Python/integration and 212 DOM tests pass with explicit preview Builders provenance. Continue framework work here now. First establish a reproducible Gramlot-local environment, then implement the bounded builder slice; publication and historical directory removal remain blocked on their own checks.
+
+## Rosetta consumer update — 2026-09-09
+
+Local migration to Gramlot is implemented in the existing demo-rosetta checkout; see workspace-map.md and its docs/GRAMLOT-MIGRATION.md. FastAPI source consumption is verified without genro-asgi. This resolves the local consumer migration work, not host-optional wheel packaging, repository renaming or removal of Builders preview.
+
+## GramlotBuilder implemented — superseding preview gate
+
+The first facade/transport slice now works with public Builders 0.23.2; see gramlot-builder.md. Gramlot has its own .venv and a clean-wheel installation check. Rosetta consumes that wheel and public Builders. Earlier preview requirements are historical for these migrated consumers. Generic removal under #43, controller naming, remote and broader composition remain separate work.
+
+## Server independence — owner decision, 2026-09-09
+
+Gramlot must not depend on Genro ASGI, including through an optional extra. A future separate application repository will combine Gramlot and Genro ASGI for business applications. This supersedes earlier suggestions for gramlot[asgi] or an optional in-package host adapter.
+
+The integration has been extracted from the Python package and browser assets: application/routes, worker, server configuration, host-specific startup document, WSX/RPC client and bootstrap. Exact originals and associated host tests are preserved under docs/history/asgi-extraction-20260909 with a SHA-256 manifest, excluded from wheels and source distributions. They are recovery material for the future repository, not an active integration maintained inside Gramlot.
+
+Gramlot retains the builder, typed transport, browser runtime, widgets, inspector, recipes and host-independent tests. The CLI only serves local HTML documentation via the Python standard library; it no longer launches an application server. Rosetta owns its FastAPI integration and now installs the Gramlot wheel normally, without --no-deps. No server framework is required by Gramlot.

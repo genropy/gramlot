@@ -1,11 +1,11 @@
 # Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 """Python-authored JavaScript laboratory; client code only implements behavior."""
 from ..page import WebPage
-from ..widget_test_builder import WidgetTestBuilder
+from ..builder import GramlotBuilder
 
 
 class PlaygroundPage(WebPage):
-    source_builder = WidgetTestBuilder
+    source_builder = GramlotBuilder
     client_builder = ("/_assets/pages/playground-page.js", "PlaygroundBuilder")
     client_setup = ("/_assets/pages/playground.js", "mountPlayground")
     source_inspection = False

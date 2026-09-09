@@ -1,0 +1,117 @@
+[
+  {
+    "path": "src/gramlot/application.py",
+    "sha256": "235cbedb7979a90f20b464f92be6ecc84bf7fc67906766892115af683c81b17c",
+    "action": "extracted"
+  },
+  {
+    "path": "src/gramlot/demo.py",
+    "sha256": "c6754cb8c57b961976236ac7151d9353cbcd9d8f63b93f5084080985f0e1b273",
+    "action": "extracted"
+  },
+  {
+    "path": "src/gramlot/hello_world.py",
+    "sha256": "7ddff7206833b9690092dcedfc10b8be552c7b3b7494ac4906d64023da492a1b",
+    "action": "extracted"
+  },
+  {
+    "path": "src/gramlot/server_configuration.py",
+    "sha256": "161cbda65abd37ab9f8636fc9bdd8cd5283ef02b29a446dd08bc90547359e7b5",
+    "action": "extracted"
+  },
+  {
+    "path": "src/gramlot/worker.py",
+    "sha256": "67e6a9ac2a4d6106c6a89cc054dbaf1477584618e9da82abbd57f9f909c51fbf",
+    "action": "extracted"
+  },
+  {
+    "path": "src/gramlot/page_document.py",
+    "sha256": "40a072801c4bc64487be60965d86097969925b4fe808683427049ab795b0568c",
+    "action": "extracted"
+  },
+  {
+    "path": "js/pages/src/application.js",
+    "sha256": "6029bf4ae8d110ea072a19ca0f3afc3f935a04759ce2206022e2907471105f49",
+    "action": "extracted"
+  },
+  {
+    "path": "js/pages/src/bootstrap.js",
+    "sha256": "88e726e3c72bc937a46477c7e8ee93098d9a980d16ee14e597f1c07c4e4d2216",
+    "action": "extracted"
+  },
+  {
+    "path": "js/pages/src/rpc.js",
+    "sha256": "7447352e7532287b1939beb2e0249f3b0f5829292791bf3bf24b5bff94e26c2f",
+    "action": "extracted"
+  },
+  {
+    "path": "tests/test_hello_world.py",
+    "sha256": "adcc0814f56a08255e6a3ba2b1262b6f5f6a9295d6f38e2c370a12ad3c02157b",
+    "action": "extracted"
+  },
+  {
+    "path": "tests/test_page_bootstrap.py",
+    "sha256": "d602d7b66966cd741f2f3c40d60e90c7b9c5dfbd7e745ae236ca2bc4b83ba8dd",
+    "action": "extracted"
+  },
+  {
+    "path": "tests/test_registered_page.py",
+    "sha256": "9246cd06f91522d1b1e187117f650c703ebead3ad7a91a4faac804e6b071a9a8",
+    "action": "extracted"
+  },
+  {
+    "path": "tests/test_registered_server.py",
+    "sha256": "1f010ad585ddde3cba74d1619fd0934e1d83bdb3bde49051cff793fddbc291bd",
+    "action": "extracted"
+  },
+  {
+    "path": "tests/test_registered_channel.py",
+    "sha256": "d7fab78db76f596af8703aed29fc9f2b30e1d5ca2d756a50b0a33c6906411912",
+    "action": "extracted"
+  },
+  {
+    "path": "tests/page_bootstrap.mjs",
+    "sha256": "636f9e55b1ed80f66ee81055c8048ccf47fe5ea02d1d3cf9a725233c074fbba4",
+    "action": "extracted"
+  },
+  {
+    "path": "tests/registered_channel.mjs",
+    "sha256": "1a12cc1ba8aa26078c7540344155495db74764650b36d76a302cda2e8f979cde",
+    "action": "extracted"
+  },
+  {
+    "path": "js/pages/tests/rpc.test.mjs",
+    "sha256": "1d9d9eea8d6808c1ff1c6b7a28a02f0c95048f75dafa1378d5a445dc6b05010e",
+    "action": "extracted"
+  },
+  {
+    "path": "src/gramlot/__main__.py",
+    "sha256": "8cf2fd27e9e267207f0dac33cf3f0ebc1326b1227a030e3baebda44a10b5a58f",
+    "action": "original before split"
+  },
+  {
+    "path": "tests/test_manual_cli.py",
+    "sha256": "a3e6b425a1343db23de3bfa42317b5fe3d87a58a9391dafdebdd893a33ad95c7",
+    "action": "original before split"
+  },
+  {
+    "path": "tests/test_runtime_consumers.py",
+    "sha256": "e005531d9618a97bfef77aff8017be9474cd8a708343f57d3dec0dcad919ba16",
+    "action": "original before split"
+  },
+  {
+    "path": "tests/runtime_consumers.mjs",
+    "sha256": "86d523a0e374fa3bf666cf10bc2eb9f4bb143e065716c21b4d6c6f08d81a2709",
+    "action": "original before split"
+  },
+  {
+    "path": "tests/test_widget_pages.py",
+    "sha256": "cb2aa3f299f45a0b9adde03e39c375fc087ccc2aa6677a976db64544d9de3559",
+    "action": "original before split"
+  },
+  {
+    "path": "scripts/verify_distribution.py",
+    "sha256": "296e2bffc1f2795175c7af33182b3955d1d9c4cea05fc4ae1b568cd249516189",
+    "action": "original before split"
+  }
+]

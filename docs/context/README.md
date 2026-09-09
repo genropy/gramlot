@@ -4,13 +4,23 @@ Updated: 2026-09-08. This is a record of owner decisions and inherited work, not
 
 Read [decisions](decisions.md), [conversation summaries](conversations.md), [open work](open-work.md), and the [first-version scope](first-version.md) before continuing implementation. [Historical documents](../history/README.md) retain detailed source evidence. New user instructions take precedence over every historical record.
 
+See [canonical workspace and retirement map](workspace-map.md) before choosing a checkout or removing old directories.
+
+Read the [approved GramlotBuilder architectural basis and remaining questions](gramlot-builder.md) before changing authoring APIs.
+
+See the [legacy data and remote service inventory](legacy-data-remote-services.md) and [public-wheel builder probes](gramlot-builder-verification.md) for the new builder contract discussion.
+
+Read [development transition and next-task handoff](transition-to-gramlot.md) to continue directly in Gramlot while keeping release and cleanup gates separate.
+
+Read the latest **Server independence** decision in [decisions](decisions.md): no ASGI dependency or extra belongs in Gramlot. The old integration is archived for a separate application repository.
+
 ## Current direction
 
 **Gramlot — GRAMmar for Live Object Trees** is the independent home for the framework previously developed in Genro Pages and Genro DOM JS. The official homepage is https://gramlot.com. The tentative `genro-gui` name is superseded. Live Object Tree (LOT) is intentional vocabulary whose formal semantics remain open; `GRAMmar` evokes Python builders as grammars describing these trees.
 
 **Gramlot Rosetta** is a separate FastAPI consumer and comparison application, intended repository name `gramlot-rosetta`. Its independent installation should expose unwanted framework/host coupling. Generic Bag, TYTX, Builders and server libraries remain external.
 
-The owner is considering a GitHub organization named `gramlot`. `gramlot/gramlot` and `gramlot/gramlot-rosetta` are intended destinations if that organization is established; the existing remote is still `genropy/gramlot`. No organization creation or repository transfer is recorded as completed. Continue local work without inventing a completed transfer.
+**Owner decision, 2026-09-09:** keep the projects under the existing `genropy` GitHub organization. The separate `gramlot` organization proposal is withdrawn; that username is occupied. The active repositories remain `genropy/gramlot` and `genropy/demo-rosetta`. Gramlot Rosetta remains the product name; no repository transfer or rename is implied.
 
 The owner explicitly corrected Pages licensing: **MIT was an error; Apache 2.0 is the correct project license.** Original historical license files are retained as evidence, with this correction taking precedence for the active migration. Preserve copyright and genuine third-party notices.
 
@@ -26,7 +36,7 @@ The immediate priority is a first usable Gramlot version from the existing proto
 
 The local preparation contains 464 tracked files and eight separately retained draft notes, with verified Git blobs and SHA-256 hashes. The selected DOM source is the `codex/python-js-alignment` worktree, not its older canonical `main`. Rosetta already pins the selected Pages and DOM commits. Preparation snapshots are under ignored `temp/migration-2026-09-08/` on the original development Mac.
 
-**Update 2026-09-09:** Python and browser runtime sources have been copied and renamed into Gramlot, and an alpha distribution is being prepared. See [release status](../release.md) for current installation checks and the unpublished Builders dependency blocker. Test results in historical documents still refer to their original checkouts and dates.
+**Update 2026-09-09:** Python and browser runtime sources have been copied and renamed into Gramlot, and an alpha distribution is being prepared. See [release status](../release.md) for current installation checks and the remaining differences from published Builders 0.23.2. Test results in historical documents still refer to their original checkouts and dates.
 
 ## How the memory is preserved
 
