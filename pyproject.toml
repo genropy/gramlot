@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gramlot"
+version = "0.1.0a1"
+description = "Declarative web UI framework describing interfaces in Python as Live Object Trees"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{name = "Genropy Team", email = "info@softwell.it"}]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "genro-asgi>=0.43.1,<0.44",
+    "genro-builders>=0.23.2",
+    "genro-bag>=0.21.1,<0.22",
+    "genro-tytx[msgpack]>=0.15.0",
+    "genro-toolbox",
+]
+
+[project.urls]
+Homepage = "https://gramlot.com"
+Repository = "https://github.com/genropy/gramlot"
+Issues = "https://github.com/genropy/gramlot/issues"
+
+[project.scripts]
+gramlot = "gramlot.__main__:main"
+
+[project.optional-dependencies]
+test = ["pytest>=7.0", "pytest-asyncio>=0.23"]
+
+[tool.hatch.build.hooks.custom]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gramlot"]
+artifacts = ["src/gramlot/resources/**"]
+
+[tool.hatch.build.targets.sdist]
+only-include = ["src", "js/dom/src", "js/dom/package.json", "js/dom/package-lock.json", "js/pages/src", "scripts", "hatch_build.py", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
+artifacts = ["src/gramlot/resources/**"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

@@ -1,0 +1,43 @@
+{
+  "name": "gramlot-dom",
+  "version": "0.1.0",
+  "description": "Gramlot browser runtime (internal package)",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "reactive",
+    "dom",
+    "builder",
+    "bag",
+    "genro"
+  ],
+  "author": "Genropy Team",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/genropy/gramlot"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "dependencies": {
+    "genro-bag-js": "git+https://github.com/genropy/genro-bag-js.git#faf6bef3badb389d25ea4cb3b35c5369cb7ffd8a",
+    "genro-tytx": "git+https://github.com/genropy/genro-tytx.git#6b9bf3a486014d92812caa3b06674083e646c5cd"
+  },
+  "devDependencies": {
+    "jsdom": "27.0.1"
+  },
+  "private": true
+}

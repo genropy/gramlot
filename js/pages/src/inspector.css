@@ -1,0 +1,32 @@
+/* Self-contained inspector styling, independent of the hosting application. */
+.inspector-editor { height:100%; min-height:0; color:#38414b; font:13px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; --splitter-bg:#e5e8ec; --tree-selected-bg:#e4edf6; }
+.inspector-editor * { box-sizing:border-box; }
+.inspector-properties { display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+.inspector-toolbar { display:flex; align-items:center; justify-content:space-between; min-height:29px; padding:2px 5px 2px 9px; background:#f1f3f5; border-bottom:1px solid #d2d7de; color:#727b87; font-size:11px; }
+.inspector-grid-scroll { flex:1; min-height:0; overflow:auto; background:#fff; }
+.inspector-property-row { display:grid; grid-template-columns:minmax(105px,30%) minmax(0,1fr); border-bottom:1px solid #dce0e5; min-height:31px; }
+.inspector-property-name { background:#e6e9ed; min-width:0; }
+.inspector-property-value { display:flex; align-items:center; min-width:0; }
+.inspector-editor input { font:inherit; color:inherit; width:100%; min-width:0; height:30px; padding:4px 8px; border:1px solid transparent; border-radius:0; background:transparent; margin:0; }
+.inspector-property-name input { font-weight:600; }
+.inspector-property-value input { flex:1; }
+.inspector-editor input:not([readonly]):hover { background:#f4f8fc; }
+.inspector-editor input:focus { background:#fff; border-color:#7aa2c5; outline:none; }
+.inspector-editor select { width:72px; flex:none; font-family:inherit; font-size:11px; color:#737f8d; background:transparent; border:0; padding:3px 0; margin:0 3px; }
+.inspector-editor button { min-height:24px; padding:2px 7px; margin:0; font-family:inherit;line-height:1.4; font-size:12px; color:#526171; border:1px solid #c7ced7; border-radius:3px; background:#fff; cursor:pointer; }
+.inspector-editor button:hover { background:#e7eef5; }
+.inspector-property-value button { border:0; width:25px; flex:none; font-size:17px; background:transparent; color:#9c6663; }
+.inspector-editor [hidden] { display:none!important; }
+.inspector-editor :disabled { color:#89929e; cursor:default; }
+.inspector-editor :is(button,select):focus-visible { outline:2px solid #3977aa; outline-offset:-1px; }
+.inspector-property-row[data-dirty='true'] .inspector-property-name { box-shadow:inset 3px 0 #5687b1; }
+.inspector-property-row[data-removed='true'] input { text-decoration:line-through; opacity:.5; }
+.inspector-footer { border-top:1px solid #cbd2da; background:#f7f8fa; }
+.inspector-actions { display:flex; align-items:center; gap:6px; padding:6px; }
+.inspector-editor [data-command='apply'] { background:#356f9f; border-color:#356f9f; color:white; }
+.inspector-editor [data-field='status'] { flex:1; min-width:0; font-size:11px; color:#76818e; overflow-wrap:anywhere; }
+.inspector-editor [data-field='status'][data-error='true'] { color:#a33c35; }
+.inspector-path { padding:4px 8px; border-top:1px solid #e0e4e9; font-size:12px; color:#697582; white-space:nowrap; overflow:auto; }
+@media(pointer:coarse) { .inspector-editor input,.inspector-editor select,.inspector-editor button { min-height:36px; } }
+
+.inspector-cells { height:auto; }

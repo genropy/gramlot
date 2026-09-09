@@ -13,3 +13,16 @@ venv/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Build and test output
+build/
+dist/
+*.egg-info/
+node_modules/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Prepared browser assets (included explicitly in distributions)
+src/gramlot/resources/

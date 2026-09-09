@@ -2,6 +2,14 @@
 
 Updated: 2026-09-08. **Proposed execution scope**, derived from the owner's request to reach a first version quickly. This document does not claim that the version is already implemented, released or published.
 
+## Preparation update: 2026-09-09
+
+Python/JS sources and tests are now in Gramlot; alpha wheel/sdist preparation and
+installed-resource checks pass with the explicit Builders preview dependency.
+Public installation remains blocked by its unpublished version. Real-browser
+verification and the separate Rosetta migration remain unfinished; the exit
+criteria below are not yet all met. See [release status](../release.md).
+
 ## Objective
 
 Bring the existing Pages/DOM prototype into Gramlot, under its new project identity, with an observable runnable example and preserved behavioral tests. Keep Gramlot Rosetta as the independent FastAPI consumer. The first result should let the owner use and inspect the existing functionality immediately after migration.

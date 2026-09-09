@@ -1,0 +1,54 @@
+// Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
+// Public integration contract: no JS reconstruction of the Python-authored recipe.
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {setupDom} from '../../gramlot-dom/tests/dom.js';
+import {Application, HtmlBuilder} from 'gramlot-dom';
+import '/_assets/dom/collections/inputs.js';
+import '/_assets/dom/collections/layout.js';
+import '/_assets/dom/collections/forms.js';
+import {fromTytx} from 'genro-tytx';
+
+setupDom();
+const message=JSON.parse(readFileSync(0,'utf8'));
+const bytes=Buffer.from(message.payload,'base64');
+const source=fromTytx(message.transport==='json' ? bytes.toString() : bytes,message.transport);
+class Page extends HtmlBuilder { static wc_requires=['inputs','layout','forms']; }
+const builder=new Page('main');builder.loadSource(source);
+const host=document.body.appendChild(document.createElement('div'));
+const app=new Application(host,builder);
+const node=id=>builder.nodeById(id);
+const widget=id=>app.target._byId(builder.targetId(node(id)));
+const form=node('name').getFormHandler();
+const scope=node('city').absDatapath('^.city');
+assert.equal(scope,'main.draft.address.city');
+assert.equal(widget('fields').localName,'gnr-formlet');
+assert.equal(widget('fields').shadowRoot.querySelector('.fields').style.gridTemplateColumns,'repeat(2, minmax(0, 1fr))');
+assert.equal(widget('city').shadowRoot.querySelector('label').style.color,'blue');
+assert.equal(form.state.pending,1);
+assert.equal((await form.save()).status,'blocked');
+await new Promise(resolve=>setTimeout(resolve,0));
+assert.equal(form.state.valid,true);
+app.mutate(widget('name').id,'');
+assert.equal(app.data.getItem('main.draft.name'),null);
+assert.equal((await form.save()).status,'blocked');
+app.mutate(widget('name').id,'Alice');
+app.mutate(widget('raw').id,'');
+assert.equal(form.state.dirty,true);
+app.mutate(widget('raw').id,null);
+assert.equal(form.state.dirty,false);
+app.mutate(widget('age').id,-1);
+assert.equal(form.state.valid,false);
+app.mutate(widget('age').id,0);
+app.mutate(widget('code').id,'abc');
+assert.equal(app.data.getItem('main.draft.code'),'ABC');
+assert.equal((await form.save()).status,'saved');
+assert.equal(app.data.getItem('main.forms.contact.dirty'),false);
+app.mutate(widget('name').id,'Changed');
+assert.equal(form.state.valid,false);
+await form.restoreBaseline();
+await new Promise(resolve=>setTimeout(resolve,0));
+assert.equal(app.data.getItem('main.draft.name'),'Alice');
+assert.equal(form.state.valid,true);
+app.dispose();
+console.log(JSON.stringify({scope,saved:true}));

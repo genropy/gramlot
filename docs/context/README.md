@@ -26,7 +26,7 @@ The immediate priority is a first usable Gramlot version from the existing proto
 
 The local preparation contains 464 tracked files and eight separately retained draft notes, with verified Git blobs and SHA-256 hashes. The selected DOM source is the `codex/python-js-alignment` worktree, not its older canonical `main`. Rosetta already pins the selected Pages and DOM commits. Preparation snapshots are under ignored `temp/migration-2026-09-08/` on the original development Mac.
 
-**Runtime import and renaming are not yet complete.** This context import adds durable documentation; it does not claim that Gramlot can already be installed or run. Test results in old documents refer to their original checkouts and dates. Revalidate them after migration.
+**Update 2026-09-09:** Python and browser runtime sources have been copied and renamed into Gramlot, and an alpha distribution is being prepared. See [release status](../release.md) for current installation checks and the unpublished Builders dependency blocker. Test results in historical documents still refer to their original checkouts and dates.
 
 ## How the memory is preserved
 

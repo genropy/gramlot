@@ -1,0 +1,40 @@
+body {font: 17px/1.6 system-ui, sans-serif; margin: 0; background: #f4f6f8; color: #182534}
+* {box-sizing: border-box}
+body {display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100vh}
+main {width: 100%; max-width: 1120px; margin: 0 auto; padding: 28px 36px; min-width: 0}
+#page-menu {height: 100vh; position: sticky; top: 0; overflow-y: auto; padding: 20px 16px; background: white; border-right: 1px solid #dbe2e8; font-size: 14px}
+#page-menu ul {list-style: none; padding: 0; margin: 0}
+#page-menu > ul > li {margin-bottom: 20px; font-weight: 650}
+#page-menu ul ul {padding-left: 12px; margin-top: 4px; font-weight: 400}
+#page-menu a {display: block; padding: 4px 8px; border-radius: 5px; color: #235a87; text-decoration: none}
+#page-menu a:hover {background: #edf3f8}
+a:focus-visible, button:focus-visible, summary:focus-visible {outline: 2px solid #235a87; outline-offset: 2px}
+nav[aria-label="Transport"] {margin-bottom: 24px; font-size: 13px}
+button {font: inherit; padding: 5px 10px; border: 1px solid #c8d3df; border-radius: 5px; background: white; color: inherit; cursor: pointer}
+@media (max-width: 700px) {
+  body {display: block}
+  #page-menu {position: static; height: auto; max-height: 240px; border-right: 0; border-bottom: 1px solid #dbe2e8}
+  main {padding: 20px 16px}
+}
+.hello {padding: 32px; background: white; border: 1px solid #dbe2e8; border-radius: 12px}
+h1 {font-size: 42px; margin-top: 0} .path {color: #50677c}
+input {font: inherit; padding: 8px 12px; border: 1px solid #dbe2e8; border-radius: 6px}
+details {margin-top: 24px} pre {white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px}
+#error {color: #9b2020}
+.widget-test-card {background: white; border: 1px solid #dbe2e8; border-radius: 10px; padding: 20px; margin: 20px 0}
+.widget-test-card h2 {font-size: 20px}
+.widget-test-body {padding: 16px; border: 1px dashed #c8d3df; min-width: 0}
+.widget-test-card pre {max-height: 320px; overflow: auto}
+.python-recipe {white-space: pre; overflow: auto; max-height: 520px; padding: 20px; background: #f6f8fa; color: #24292f; font: 13px/1.7 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size: 4}
+
+.lab-toolbar {display:flex; gap:8px; flex-wrap:wrap}
+.lab-columns {display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:20px}
+.lab-columns section {min-width:0}
+.lab-columns h2 {font-size:18px}
+.lab-editor, .lab-preview {border:1px solid #c8d3df; background:white; min-height:300px}
+.lab-preview {padding:16px}
+.lab-editor textarea {width:100%; min-height:300px; font:13px/1.6 monospace}
+.lab-editor .cm-editor {height:360px; font-size:13px}
+.lab-editor .cm-scroller {overflow:auto}
+.lab-columns pre {max-height:350px; overflow:auto; background:white; padding:12px}
+@media(max-width:1000px) {.lab-columns {grid-template-columns:1fr}}
