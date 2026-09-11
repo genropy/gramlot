@@ -416,3 +416,13 @@ Implementation follow-up: `live=True` / `live: true` now selects input-event
 write-back, while absent or false keeps focus-out behavior. The earlier
 `updateOn` spelling remains a compatibility fallback when `live` is absent.
 Rosetta lesson 02 now shows two independent stacked pairs to compare both modes.
+
+## Application navigation skin — owner correction, 2026-09-11
+
+Application menus use a lightweight tree presentation: thin folder icons for
+branches, content-specific outline icons for leaves, compact indentation,
+regular-weight labels and subtle selection. Avoid heavy buttons, connector lines
+and decorative boxes in navigation. The owner reference illustrates hierarchy and
+icon style, not a request to turn the current theme dark. Gallery, tutorial and
+the composed workspace share navigation-tree.css; ordinary action buttons retain
+the previously approved button styling.

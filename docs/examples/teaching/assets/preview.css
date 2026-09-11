@@ -1,3 +1,4 @@
+@import url("navigation-tree.css");
 :root{font-family:system-ui,sans-serif;color:#172642;background:#f5f7fb}
 *{box-sizing:border-box}body{margin:0}header{padding:18px 28px;background:white;border-bottom:1px solid #dce3ee}
 header a,a{color:#1643c5}main{max-width:1440px;margin:auto;padding:32px 28px 70px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:#1643c5;font-size:12px;font-weight:700}
@@ -29,10 +30,6 @@ header{min-height:68px;background:#f5f7fb;padding:18px 28px}
 .brand{font-size:22px;font-weight:750;text-decoration:none;color:#172642}.brand span{color:#1643c5}
 .app-shell{display:grid;grid-template-columns:250px minmax(0,1fr);max-width:1800px;margin:auto}
 .sidebar{position:sticky;top:0;height:100dvh;overflow:auto;border-right:1px solid #dce3ee;padding:24px 14px 40px}
-.lesson-tree>a,.lesson-tree li a{display:block;padding:7px 10px;color:#58657a;text-decoration:none;border-radius:5px;line-height:1.35;font-size:14px}
-.lesson-tree a:hover{background:#edf1f8;color:#1643c5}.lesson-tree a[aria-current=page]{background:#e7edfc;color:#1643c5;font-weight:650}
-.lesson-tree details{margin:18px 0}.lesson-tree summary{cursor:pointer;font-weight:650;font-size:14px;padding:6px 0}
-.lesson-tree ul{list-style:none;margin:6px 0 0 6px;padding:0 0 0 8px;border-left:1px solid #e0e6f0}
 .app-shell main{width:100%;min-width:0;margin:0;padding:32px 28px 70px}
 .skip-link{position:fixed;left:12px;top:-60px;background:white;padding:10px;z-index:100}.skip-link:focus{top:8px}
 @media(max-width:1000px){.app-shell{grid-template-columns:210px minmax(0,1fr)}.example-code{grid-template-columns:1fr}.code-pane{border-left:0;border-top:1px solid #dce3ee}}

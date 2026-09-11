@@ -110,7 +110,7 @@ function section(path){
     const summary=document.createElement('summary');summary.textContent=title;node.append(summary);parent.append(node);sections.set(path,node);return node;
 }
 for(const [tag,spec] of Object.entries(catalogue)){
-    const item=document.createElement('div');item.className='item';item.draggable=!spec.disabled;item.dataset.widget=tag;
+    const item=document.createElement('div');item.className='item';item.draggable=!spec.disabled;item.dataset.widget=tag;item.dataset.container=String(Boolean(spec.container));
     const label=document.createElement('span');label.textContent=tag;
     const button=document.createElement('button');button.textContent='+';button.className='catalogue-add';button.title=spec.disabled||'Add '+tag;button.disabled=!!spec.disabled;button.setAttribute('aria-label','Add '+tag);
     if(spec.disabled){item.title=spec.disabled;item.classList.add('unavailable');}

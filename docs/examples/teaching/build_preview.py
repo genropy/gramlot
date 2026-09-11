@@ -74,14 +74,15 @@ def navigation(lessons: list[dict], current: str) -> str:
         groups.setdefault(lesson['group'], []).append(lesson)
     def link(url, title):
         selected = ' aria-current="page"' if current == url else ''
-        return f'<a href="{escape(url, quote=True)}"{selected}>{escape(title)}</a>'
+        icon = ('grid' if url == '/gallery/' or '/grid/' in url else 'file') if url.startswith('/gallery/') else 'book'
+        return f'<a href="{escape(url, quote=True)}" data-nav-icon="{icon}"{selected}>{escape(title)}</a>'
     gallery = current.startswith('/gallery/')
     branches = ([link('/gallery/', 'Gallery overview'), link('/', 'Tutorial →')] if gallery else
                 [link('/', 'Introduction'), link('/gallery/', 'Component gallery →'), link('/builder/', 'Visual Source builder · PoC')])
     for group, items in groups.items():
         links = ''.join(f'<li>{link("/" + item.get("_base", "lessons/" + item["slug"]) + "/", item["title"])}</li>' for item in items)
         branches.append(f'<details open data-nav-group="{escape(group, quote=True)}"><summary>{escape(group)}</summary><ul>{links}</ul></details>')
-    return '<nav aria-label="Examples" class="lesson-tree">' + ''.join(branches) + '</nav>'
+    return '<nav aria-label="Examples" class="lesson-tree nav-tree">' + ''.join(branches) + '</nav>'
 
 
 def document(title: str, body: str, lessons: list[dict], current: str = '/') -> str:
