@@ -10,7 +10,8 @@ recipe loader, code panel and inspector. Build both with:
 ```
 
 Navigation comes from `js/dom/src/components/builtin-components.json`: collection,
-then component. The first version contains 29 components and 60 independent cases.
+then component. The current version contains 30 components, 31 pages and 65 independent cases.
+Grid has separate pages for 50 Bag-valued rows and 5,000 attribute-backed rows.
 `cases.py` owns the curated checks. Each entry has a title, an expected behavior
 and a Python recipe body. `prepare()` adds the common imports and WebPage wrapper
 and emits the exact executable recipe next to its TYTX and frame. Each frame
@@ -37,7 +38,7 @@ The gallery retains independent, described cases and visible state. It does not
 claim to port unsupported legacy RPC, currency, formulaBox or layout features.
 Current cases cover bindings, null/disabled states, numeric precision/bounds,
 symbolic dates, layout composition, stack commands, clipboard, palette, tree
-selection, memory forms and the editor collection.
+selection, memory forms, resident grid formulas and the editor collection.
 
 ## Validation and limitations
 
@@ -50,7 +51,9 @@ for all advertised manual checks.
 Browser spot checks cover Decimal display versus full-precision editing and tree
 caption/selection with independent cases. CodeMirror reuses the existing optional
 CDN integration and its textarea fallback; Node smoke checks exercise the fallback.
-Gallery case bodies are currently Python-authored and displayed read-only.
+Gallery case bodies are Python-authored and displayed read-only. The grid cases
+also provide editable JavaScript recipes so both authoring forms execute in the
+same gallery host.
 
 
 ## Install from Chrome

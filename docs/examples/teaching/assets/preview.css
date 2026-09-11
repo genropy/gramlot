@@ -11,9 +11,9 @@ main>section{margin-block:36px}main>section>p{line-height:1.5;max-width:1000px}.
 
 .recipe-editor[hidden]{display:none}
 .lab-row[data-lesson="11-source-slider"] iframe{height:660px}
-.example-code.resizable{grid-template-columns:minmax(0,var(--example-width,45%)) 12px minmax(0,1fr)}
+.example-code.resizable{grid-template-columns:minmax(0,calc(var(--example-width,50%) - 6px)) 12px minmax(0,1fr)}
 .lab-divider{cursor:col-resize;touch-action:none;background:#edf1f7;position:relative;outline-offset:-2px}
-.lab-divider::after{content:"";position:absolute;top:calc(50% - 24px);left:4px;width:4px;height:48px;border-radius:4px;background:#9caec8}
+.lab-divider::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:4px;height:48px;border-radius:4px;background:#9caec8}
 .lab-divider:hover,.lab-divider:focus-visible{background:#dce7fa;outline:2px solid #1643c5}
 .example-code.resizing{user-select:none;cursor:col-resize}.example-code.resizing iframe{pointer-events:none}
 @media(max-width:700px){.example-code.resizable{grid-template-columns:1fr}.lab-divider{display:none}}

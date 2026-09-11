@@ -17,3 +17,6 @@ class AdjacentWidgetDeclarations:
 
     @element(sub_tags='', _meta={'webcomponent': True, 'render_tag': 'gnr-codemirror'})
     def codeMirror(self, **kwargs): ...
+
+    @element(sub_tags='', _meta={'webcomponent': True, 'render_tag': 'gnr-grid'})
+    def grid(self, **kwargs): ...

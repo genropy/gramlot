@@ -4,8 +4,8 @@
  *
  * The renderer hands the resolved branch as the `.storeBag` property (the
  * data-widget hook); the widget draws the hierarchy, keeps its own expand
- * state, and redraws on Bag change. It is kept OUT of the pointer_map, so
- * the engine never re-renders it (its internal state survives mutations).
+ * state, and redraws on Bag change. Store replacement updates the mounted
+ * widget without losing its internal expansion state.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -42,11 +42,53 @@ function mount() {
     return { genro, el: root.querySelector('gnr-storetree') };
 }
 
+test('replacing a store branch updates the existing tree and preserves expansion', () => {
+    const {genro, el} = mount();
+    const branch = el.shadowRoot.querySelector('details');
+    branch.open = true;
+    branch.dispatchEvent(new window.Event('toggle'));
+    const replacement = new Bag();
+    replacement.setItem('docs', new Bag(), {caption:'Updated documents'});
+    replacement.setItem('docs.new', 'content', {caption:'New file'});
+    genro.live(() => genro.data.setItem('main.fs', replacement));
+    assert.equal(el.storeBag, replacement);
+    assert.match(el.shadowRoot.textContent, /New file/);
+    assert.equal(el.shadowRoot.querySelector('details').open, true);
+    genro.dispose();
+});
+
 test('the data-widget receives the Bag branch as the .storeBag property', () => {
     const { el } = mount();
     assert.ok(el, 'storeTree projected as <gnr-storetree>');
     assert.ok(el.storeBag instanceof Bag, '.storeBag is the resolved Bag (not a string)');
     assert.equal(el.getAttribute('store'), null, 'the store branch is not stringified as an attribute');
+});
+
+test('an externally attached store survives unrelated source reconciliation', () => {
+    setupDom();
+    class ExternalTreePage extends HtmlBuilder {
+        static wc_requires = ['storeTree'];
+        main(root) { root.storeTree({labelAttribute:'caption', node_id:'tr'}); }
+    }
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    const genro = new Application(root, new ExternalTreePage('main'));
+    const el = root.querySelector('gnr-storetree');
+    const external = new Bag();
+    external.setItem('attached', 'value');
+    el.storeBag = external;
+    genro.live(() => genro.builder.nodeById('tr').setAttr({labelAttribute:'name'}));
+    assert.equal(el.storeBag, external);
+    assert.match(el.shadowRoot.textContent, /attached/);
+    genro.dispose();
+});
+
+test('a recipe-managed store is cleared when its pointer becomes empty', () => {
+    const {genro, el} = mount();
+    genro.live(() => genro.data.pop('main.fs'));
+    assert.equal(el.storeBag, null);
+    assert.equal(el.shadowRoot.querySelector('.leaf, details'), null);
+    genro.dispose();
 });
 
 test('renders one row per node, captions from labelAttribute', () => {

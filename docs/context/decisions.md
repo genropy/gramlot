@@ -1,5 +1,77 @@
 # Recorded decisions and corrections
 
+## Python application authors, JavaScript framework behavior — 2026-09-11
+
+The owner clarified that Gramlot targets Python programmers. Applications and
+demos must be authored in Python, with only small local JavaScript fragments
+when necessary. Source views should show Python first. Missing browser behavior
+should become a Python declaration backed by reusable framework JavaScript,
+not a large embedded script or application-specific JS support file.
+
+The OpenAPI PoC now follows this direction: page.py declares the application;
+openApiClient/openApiForm emit Source controllers backed by the framework's
+OpenApiClientService. The JSON/OpenAPI compiler is framework domain logic.
+Python Source is compiled to TYTX and mounted by a generic browser host.
+The remaining limits are recorded in the OpenAPI client guide and PoC README.
+
+## Gramlot-only applications — imperative owner directive, 2026-09-11
+
+Anything written or presented as a Gramlot application, example or PoC must use
+only Gramlot's application mechanisms. The purpose is to reveal capabilities
+missing from the framework. Achieving the visible result through manual DOM,
+event wiring, input scraping, ad hoc HTTP or parallel state management defeats
+that purpose and is unacceptable, even if Gramlot creates part of the UI.
+
+Missing capabilities must be identified and implemented as reusable Gramlot
+features, then consumed through Source, Data Bags, bindings, controllers,
+resolvers and shared components. Native implementation inside the framework is
+distinct from an application bypass; ordinary domain/schema translation code
+still runs through supported Gramlot mechanisms.
+
+This is a mandatory source-review and completion criterion. Earlier PoCs are
+not exemptions. In particular, the current OpenAPI explorer requires a rewrite;
+its passing HTTP/browser checks do not establish compliance with this rule.
+
+## Grid column widths — owner clarification, 2026-09-11
+
+The owner accepts plain numeric widths in pixels instead of requiring a `px`
+suffix. `width=0` denotes an elastic column, following the intended legacy
+convention; it is not a hidden or zero-pixel column. Preserve the declared zero
+in the structure separately from computed viewport geometry. The current alpha
+still rejects zero and therefore does not yet implement this requirement.
+Minimum elastic width, distribution among multiple elastic columns and the
+effect of manual resizing on elasticity require an explicit implementation
+contract; they were not settled by the owner's clarification.
+
+## Approved button appearance — owner preference, 2026-09-11
+
+The owner approved the compact light button style shown in the static-grid
+gallery and requests the same appearance in other contexts with buttons. Use it
+as the default visual reference for future work: 13px typography, restrained
+padding, a light background, thin neutral border and subtly rounded corners,
+with clear hover/focus states. The current reference implementation is the
+button rule in `docs/examples/teaching/assets/frame.css` (26px minimum height,
+3px 9px padding, 4px radius). Reuse shared styling rather than introducing a
+different button treatment in each example. This records a cross-context design
+preference; it does not claim that all existing framework buttons were migrated.
+
+## Compact grid presentation — owner direction, 2026-09-11
+
+The supplied legacy screenshots establish a general standard of compact,
+information-dense interfaces. The owner explicitly requested a cleaner base grid
+style with centered headers and zebra rows, plus the ability to freeze the first
+column or first N columns. The alpha now provides 13px typography, 26px rows,
+shared theme variables and `frozenColumns` (default 0). Gallery examples freeze
+the first two columns. This does not imply adopting every feature visible in the
+screenshots or implementing a full theme redesign for all controls.
+
+## Example/code splitter — owner decision, 2026-09-11
+
+Always provide the draggable splitter between the live example panel and its
+code in the tutorial/gallery host, for both Python and JavaScript. This is a
+shared host default rather than a per-lesson opt-in. Narrow mobile layouts may
+stack the panels using the existing responsive layout.
+
 ## Installable example applications — owner decision, 2026-09-11
 
 User-facing applications produced here should be installable from Chrome, as in
@@ -417,6 +489,25 @@ write-back, while absent or false keeps focus-out behavior. The earlier
 `updateOn` spelling remains a compatibility fallback when `live` is absent.
 Rosetta lesson 02 now shows two independent stacked pairs to compare both modes.
 
+## Grid structure in Data — owner correction, 2026-09-11
+
+Grid columns must be controlled through a legacy-shaped structure Bag in Data:
+`view_0.rows_0.cell_*`, cell metadata in attributes, node order as column order.
+`structpath` connects the grid to this Bag; resize writes back to its cell node.
+Source-owned arrays are superseded as the primary authoring mechanism. See
+[legacy audit and implementation](../development/grid-structure-legacy-2026-09-11.md).
+
+## Resident grid formulas — implemented contract, 2026-09-11
+
+The owner requested legacy-style structure formulas whose results are stored in
+the resident records. `formula`, `calculated` and reactive/passive `formula_*`
+parameters retain their verified legacy roles. Gramlot makes dependency ordering
+and cycle rejection explicit, and recalculates order/aggregate special forms on
+delete and reorder where the legacy implementation did not. Decimal arithmetic
+uses a Decimal-backed bounded grammar and never falls through to native JavaScript
+operators. Presentation formatting does not round stored results. See the
+[implementation record](../development/grid-formulas-plan-2026-09-11.md#implemented-contract-and-verification).
+
 ## Application navigation skin — owner correction, 2026-09-11
 
 Application menus use a lightweight tree presentation: thin folder icons for
@@ -426,3 +517,24 @@ and decorative boxes in navigation. The owner reference illustrates hierarchy an
 icon style, not a request to turn the current theme dark. Gallery, tutorial and
 the composed workspace share navigation-tree.css; ordinary action buttons retain
 the previously approved button styling.
+
+## Distributable browser runtime built by Gramlot CI — owner decision, 2026-09-11
+
+The owner wants Gramlot CI to produce a distributable browser runtime bundle.
+Consumers should be able to use that prebuilt artifact across their pages,
+without rebuilding the framework separately for each site or page. The Rosetta
+and gramlot.org application-level bundling work is transitional, not the desired
+long-term distribution boundary.
+
+The intended artifact must retain the runtime entry points/shared chunks and
+supporting component/inspector resources, with version identity and license
+notices. It can be hosted by a consuming site; a CDN is an optional delivery
+mechanism, not a requirement. Recipe and application-code builds remain separate.
+The precise artifact format, release channel, wheel inclusion and CI implementation
+are still to be designed; this records the distribution objective, not a completed
+framework release or authorization to publish a new package.
+
+The owner accepted the proposed starting format: a CI-built versioned browser ZIP
+and identical prebuilt payload in the Python wheel, with CDN delivery optional
+later. Local implementation is authorized. This does not publish a new framework
+version by itself. See [distribution contract](../development/browser-distribution-proposal.md).

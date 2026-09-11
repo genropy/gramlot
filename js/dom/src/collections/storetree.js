@@ -8,9 +8,8 @@
  * resolved Bag branch as the `.storeBag` property (see html-builder
  * renderedItem), and the widget owns everything — it draws the hierarchy
  * from the Bag, keeps its own expand/collapse state, and subscribes to the
- * Bag to redraw on change (the GnrStoreBag model). The engine does NOT
- * re-render it (it is kept out of the pointer_map, see builder-base
- * runtimeValues).
+ * Bag to redraw on change (the GnrStoreBag model). Store-pointer replacement
+ * is reconciled onto the same mounted widget, preserving expansion state.
  *
  * Authoring:
  *   pane.storeTree({ store: '^data.folders', labelAttribute: 'caption' })

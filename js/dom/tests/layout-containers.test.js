@@ -241,3 +241,46 @@ test('the toggle collapses and expands the drawer', () => {
     left.querySelector('.drawer-toggle').click();
     assert.equal(left.classList.contains('drawer-closed'), false);
 });
+
+test('legacy contentPane region routes panes and enables its splitter', () => {
+    class RegionPage extends HtmlBuilder {
+        static wc_requires = ['layout'];
+        main(root) {
+            const layout = root.borderContainer({height:'460px'});
+            layout.contentPane({region:'top',height:'38px'}).div('Header');
+            layout.contentPane({region:'left',width:'150px',splitter:true,drawer:true}).div('Navigation');
+            layout.contentPane({region:'center'}).div('Center');
+            layout.contentPane({region:'bottom',height:'30px'}).div('Footer');
+        }
+    }
+    const {genro,host} = mountApp(RegionPage);
+    const border = host.querySelector('gnr-bordercontainer');
+    assert.deepEqual([...border.children].map(pane=>pane.getAttribute('slot')), ['top','left','','bottom']);
+    assert.ok(border.shadowRoot.querySelector('.region.left .handle'));
+    assert.ok(border.shadowRoot.querySelector('.region.left .drawer-toggle'));
+    genro.dispose(); host.remove();
+});
+
+test('reactive splitter pane width opens its owned region from zero', () => {
+    setupDom();
+    class Page extends HtmlBuilder {
+        static wc_requires = ['layout'];
+        main(root) {
+            root.dataSetter({destination:'width',value:'0px'});
+            const layout=root.borderContainer({height:'300px'});
+            layout.contentPane({region:'center'}).div('Application');
+            layout.contentPane({region:'right',width:'^width',splitter:true}).pre('Source');
+        }
+    }
+    const host=document.body.appendChild(document.createElement('div'));
+    const app=new Application(host,new Page('main'));
+    const layout=host.querySelector('gnr-bordercontainer');
+    const region=layout.shadowRoot.querySelector('.region.right');
+    assert.equal(region.style.width,'0px');
+    app.live(()=>app.data.setItem('main.width','420px'));
+    assert.equal(region.style.width,'420px');
+    assert.equal(layout.querySelector('[slot=right]').style.width,'100%');
+    app.live(()=>app.data.setItem('main.width','0px'));
+    assert.equal(region.style.width,'0px');
+    app.dispose();host.remove();
+});

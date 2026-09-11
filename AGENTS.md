@@ -17,6 +17,39 @@ owner corrections. The user's current instructions always take precedence.
 - Keep code and maintained technical documentation in English. Preserve original
   language in historical copies and explicitly requested Italian documentation.
 
+## Imperative: Gramlot applications must use only Gramlot
+
+Owner directive, 2026-09-11: anything presented as a Gramlot application,
+example, demo or PoC MUST be implemented through Gramlot. This is an acceptance
+requirement, not a preference. These applications exist to expose framework gaps.
+
+- Use Gramlot Source, Data Bags, bindings, controllers, resolvers and shared
+  components for application UI, state, interactions and requests.
+- Do not bypass the framework with direct DOM construction/manipulation, manual
+  DOM event wiring, input scraping, ad hoc fetch calls or parallel UI/state
+  machinery in application code. A Gramlot-generated shell around imperative
+  application code does not satisfy this rule.
+- When a required capability is missing, identify it explicitly and implement
+  the reusable capability in Gramlot before using it in the application. Do not
+  hide the gap behind a local workaround to make the demo appear complete.
+- Native browser implementation belongs inside framework internals/components;
+  it is not an exemption for application code. Domain logic and schema-to-Source
+  translation may use Python/JavaScript through Gramlot's supported mechanisms.
+- Review the application source against this rule before calling work complete.
+  Existing bypasses are migration debt, not precedent or authorization to repeat
+  them. The OpenAPI PoC rewrite and its remaining scope are documented in
+  docs/examples/gramlot-api-poc/README.md.
+
+## Python-first application authoring
+
+Owner clarification, 2026-09-11: the intended application authors are Python
+programmers. Author applications and demos in Python and show Python first in
+Source views. Small local JavaScript fragments are acceptable when necessary;
+do not hide an application's implementation in large JS strings or support files.
+Expose missing client capabilities as Python declarations backed by reusable
+framework JavaScript services/components. Framework internals and explicit JS
+runtime tests may use JavaScript; application authors should not need to.
+
 ## Canonical workspace policy
 
 Read `docs/context/workspace-map.md` before checkout/dependency cleanup. The active

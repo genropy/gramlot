@@ -1,5 +1,5 @@
 @import url("navigation-tree.css");
-:root{font-family:system-ui,sans-serif;color:#172642}body{margin:0;padding:22px}p{color:#58657a}button{font:inherit;margin:4px;padding:6px 10px}#error{color:#a02020;background:#fff0f0;padding:12px}
+:root{font:13px/1.4 system-ui,sans-serif;color:#283340}body{margin:0;padding:12px}p{color:#58657a}button{font:inherit;margin:0 6px 0 0;padding:3px 9px;min-height:26px;border:1px solid #c6ced6;border-radius:4px;background:#f8fafb;color:inherit;cursor:pointer}button:hover{background:#edf2f6}button:focus-visible{outline:2px solid #527fa2;outline-offset:1px}#error{color:#a02020;background:#fff0f0;padding:12px}
 .contact-cards{margin-top:14px}
 .contact-controls{display:flex;align-items:end;gap:14px;flex-wrap:wrap}.contact-controls button{margin:0}.gramlot-inspector-launcher{display:inline-flex;align-items:center;gap:7px}
 

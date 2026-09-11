@@ -14,6 +14,7 @@
  */
 import { Bag, BagNode } from 'genro-bag-js';
 import { registerClass } from 'genro-tytx';
+import {resolverDeclaration} from './resolvers/service.js';
 
 /** Names that collide with a language keyword; the trailing-underscore
  *  form escapes them (`class_` → `class`), parity with fixed_attr_items. */
@@ -361,6 +362,34 @@ export function wrapSource(target) {
                 return (destination, value, attrs = {}) => call(typeof destination === "string"
                     ? {...attrs, destination, value} : destination);
             }
+            if (prop === 'quickGrid' && builder.schemaTag('grid')) {
+                return (options = {}) => {
+                    const {value = null, ...attrs} = options;
+                    if ('store' in attrs) throw new TypeError('quickGrid uses value; use grid for an explicit store');
+                    return elementCall(builder, obj, 'grid', onBag)({...attrs, store:value});
+                };
+            }
+            if (prop === 'urlResolver' || prop === 'openApiResolver') {
+                return (destination, url, options = {}) => elementCall(builder, obj, 'dataController', onBag)(
+                    resolverDeclaration(prop === 'urlResolver' ? 'url' : 'openapi', destination, url, options));
+            }
+            if (prop === 'column' && !onBag && obj.nodeTag === 'grid') {
+                return (field, attrs = {}) => {
+                    if (typeof field !== 'string' || !field) throw new TypeError('column() requires a nonempty field');
+                    if (!obj._gridStructure) {
+                        if (obj.getAttr('structpath') || obj.getAttr('columns')) throw new TypeError('column() cannot extend an external structure');
+                        builder._gridStructSerial = (builder._gridStructSerial || 0) + 1;
+                        const path = `__grid_structures.grid_${builder._gridStructSerial}`;
+                        obj._gridStructure = new Bag();
+                        obj._gridStructure.setItem('view_0.rows_0', new Bag());
+                        elementCall(builder, builder.source, 'dataSetter', true)({destination:path, value:obj._gridStructure});
+                        obj.setAttr({structpath:path});
+                    }
+                    const cells = obj._gridStructure.getItem('view_0.rows_0');
+                    cells.setItem(`cell_${cells.getNodes().length}`, null, {...attrs, field});
+                    return wrapSource(obj);
+                };
+            }
             const tag = builder.schemaTag(prop);
             if (onBag && tag) {
                 return elementCall(builder, obj, tag, onBag);
@@ -387,7 +416,25 @@ export function wrapSource(target) {
 /** Build the callable that creates and returns a wrapped child node. */
 function elementCall(builder, target, tag, onBag) {
     return (...args) => {
-        const { value, attrs } = splitArgs(args);
+        let { value, attrs } = splitArgs(args);
+        if (tag === 'dataFormula' && typeof args[0] === 'string') {
+            const [destination, formula, bindings = {}] = args;
+            if (args.length > 3 || (typeof formula !== 'string' && typeof formula !== 'function')
+                || !bindings || typeof bindings !== 'object' || Array.isArray(bindings)
+                || 'destination' in bindings || 'formula' in bindings) {
+                throw new Error('Use dataFormula(destination, formula, bindings)');
+            }
+            value = null;
+            attrs = {...bindings, destination, formula};
+        } else if (tag === 'css' && (typeof args[0] !== 'object' || args[0] === null)) {
+            value = null;
+            attrs = {rule:args[0], styleRule:typeof args[1] === 'string' ? args[1] : '',
+                ...(typeof args[1] === 'object' ? args[1] : args[2])};
+        } else if (tag === 'styleSheet' && (typeof args[0] !== 'object' || args[0] === null)) {
+            value = null;
+            attrs = {cssText:args[0], ...(typeof args[1] === 'object' ? args[1]
+                : {cssTitle:args[1], href:args[2]})};
+        }
         const node = onBag
             ? builder.bagCall(target, tag, value, attrs)
             : builder.commandOnNode(target, tag, value, attrs);

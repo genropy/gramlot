@@ -4,6 +4,10 @@ from genro_builders.builder import SourceBag, SourceBagNode
 from genro_bag import Bag
 from genro_builders.contrib.html.html_builder import HtmlBuilder
 
+from .grammar.resources import ResourceDeclarations, ResourceAuthoring
+from .grammar.grid import GridAuthoring
+from .grammar.resolvers import ResolverAuthoring
+
 from .grammar import (
     AdjacentWidgetDeclarations,
     DecorationDeclarations,
@@ -16,6 +20,7 @@ from .grammar import (
 
 
 class GramlotBuilder(
+    ResourceDeclarations,
     FormDeclarations,
     DecorationDeclarations,
     InputDeclarations,
@@ -56,7 +61,7 @@ class GramlotBuilder(
         """Browser runtime owns execution of declarative logic."""
 
 
-class AuthoringNode(LogicDeclarations):
+class AuthoringNode(GridAuthoring, ResolverAuthoring, ResourceAuthoring, LogicDeclarations):
     """Recipe facade: names do not replace properties on generic source nodes.
 
     Pass this surface to helpers to build into an existing parent. ``node`` is

@@ -16,3 +16,7 @@ export {ControlTools} from './components/control-tools.js';
 export {getComponentBases, Decorated, FieldState} from './components/bases.js';
 export {registerComponentCollection, getComponentDescriptions} from './components/registry.js';
 export {builtinComponents} from './components/builtin-components.js';
+export {BagRows, ValuesBagRows, AttributesBagRows} from './stores/bag-rows.js';
+export {GridChangeManager} from './collections/grid-formulas.js';
+export {GridStruct} from './collections/grid-authoring.js';
+export {UrlResolver, OpenApiResolver, jsonBag, plainJson} from './resolvers/http.js';

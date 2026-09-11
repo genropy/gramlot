@@ -1,43 +1,54 @@
-# Gramlot API exploration
+# Python OpenAPI explorer
 
-Status, 2026-09-10: parked by the owner; no further work scheduled.
-The tag -> path -> HTTP operation disclosure tree was added and verified,
-including branch collapse and operation selection. To resume, the proposed
-next experiment is one nested request (customer, address, editable item list),
-including omitted/null/empty values and field errors. That experiment is not
-authorized merely by this note. CDN packaging and a reusable public component
-remain future work.
+The application is authored in **page.py**. It contains Python layout, Data,
+resolver and component declarations, plus small button-action JavaScript snippets.
+There is no application JavaScript module. The Source button displays page.py
+in readonly CodeMirror with Python syntax highlighting.
 
-Local proof of concept, not a published package or complete OpenAPI client.
-The browser reads `openapi.json` and generates the operation form as Gramlot
-Source through HtmlBuilder. Navigation and response rendering are small DOM
-adapters; requests use fetch while the framework service contract is pending.
-No Python runs in the interface. The Node server only serves assets and provides
-an in-memory demo API. Requests do not save orders or modify external services.
+`root.openApiClient()` installs reusable browser client behavior, while
+`content.openApiForm()` generates bound form Source from the selected operation.
+These are framework declarations, not copies of application code embedded in a
+Python string. Their implementation, domain compiler and request handling live
+in `js/dom/src/services/openapi-client.js` and `openapi-schema.js`.
+See [the API and Data contract](../../guides/openapi-client.md).
 
-Run from the repository root (requires existing teaching-preview runtime assets):
+## Run
 
 ```sh
+.venv/bin/python scripts/prepare_assets.py
+.venv/bin/python docs/examples/teaching/build_preview.py --output build/teaching-preview
 node docs/examples/gramlot-api-poc/server.mjs
 ```
 
-Open http://127.0.0.1:64324/.
+The server compiles page.py to page.tytx at startup using `.venv/bin/python`;
+`GRAMLOT_PYTHON` can override the interpreter. Default port: 64324 (`PORT` overrides
+it; zero picks a free port). After editing Python, recompile and reload:
 
-Supported demonstration subset:
-- Local OpenAPI 3.0.3 document, GET query and POST flat JSON object.
-- String, number/integer, enum and optional boolean inputs.
-- Required fields and numeric minimum through native HTML validation.
-- Request preview, HTTP status/duration/headers, raw JSON and array table.
-- Abort on operation changes and generation checks against stale responses.
+```sh
+.venv/bin/python docs/examples/gramlot-api-poc/build.py
+```
 
-This is intentionally bound to two local demo operations. It does not yet load
-arbitrary schemas, resolve refs, handle nested objects, oneOf, authentication,
-files, path/header parameters or OpenAPI parameter serialization styles.
-Blank fields are omitted in this first PoC: explicit empty string versus null
-versus omission needs a dedicated control before claiming general API support.
-There is no CDN bundle or custom-element public API yet; import maps and local
-assets are used to verify the interface concept first.
+`index.html` only supplies an import map and mount point to the generic Gramlot
+standalone Python-page loader. It contains no application event handlers.
+The Node server serves assets and local products/quotation API fixtures. All
+external API calls use browser resolvers and obey browser CORS.
 
-Browser checks performed: GET q=lamp returns only Desk lamp as table and JSON;
-POST productId=1 and quantity=2 returns total=98 with HTTP 200 and response
-headers. These are actual HTTP calls to the local demo server.
+## Verification and boundaries
+
+The integration test compiles the actual Python Page, decodes TYTX, mounts it in
+the browser runtime, selects a referenced-body operation, and sends a request.
+It also checks that page.py contains no DOM/HTTP bypasses. Run:
+
+```sh
+node --test js/dom/tests/openapi-poc.test.js
+node --test docs/examples/gramlot-api-poc/schema.test.mjs
+```
+
+Chrome verification: quantity changed to 4 through the number editor, POST quote
+returns HTTP 200 and 196 EUR. Source loads actual Python and CodeMirror is readonly.
+
+This remains a bounded OpenAPI prototype, not full Swagger UI parity. Local refs,
+scalar path/query/header fields and JSON bodies are supported. Nested objects and
+arrays use Gramlot JSON text editors; visual nested forms, composed schemas,
+external refs, files/multipart and OAuth flows are still missing. JSON-derived
+Bag array shape is retained in memory, not guaranteed across TYTX serialization.

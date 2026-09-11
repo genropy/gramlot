@@ -78,6 +78,33 @@ export class DomTarget extends TargetWrapper {
             'gnr-bordercontainer', 'gnr-panel', 'gnr-box', 'gnr-stackcontainer', 'gnr-contentpane'].includes(el.localName);
         const names = new Set([...prior.attributes, ...next.attributes].map(a => a.name));
         const changes = [...names].filter(name => prior.getAttribute(name) !== next.getAttribute(name));
+        if (el.localName === 'gnr-storetree') {
+            this._patchAttributes(el, next, prior, names);
+            // A store supplied by the recipe participates in reconciliation.
+            // Tools may instead attach a live Bag directly (the inspector does);
+            // an unrelated source patch must retain that external attachment.
+            if (el._gramlotStoreManaged || next._gramlotStoreManaged) {
+                if (el.storeBag !== next.storeBag) el.storeBag = next.storeBag;
+                el._gramlotStoreManaged = Boolean(next._gramlotStoreManaged);
+            }
+            if (changes.includes('labelattribute')) el._render();
+            el._widgetLabel?.apply();
+            return true;
+        }
+        if (el.localName === 'gnr-grid') {
+            this._patchAttributes(el, next, prior, names);
+            // Typed collection properties never travel through HTML attributes.
+            // Keep the mounted viewport and its owned subscription intact.
+            el.sourceNode = next.sourceNode;
+            el.configureStore(next.storeBag, {identifier:next.identifier, datamode:next.datamode});
+            el.locale = next.locale;
+            el.structBag = next.structBag;
+            el.columns = next.columns;
+            el.frozenColumns = next.frozenColumns;
+            el.rowHeight = next.rowHeight;
+            el.selectedKey = next.selectedKey;
+            return true;
+        }
         const decorationChanges = changes.filter(name => !(
             (name === 'value' && next.hasAttribute('data-value-pointer') && String(el.value) === String(next.value))
             || (name === 'checked' && next.hasAttribute('data-checked-pointer') && el.checked === next.checked)));
@@ -144,6 +171,7 @@ export class DomTarget extends TargetWrapper {
             } else if (next.hasAttribute(name)) el.setAttribute(name, next.getAttribute(name));
             else el.removeAttribute(name);
         }
+        el.parentElement?.syncRegionDimensions?.(el, next, prior);
         this.recipes.set(el, next.cloneNode(false));
     }
 

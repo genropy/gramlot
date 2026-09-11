@@ -30,9 +30,10 @@ main{grid-template-columns:var(--left-sidebar,210px) 6px minmax(320px,1fr) 6px v
 #catalogue details details{margin-left:10px}#catalogue .unavailable{color:#9098a3;cursor:default}#catalogue{overflow:auto;max-height:calc(100vh - 175px)}
 
 /* Shared navigation skin; catalogue leaves remain draggable with a small add action. */
-#catalogue.nav-tree details{margin:3px 0}
+#catalogue.nav-tree details{margin:1px 0}
+#catalogue.nav-tree summary{padding:2px 8px;font-weight:500}
 #catalogue.nav-tree details details{margin-left:16px}
-#catalogue.nav-tree .item{justify-content:flex-start;gap:8px;min-height:28px;margin:1px 0 1px 18px;padding:3px 7px;border:0;border-radius:6px;background:transparent}
+#catalogue.nav-tree .item{justify-content:flex-start;gap:8px;min-height:24px;margin:0 0 0 18px;padding:1px 7px;border:0;border-radius:6px;background:transparent}
 #catalogue.nav-tree .item::before{content:'';flex:none;width:16px;height:16px;background:currentColor;opacity:.75;mask:var(--tree-file) center/contain no-repeat}
 #catalogue.nav-tree .item[data-container=true]::before{mask-image:var(--tree-folder)}
 #catalogue.nav-tree .item:hover{background:#e9edf1}

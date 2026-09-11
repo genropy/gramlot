@@ -1,5 +1,5 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
-import {toTytx, fromTytx} from 'genro-tytx';
+import {toTytx, fromTytx, isDecimal, createDecimal} from 'genro-tytx';
 /** Typed property grid. Leaving a row commits validated edits through Bag APIs. */
 export class InspectorEditor {
     constructor(host, bag, page) {
@@ -70,6 +70,7 @@ export class InspectorEditor {
     }
     getType(value) {
         if (value === null) return null;
+        if (isDecimal(value)) return 'decimal';
         if (value instanceof Date && Number.isFinite(value.getTime())) {
             const wire = toTytx(value, 'json');
             return wire.includes('::D"') ? 'date' : wire.includes('::H"') ? 'time' : 'datetime';
@@ -77,12 +78,19 @@ export class InspectorEditor {
         return ['string', 'number', 'boolean'].includes(typeof value) ? typeof value : null;
     }
     declaredType(dtype) {
-        return ({T:'string', A:'string', L:'integer', I:'integer', N:'number', R:'number',
+        return ({T:'string', A:'string', L:'integer', I:'integer', N:'decimal', R:'number',
             B:'boolean', D:'date', H:'time', DH:'datetime', DHZ:'datetime',
             string:'string', number:'number', boolean:'boolean', date:'date', time:'time'})[dtype];
     }
     getParsed(type, text) {
         if (type === 'string') return text;
+        if (type === 'decimal') {
+            if (/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(text.trim())) {
+                const value = createDecimal(text.trim());
+                if (isDecimal(value) && value.isFinite()) return value;
+            }
+            throw new Error(`Invalid decimal: ${text || '(empty)'}.`);
+        }
         if (type === 'number' || type === 'integer') {
             const number = Number(text);
             if (text.trim() && Number.isFinite(number) && (type !== 'integer' || Number.isSafeInteger(number))) return number;
@@ -101,6 +109,7 @@ export class InspectorEditor {
         const input = row.querySelector('[data-cell="value"]');
         input.type = ({string:'text',number:'number',integer:'number',boolean:'checkbox',
             date:'date',time:'time',datetime:'datetime-local'})[type] || 'text';
+        input.inputMode = type === 'decimal' ? 'decimal' : '';
         input.step = type === 'integer' ? '1' : type === 'number' ? 'any' : '0.001';
         input.checked = value === true;
         input.indeterminate = type === 'boolean' && value === null;

@@ -19,6 +19,8 @@ for (const collection of catalogue.collections) {
     for (const component of collection.components) {
         const folder = join(root, collection.name, component.name);
         const cases = readdirSync(folder).filter(name => /^\d+$/.test(name));
+        if (component.name === 'grid') cases.push(...readdirSync(join(folder, 'attributes'))
+            .filter(name => /^\d+$/.test(name)).map(name => `attributes/${name}`));
         assert.ok(cases.length >= 2, `${component.name}: needs multiple cases`);
         for (const name of cases) {
             const builder = new (collection.name === 'labEditors' ? PlaygroundBuilder : GramlotBuilder)('example');

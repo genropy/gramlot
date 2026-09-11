@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Studio API",
-    "version": "0.1",
+    "version": "0.2",
     "description": "Explore a small catalogue and calculate a quotation."
   },
   "paths": {
@@ -50,31 +50,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": [
-                  "productId",
-                  "quantity"
-                ],
-                "properties": {
-                  "productId": {
-                    "type": "integer",
-                    "enum": [
-                      1,
-                      2,
-                      3
-                    ],
-                    "description": "Product"
-                  },
-                  "quantity": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "default": 2
-                  },
-                  "note": {
-                    "type": "string",
-                    "description": "Optional note"
-                  }
-                }
+                "$ref": "#/components/schemas/QuoteInput"
               }
             }
           }
@@ -85,6 +61,65 @@
           },
           "422": {
             "description": "Invalid product or quantity"
+          }
+        }
+      }
+    },
+    "/api/products/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      ],
+      "get": {
+        "summary": "Read a product",
+        "tags": [
+          "Catalogue"
+        ],
+        "operationId": "getProduct",
+        "responses": {
+          "200": {
+            "description": "Product"
+          },
+          "404": {
+            "description": "Unknown product"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "QuoteInput": {
+        "type": "object",
+        "required": [
+          "productId",
+          "quantity"
+        ],
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ],
+            "description": "Product"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 2
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note"
           }
         }
       }

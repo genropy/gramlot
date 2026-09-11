@@ -346,6 +346,20 @@
           ]
         }
       ]
+    },
+    {
+      "name": "grid",
+      "components": [
+        {
+          "name": "grid",
+          "tag": "gnr-grid",
+          "subTags": "",
+          "pythonGroup": "AdjacentWidgetDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        }
+      ]
     }
   ]
 }

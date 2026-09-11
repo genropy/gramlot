@@ -196,6 +196,7 @@ export class BuilderHandler {
 
     /** Drop `node` (and its subtree) from the pointer_map. */
     _unregisterPointer(node) {
+        this.application?.resolvers?.cancel(node);
         // A removed provider may already be queued by an earlier write in the
         // same live batch. Teardown must remove that pending execution too.
         this._pendingFormulas.delete(node);

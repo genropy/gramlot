@@ -1,5 +1,52 @@
 # Gramlot project memory
 
+**Python-first authoring:** application authors work in Python with only small
+local JS fragments when needed. The OpenAPI PoC now uses page.py, openApiClient
+and openApiForm declarations; reusable browser behavior lives in the framework.
+See [the Python client contract](../guides/openapi-client.md).
+
+**Imperative owner rule, 2026-09-11: Gramlot applications must use only Gramlot.**
+Examples and PoCs must expose missing framework capabilities, never disguise
+them with application-local DOM, event, state or HTTP workarounds. Implement
+missing reusable capabilities in the framework. See the mandatory rule in
+[AGENTS.md](../../AGENTS.md) and the [decision register](decisions.md).
+The OpenAPI PoC has now been rewritten around Source, Data Bags, bindings,
+controllers, resolvers and shared components. See its [architecture and limits](../examples/gramlot-api-poc/README.md).
+An integration test and a source audit guard against application bypasses.
+
+HTTP resolver authoring now exposes `urlResolver` and `openApiResolver` in Python
+and JavaScript. Browser requests publish Bags to Data, cancel stale requests,
+and expose request state. OpenAPI discovery follows the Python tag/operation
+layout; endpoint invocation is explicit. See the [HTTP resolver guide](../guides/http-resolvers.md)
+for implemented behavior and boundaries.
+
+Grid structure now follows the legacy Data Bag contract through `structpath`:
+`view_0.rows_0.cell_*`, definitions in attributes, node order as column order,
+resize writing back to the original cell. Both gallery pages expose `struct`.
+See the [legacy structure audit](../development/grid-structure-legacy-2026-09-11.md).
+
+Resident grid formulas now write calculated fields into Bag-valued or
+attribute-backed records, with deterministic chains, reactive `formula_*`
+parameters, `#`/`+=field`/`%=field` special forms and Decimal-backed arithmetic
+for a bounded expression grammar. See the [grid guide](../guides/static-grid.md#resident-formulas)
+and [implementation plan/outcome](../development/grid-formulas-plan-2026-09-11.md).
+
+Static grids now support both `datamode='bag'` and `datamode='attr'`. A reusable
+resident collection-store layer retains a bounded subset of legacy read/update
+APIs; see [assessment and implementation](../development/collection-stores-2026-09-11.md).
+The gallery includes paired Python/JavaScript attribute-row examples.
+
+The first static grid alpha now displays a complete resident Bag with typed
+columns, bounded rendering and stable-key selection. Python and JavaScript
+examples include 50 rows. See the [grid guide](../guides/static-grid.md) and
+[verification checkpoint](../development/static-grid-implementation-2026-09-11.md).
+The [incremental plan](../development/static-grid-plan-2026-09-11.md) remains the
+proposal for later editing, filtering, groups and configuration work.
+
+Python and JavaScript now support Source-owned `css` and `styleSheet` declarations
+for inline rules, complete stylesheets and external CSS, including reactive
+updates and branch cleanup. See [CSS declarations](../guides/style-resources.md).
+
 Publish/subscribe uses the application-local `genro` coordinator, with declarative
 controller subscriptions and Source-owned callback cleanup. See
 [publish and subscribe](../guides/publish-subscribe.md).

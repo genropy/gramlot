@@ -27,6 +27,8 @@ import { DomTarget } from './target-wrapper.js';
 import { wrapSource } from './source-bag.js';
 import { TopicService } from './services/topics.js';
 import { RecipeRuntime } from './services/recipe-runtime.js';
+import {ResolverService} from './resolvers/service.js';
+import {OpenApiClientService} from './services/openapi-client.js';
 
 export class Application {
     /**
@@ -39,6 +41,8 @@ export class Application {
         this._domListeners = [];
         this.events = new TopicService(this);
         this._recipeRuntime = new RecipeRuntime(this);
+        this.resolvers = new ResolverService(this);
+        this.openapi = new OpenApiClientService();
         this.handler = new BuilderHandler(this);
         this.vld = new Validator(this);
         this._forms = new FormService(this);
@@ -78,6 +82,7 @@ export class Application {
         this._builderApplicationCleanup?.();
         this.dev?.dispose();
         this.events.dispose();
+        this.resolvers.dispose();
         this._forms.dispose();
         this.handler.dispose();
         for (const node of [...this.target.root.childNodes]) {

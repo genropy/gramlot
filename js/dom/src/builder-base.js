@@ -240,6 +240,13 @@ export class BuilderBase {
             if (!entries.has(key) && !["_meta","datapath","node_id","formId","form","controllerPath","store","live"].includes(key)) entries.set(key,value);
         }
         for (const [k, v] of entries) {
+            // Legacy grid structpath is a Data path, reactive without a ^ prefix.
+            if (node.nodeTag === 'grid' && k === 'structpath') {
+                const path = node.absDatapath(v);
+                this.handler._registerPath(node, path);
+                resolved.set(k, this.handler.data.getItem(path));
+                continue;
+            }
             const ptype = node.pointerType(v);
             if (!ptype) {
                 resolved.set(k, v);
@@ -247,13 +254,13 @@ export class BuilderBase {
             }
             const absPath = node.absDatapath(v);
             const value = this.handler.data.getItem(absPath);
-            // A data-widget owns its reactivity (it subscribes to the Bag
-            // branch itself. Only its independent label/box bindings enter
-            // the pointer map; store updates must not reset tree expansion.
+            // A data-widget subscribes to mutations of its Bag branch. Track
+            // the store pointer too so asynchronous branch replacement reaches
+            // the mounted widget; reconciliation preserves its expansion state.
             const decoration = typeof k === 'string'
                 && (k === 'lbl' || k.startsWith('lbl_') || k.startsWith('box_'));
             const registers = ptype === '^' && node.handler !== null
-                && node.handler !== undefined && (!node._getMeta('dataWidget') || decoration);
+                && node.handler !== undefined && (!node._getMeta('dataWidget') || decoration || k === 'store');
             if (registers) {
                 this.handler._registerPath(node, absPath);
             }

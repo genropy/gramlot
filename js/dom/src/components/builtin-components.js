@@ -345,6 +345,20 @@ export const BUILTIN_COMPONENTS = [
         ]
       }
     ]
+  },
+  {
+    "name": "grid",
+    "components": [
+      {
+        "name": "grid",
+        "tag": "gnr-grid",
+        "subTags": "",
+        "pythonGroup": "AdjacentWidgetDeclarations",
+        "capabilities": [
+          "adapter"
+        ]
+      }
+    ]
   }
 ];
 export function builtinComponents(name) {

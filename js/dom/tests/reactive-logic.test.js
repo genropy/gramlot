@@ -210,3 +210,22 @@ test('formula accepts callable and function text without exposing formula as a b
     const handler = mount(FormulaNames);
     assert.equal(handler.data.getItem('main.label'), '6px');
 });
+
+
+test('positional dataFormula preserves relative bindings and reactive updates', () => {
+    class BudgetPage extends HtmlBuilder {
+        main(root) {
+            const pane = root.div({datapath: 'budget'});
+            pane.dataSetter({destination: '.income', value: 2500});
+            pane.dataSetter({destination: '.expenses', value: 1580});
+            pane.dataFormula('.balance', 'income - expenses', {
+                income: '^.income', expenses: '^.expenses', _on_start: true,
+            });
+            assert.throws(() => pane.dataFormula('.bad', 'x', {formula: 'y'}), /Use dataFormula/);
+        }
+    }
+    const handler = mount(BudgetPage);
+    assert.equal(handler.data.getItem('main.budget.balance'), 920);
+    handler.live(() => handler.data.setItem('main.budget.income', 1000));
+    assert.equal(handler.data.getItem('main.budget.balance'), -580);
+});

@@ -33,7 +33,7 @@ document.querySelectorAll('.lab-divider').forEach(divider => {
     divider.addEventListener('pointermove', event => {
         if (event.pointerId !== pointer) return;
         const bounds = layout.getBoundingClientRect();
-        resize((event.clientX - bounds.left - divider.offsetWidth / 2) / bounds.width * 100);
+        resize((event.clientX - bounds.left) / bounds.width * 100);
     });
     divider.addEventListener('pointerup', finish);
     divider.addEventListener('lostpointercapture', finish);

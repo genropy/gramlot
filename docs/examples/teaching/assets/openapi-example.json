@@ -1,0 +1,14 @@
+{
+  "openapi": "3.0.3",
+  "info": {"title": "Contacts example", "version": "1.0", "description": "Local OpenAPI discovery example"},
+  "servers": [{"url": "/example-api"}],
+  "tags": [{"name": "contacts", "description": "Contact operations"}],
+  "paths": {
+    "/contacts": {
+      "get": {"operationId": "listContacts", "summary": "List contacts", "tags": ["contacts"], "parameters": [{"name": "city", "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "Contacts list"}}},
+      "post": {"operationId": "createContact", "summary": "Create contact", "tags": ["contacts"], "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Contact"}}}}, "responses": {"201": {"description": "Created"}}}
+    },
+    "/contacts/{id}": {"get": {"operationId": "getContact", "summary": "Read a contact", "tags": ["contacts"], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}], "responses": {"200": {"description": "Contact"}}}}
+  },
+  "components": {"schemas": {"Contact": {"type": "object", "properties": {"name": {"type": "string"}, "city": {"type": "string"}}}}}
+}

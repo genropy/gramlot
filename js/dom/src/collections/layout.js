@@ -207,6 +207,21 @@ function defineComponents() {
             ) || null;
         }
 
+        /** Apply a changed Source dimension to the region that owns the splitter. */
+        syncRegionDimensions(child, next, prior) {
+            const name = child.getAttribute('slot');
+            const cell = this._cells[name];
+            if (!cell?._handled) return;
+            const dimension = ['left', 'right'].includes(name) ? 'width' : 'height';
+            if (next.style[dimension] !== prior.style[dimension]) {
+                const size = next.style[dimension];
+                cell.style[dimension] = size.endsWith('%')
+                    ? `${this.getBoundingClientRect()[dimension] * parseFloat(size) / 100}px` : size;
+                child.style[dimension] = '100%';
+            }
+            if (next.style.display !== prior.style.display) cell.style.display = next.style.display;
+        }
+
         // A region child marked `splitter` (or `drawer`, which implies it —
         // legacy: `drawer && region → splitter=true`) gets a drag bar on its
         // inner edge: left/right resize width, top/bottom resize height.

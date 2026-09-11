@@ -79,9 +79,24 @@ def navigation(lessons: list[dict], current: str) -> str:
     gallery = current.startswith('/gallery/')
     branches = ([link('/gallery/', 'Gallery overview'), link('/', 'Tutorial →')] if gallery else
                 [link('/', 'Introduction'), link('/gallery/', 'Component gallery →'), link('/builder/', 'Visual Source builder · PoC')])
+    hierarchy = {}
     for group, items in groups.items():
-        links = ''.join(f'<li>{link("/" + item.get("_base", "lessons/" + item["slug"]) + "/", item["title"])}</li>' for item in items)
-        branches.append(f'<details open data-nav-group="{escape(group, quote=True)}"><summary>{escape(group)}</summary><ul>{links}</ul></details>')
+        cursor = hierarchy
+        for part in group.split(' / '):
+            cursor = cursor.setdefault(part, {})
+        cursor.setdefault('_lessons', []).extend(items)
+
+    def render_groups(nodes, parents=()):
+        result = []
+        for name, children in nodes.items():
+            if name == '_lessons':
+                continue
+            path = parents + (name,)
+            links = ''.join(f'<li>{link("/" + item.get("_base", "lessons/" + item["slug"]) + "/", item["title"])}</li>' for item in children.get('_lessons', []))
+            result.append(f'<details open data-nav-group="{escape(" / ".join(path), quote=True)}"><summary>{escape(name)}</summary>' +
+                          (f'<ul>{links}</ul>' if links else '') + render_groups(children, path) + '</details>')
+        return ''.join(result)
+    branches.append(render_groups(hierarchy))
     return '<nav aria-label="Examples" class="lesson-tree nav-tree">' + ''.join(branches) + '</nav>'
 
 
@@ -221,8 +236,11 @@ def build(output: Path) -> None:
                 source = (example_folder / f"recipe.{extension}").read_text()
                 write(output, f"{example_base}/recipe.{extension}", source)
                 write(output, f"{example_base}/{language}.html", frame(example["title"], language, runtime_base, lesson.get("inspector", False), lesson.get("support"), lesson.get("editor_collection", False)))
-                displayed = recipe_body(source, extension) if "examples" in lesson else source
-                mode = "body" if "examples" in lesson else "module"
+                compact = "examples" in lesson and not (
+                    language == "javascript" and source.lstrip().startswith("import ")
+                )
+                displayed = recipe_body(source, extension) if compact else source
+                mode = "body" if compact else "module"
                 if language == "javascript":
                     code = (f'<textarea class="recipe-editor" aria-label="JavaScript code" spellcheck="false">'
                             f'{escape(displayed)}</textarea>'
@@ -234,11 +252,11 @@ def build(output: Path) -> None:
                             f'spellcheck="false">{escape(displayed)}</textarea>')
                 divider = ('<div class="lab-divider" role="separator" tabindex="0" '
                            'aria-label="Example width" aria-orientation="vertical" '
-                           'aria-valuemin="25" aria-valuemax="80" aria-valuenow="45" '
-                           'title="Drag to resize; use arrow keys when focused"></div>') if lesson.get("resizable") else ""
+                           'aria-valuemin="25" aria-valuemax="80" aria-valuenow="50" '
+                           'title="Drag to resize; use arrow keys when focused"></div>')
                 panels.append(
                     f'<section class="panel lab-row" data-lesson="{slug}" data-language="{language}" data-source-mode="{mode}">'
-                    f'<h3>{label}</h3><div class="example-code{" resizable" if divider else ""}">'
+                    f'<h3>{label}</h3><div class="example-code resizable">'
                     f'<div class="example-pane"><iframe title="{escape(example["title"])} — {label}" '
                     f'src="/{example_base}/{language}.html"></iframe>'
                     + ('<div class="example-tools"><button type="button" class="inspector-tool" '
@@ -293,8 +311,8 @@ def build(output: Path) -> None:
     write(output, "index.html", document("Introduction", body, lessons))
     gallery_body = ('<p class="eyebrow">Component gallery</p><h1>Explore the collections.</h1>'
         '<p class="lead">Choose a component from the tree. Compare independent cases, '
-        'exercise edge conditions and inspect their Data and Source alongside the executed Python code.</p>'
-        f'<p>{len(gallery_lessons)} components · {sum(len(item["examples"]) for item in gallery_lessons)} manual checks.</p>'
+        'exercise edge conditions and inspect their Data and Source alongside the executed Python and, where available, JavaScript code.</p>'
+        f'<p>{len(gallery_lessons)} example pages · {sum(len(item["examples"]) for item in gallery_lessons)} manual checks.</p>'
         '<section><h2>How to use a case</h2><p>Read its Check description, interact with the component '
         'and compare the result. These are reproducible manual checks, not a claim of automated browser coverage.</p>'
         '<p>Each case runs in an isolated application. Reload to restore its starting values.</p></section>')

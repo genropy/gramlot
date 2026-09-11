@@ -7,14 +7,14 @@ registerComponentCollection('labEditors', {
     defineComponents() {
         if (customElements.get('gnr-codemirror')) { return; }
         class CodeMirrorElement extends HTMLElement {
-            static get observedAttributes() { return ['value']; }
+            static get observedAttributes() { return ['value', 'language', 'readonly']; }
             constructor() {
                 super();
                 this.attachShadow({mode: 'open'});
                 this._value = '';
                 this._content = document.createElement('div');
                 const style = document.createElement('style');
-                style.textContent = ':host{display:block;border:1px solid var(--gray-300,#d8d8dc);border-radius:3px;background:white}.cm-editor{height:280px;font-size:12px}.cm-scroller{overflow:auto}textarea{box-sizing:border-box;width:100%;height:280px;font:13px monospace}';
+                style.textContent = ':host{display:block;border:1px solid var(--gray-300,#d8d8dc);border-radius:3px;background:white}.cm-editor{height:var(--code-editor-height,280px);font-size:var(--code-editor-font-size,12px)}.cm-scroller{overflow:auto}textarea{box-sizing:border-box;width:100%;height:var(--code-editor-height,280px);font:var(--code-editor-font-size,13px) monospace}';
                 this.shadowRoot.append(style, this._content);
                 this._widgetLabel = new WidgetLabel(this, null, this._content);
             }
@@ -26,7 +26,10 @@ registerComponentCollection('labEditors', {
                     this.editor.dispatch({changes: {from: 0, to: this.editor.state.doc.length, insert: this._value}});
                 }
             }
-            attributeChangedCallback(_name, _old, value) { this.value = value; }
+            attributeChangedCallback(name, old, value) {
+                if (name === 'value') this.value = value;
+                else if (old !== value && this.isConnected) { this.disconnectedCallback(); this.connectedCallback(); }
+            }
             async connectedCallback() {
                 const generation = this.generation = (this.generation || 0) + 1;
                 this.fallback = document.createElement('textarea');
@@ -44,7 +47,11 @@ registerComponentCollection('labEditors', {
                     const [{EditorView, basicSetup}, {EditorState}, language] = await Promise.all([
                         import('https://esm.sh/codemirror@6.0.2' + deps),
                         import('https://esm.sh/@codemirror/state@6.7.4'),
-                        this.getAttribute('language') === 'xml'
+                        this.getAttribute('language') === 'python'
+                            ? import('https://esm.sh/@codemirror/lang-python@6.2.1' + deps)
+                            : this.getAttribute('language') === 'css'
+                            ? import('https://esm.sh/@codemirror/lang-css@6.3.1' + deps)
+                            : this.getAttribute('language') === 'xml'
                             ? import('https://esm.sh/@codemirror/lang-xml@6.1.0' + deps)
                             : import('https://esm.sh/@codemirror/lang-javascript@6.2.3' + deps)
                     ]);
@@ -52,7 +59,7 @@ registerComponentCollection('labEditors', {
                     const readonly = this.hasAttribute('readonly');
                     this.fallback.remove();
                     this.editor = new EditorView({parent: this._content, doc: this._value,
-                        extensions: [basicSetup, (language.xml || language.javascript)(),
+                        extensions: [basicSetup, (language.python || language.css || language.xml || language.javascript)(),
                             EditorState.readOnly.of(readonly), EditorView.editable.of(!readonly),
                             EditorView.lineWrapping,
                             EditorView.contentAttributes.of({tabindex: '0', 'aria-label': this.getAttribute('aria-label') || 'Code'}),

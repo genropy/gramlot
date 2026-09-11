@@ -45,13 +45,19 @@ slice covers local setters, formula/controller expressions/scripts and inline
 ==. RPC, remote and broader scheduling remain pending; the full logical-block
 plan is not complete.
 
-## Gramlot API PoC — parked by owner, 2026-09-10
+## Gramlot API PoC — resumed by owner, 2026-09-11
 
-The browser-only OpenAPI explorer experiment is parked for later resumption.
-Sources and verified capabilities are in
-[the PoC README](../examples/gramlot-api-poc/README.md).
-No further API-console development is scheduled. This does not cancel the
-separate component guide and logical-block work.
+The mandatory Gramlot-only rewrite is implemented and now authored in Python
+(page.py), using framework openApiClient/openApiForm declarations. Application-local DOM, events,
+input scraping and fetch have been removed. Layout, menu, form, source viewer,
+response tabs/tree/grid use Source and shared components; state lives in Bags.
+Text/auto HTTP response modes and envelopes were added to the framework resolver.
+Integration and architecture tests cover the rewrite; all 348 DOM tests passed.
+
+Remaining scope: nested visual object/array editors, composed schemas, external
+references, parameter serialization styles and auth flows. JSON array shape is
+preserved in memory but not yet a guaranteed TYTX roundtrip contract.
+See [the PoC README](../examples/gramlot-api-poc/README.md).
 
 ## Simple component guide — immediate owner priority, 2026-09-10
 
@@ -289,3 +295,34 @@ legacy contracts, then identify shared menu/action behavior and the missing piec
 Preserve prior event/topic and layout decisions; this request does not approve
 unrelated toolbar, authorization or container redesign. No implementation or
 background work started at this checkpoint.
+
+
+## Tutorial validation presentation follow-up — 2026-09-11
+
+While adding lessons 23–24, browser checks observed a nonempty validation error
+message and `data-invalid` on the host while its inner input had
+`aria-invalid="false"` after blur (numeric max rule; also email before explicitly
+setting email_iswarning=False). Audit competing field-state/blur presenters.
+The tutorial tests verify visible messages and correction recovery; they do not
+claim this accessibility-state discrepancy is fixed.
+
+## Reusable CI-built browser distribution — 2026-09-11
+
+Design Gramlot's versioned, distributable browser runtime artifact built by its
+own CI. Consumers should reuse it across pages instead of each rebuilding the
+framework. Define entry points, shared chunks, lazy resources, manifest, notices
+and release verification; decide packaging/wheel delivery separately. Rosetta and
+site bundling are transitional implementations. See the corresponding owner
+decision in decisions.md. No new framework release has been published for this.
+
+Concrete packaging proposal: [CI-built browser distribution](../development/browser-distribution-proposal.md).
+It separates the approved distribution objective from the proposed zip/wheel
+layout, manifest fields, delivery policy and release gates.
+
+Implementation update: ZIP/wheel payload parity and the optional FastAPI adapter
+are implemented and locally verified; see the proposal's local checkpoint.
+Framework publication and consumer migration to that artifact remain pending.
+The floating inspector defect found during packaging is corrected: recipe
+compilation now checks SourceBag typing, and reconciliation preserves externally
+attached stores. Browser checks verified populated Data/Source trees, editing and
+close/reopen in both source and bundled modes. See the checkpoint for evidence.
