@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 from hashlib import sha256
 import importlib.util
+import inspect
 import json
 from pathlib import Path
 import tempfile
@@ -250,6 +251,11 @@ def generated_files() -> dict[Path, str]:
             builder_class = _load_generated_builder(declaration, identity["recipe_name"])
             builder_class.to_grammar(grammar_path)
             grammar = _load(grammar_path)
+            # Python 3.14 dedents compiled docstrings; older versions retain
+            # indentation. Keep the exported example identical across versions.
+            for entry in grammar.get("elements", {}).values():
+                if isinstance(entry.get("doc"), str):
+                    entry["doc"] = inspect.cleandoc(entry["doc"])
 
         result[GENERATED / f"{stem.replace('-', '_')}_declaration.py"] = python_source
         result[GENERATED / f"{stem}-builder-grammar.json"] = (

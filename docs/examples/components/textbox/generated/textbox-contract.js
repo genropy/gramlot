@@ -214,7 +214,7 @@ export const guideTextBoxContract = Object.freeze({
     "abstracts": {},
     "elements": {
       "guideTextBox": {
-        "doc": "An isolated textBox contract example linked to Gramlot's existing gnr-textbox implementation.\n\nExplicit parameters come from the component descriptor and its\nreferenced shared attribute sets. ``**kwargs`` preserves the open\nGramlot attribute families documented by those sets.\n",
+        "doc": "An isolated textBox contract example linked to Gramlot's existing gnr-textbox implementation.\n\nExplicit parameters come from the component descriptor and its\nreferenced shared attribute sets. ``**kwargs`` preserves the open\nGramlot attribute families documented by those sets.",
         "sub_tags": "",
         "parent_tags": null,
         "inherits_from": null,
