@@ -35,15 +35,21 @@ const rows = kind => editor(kind).querySelector('[data-field="rows"]').shadowRoo
 const field = (kind, name) => editor(kind).querySelector(`[data-field="${name}"]`) || rows(kind).querySelector(`[data-field="${name}"]`);
 const fill = (kind, name, value) => {
     const input = field(kind, name);
-    input.value = value;
+    if (!input) return;
+    if(input.type==='checkbox')input.checked=value==='true';else input.value = value;
     input.dispatchEvent(new window.Event('input', {bubbles:true, composed:true}));
 };
-const click = (kind, name) => editor(kind).querySelector(`[data-command="${name}"]`).click();
+const click = (kind, name) => {
+    if (name === 'apply') {field(kind, 'value').dispatchEvent(new window.FocusEvent('focusout',{bubbles:true,composed:true}));return;}
+    if (name === 'reload') {const path=tool.app.builder.data.getItem(kind+'Path');select(kind,'');select(kind,path);return;}
+    editor(kind).querySelector(`[data-command="${name}"]`).click();
+};
 const attributeRow = (kind, name) => Array.from(rows(kind).querySelectorAll('[data-property="attribute"]'))
     .find(row => row.querySelector('[data-cell="name"]').value === name);
 const editCell = (row, cell, value) => {
     const input = row.querySelector(`[data-cell="${cell}"]`);
-    input.value = value;
+    if (!input) return;
+    if(input.type==='checkbox')input.checked=value==='true';else input.value = value;
     input.dispatchEvent(new window.Event('input', {bubbles:true, composed:true}));
 };
 // Same Bag contracts, exercised through the new directly editable property cells.
@@ -54,12 +60,14 @@ const stage = (kind, name, type, text) => {
         row = rows(kind).querySelector('[data-property="attribute"]:last-child');
         editCell(row, 'name', name);
     }
-    editCell(row, 'type', type);
+    editCell(row, 'type', type==='null'?'string':type);
     editCell(row, 'value', text);
+    if(type==='null')row.querySelector('[data-cell="value"]').dispatchEvent(new window.KeyboardEvent('keydown',{key:'Backspace',bubbles:true,cancelable:true}));
 };
 const removeAttribute = (kind, name) => attributeRow(kind, name).querySelector('[data-cell="remove"]').click();
 select('data', 'amount');
-assert.equal(field('data', 'value-type').value, 'number');
+assert.equal(field('data', 'value').type, 'number');
+assert.equal(field('data', 'value-type'),null);
 fill('data', 'value', '1234.56');
 assert.equal(builder.data.getItem('amount'), 12.5, 'explicit Apply required');
 for (let i = 0; i < 2; i++) document.dispatchEvent(new window.KeyboardEvent('keydown', {
@@ -73,11 +81,10 @@ const input = pageHost.querySelector('input');
 input.value = '88';
 input.dispatchEvent(new window.Event('change', {bubbles:true}));
 assert.equal(field('data', 'value').value, '88');
-for (const [type, text, expected] of [['boolean','false',false],['null','',null],['string','0042','0042'],['number','0',0]]) {
-    fill('data', 'value-type', type);
-    fill('data', 'value', text);
-    click('data', 'apply');
-    assert.equal(builder.data.getItem('amount'), expected);
+for (const [initial, text, expected] of [[false,'false',false],[null,null,null],['0042','0042','0042'],[0,'0',0]]) {
+    page.live(()=>builder.data.setItem('amount',initial));
+    if(text!==null){fill('data','value',text);click('data','apply');}
+    assert.equal(builder.data.getItem('amount'),expected);
 }
 stage('data', 'nullable', 'null', '');
 stage('data', 'enabled', 'boolean', 'true');
@@ -96,9 +103,9 @@ assert.equal(builder.data.getItem('amount'), 0);
 assert.equal(Object.hasOwn(builder.data.getNode('amount').attr, 'good'), false);
 assert.match(field('data', 'status').textContent, /Invalid number/);
 click('data', 'reload');
-fill('data', 'value', 'draft');
+fill('data', 'value', '51');
 page.live(() => builder.data.setItem('amount', 50));
-assert.equal(field('data', 'value').value, 'draft');
+assert.equal(field('data', 'value').value, '51');
 assert.match(field('data', 'status').textContent, /outside this draft/);
 click('data', 'apply');
 assert.equal(builder.data.getItem('amount'), 50);
@@ -120,7 +127,7 @@ click('source', 'apply');
 page.live(() => builder.data.setItem('amount', 70));
 page.live(() => builder.data.setItem('color', 'orange'));
 assert.equal(pageHost.querySelector('div').style.color, 'green');
-fill('source', 'value-type', 'string');
+
 fill('source', 'value', 'Static source text');
 click('source', 'apply');
 assert.equal(pageHost.querySelector('div').textContent, 'Static source text');

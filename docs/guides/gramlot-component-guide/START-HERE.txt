@@ -1,0 +1,6 @@
+Gramlot Component Development Guide — alpha
+
+Open docs/guides/component-development.html for the offline handbook.
+Examples and source references are included for inspection. Running the
+integration tests requires the Gramlot repository and its dependencies;
+this archive is documentation, not a runtime distribution.

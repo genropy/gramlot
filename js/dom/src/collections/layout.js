@@ -27,23 +27,14 @@
  * light-DOM slot (still real, still patched by the reactive engine) and only
  * the chrome lives in the shadow.
  */
-import { registerCollection, webcomponent } from '../collections.js';
-import {WidgetLabel} from '../widget-label.js';
+import {registerComponentCollection} from '../components/registry.js';
+import {builtinComponents} from '../components/builtin-components.js';
+import {defineLabledBoxComponent} from './decoration/labled-box.js';
+import {WidgetLabel} from './decoration/widget-label.js';
+import {defineGroupBoxComponent} from './layout/group-box.js';
+import {defineFormletComponent} from './layout/formlet.js';
 
-const GRAMMAR = {
-    elements: {
-        formlet: webcomponent('formlet', {subTags:'*'}),
-        labledBox: webcomponent('labledBox', {subTags:'*'}),
-        panel: webcomponent('panel', { subTags: '*' }),
-        box: webcomponent('box', { subTags: '*' }),
-        borderContainer: webcomponent('borderContainer', { subTags: '*' }),
-        tabContainer: webcomponent('tabContainer', { subTags: '*' }),
-        tab: webcomponent('tab', { subTags: '*' }),
-        contentPane: webcomponent('contentPane', {subTags:'*'}),
-        stackContainer: webcomponent('stackContainer', {subTags:'*'}),
-        stackButtons: webcomponent('stackButtons'),
-    },
-};
+
 
 const PANEL_CSS =
     ':host { display: block; margin: 8px 0; }'
@@ -96,17 +87,21 @@ const BORDER_CSS =
 
 const TABS_CSS =
     ':host { display: flex; flex-direction: column; min-height: 0; }'
-    + '.tabbar { display: flex; gap: 2px; border-bottom: 1px solid #c8c8c8; }'
-    + '.tab { padding: 4px 11px; border: 1px solid #c8c8c8; border-bottom: none;'
-    + '  background: #f4f4f4; cursor: pointer; border-radius: 3px 3px 0 0;'
-    + '  font: inherit; }'
-    + '.tab.active { background: #fff; font-weight: 600; margin-bottom: -1px; }'
-    + '.panes { flex: 1; min-height: 0; overflow: auto; padding: 8px 2px; }';
+    + '.tabbar { display: flex; gap: 2px; border-bottom: 1px solid var(--tab-border,#c8c8c8); }'
+    + '.tab { padding: var(--tab-padding,4px 11px); color:var(--tab-color,inherit); border: 1px solid var(--tab-border,#c8c8c8); border-bottom: none;'
+    + '  background: var(--tab-background,#f4f4f4); cursor: pointer; border-radius: 3px 3px 0 0;'
+    + '  font: inherit; font-size:var(--tab-font-size,inherit);font-weight:var(--tab-font-weight,normal); }'
+    + '.tab.active { color:var(--tab-active-color,inherit); background: var(--tab-active-background,#fff); font-weight: 600; margin-bottom: -1px; }'
+    + '.panes { flex: 1; min-height: 0; overflow: auto; padding: var(--tab-pane-padding,8px 2px); }';
 
 function defineComponents() {
-    if (typeof customElements === 'undefined' || customElements.get('gnr-panel')) {
+    if (typeof customElements === 'undefined') {
         return;
     }
+    defineFormletComponent();
+    defineGroupBoxComponent();
+    defineLabledBoxComponent();
+    if (customElements.get('gnr-panel')) return;
 
     class GnrPanel extends HTMLElement {
         static get observedAttributes() { return ['caption']; }
@@ -239,9 +234,10 @@ function defineComponents() {
                 if (name === 'top') { bar.style.bottom = '0'; }
                 if (name === 'bottom') { bar.style.top = '0'; }
                 cell.appendChild(bar);
-                const pointerEvents = Boolean(window.PointerEvent);
+                const pointerEvents = Boolean(this.ownerDocument.defaultView.PointerEvent);
                 bar.addEventListener(pointerEvents ? 'pointerdown' : 'mousedown', (down) => {
                     if (down.button !== 0) return;
+                    const hostWindow = this.ownerDocument.defaultView;
                     this._stopResize?.();
                     down.preventDefault();
                     const r = cell.getBoundingClientRect();
@@ -261,19 +257,19 @@ function defineComponents() {
                         cell.style[dimension] = `${Math.min(maximum, Math.max(minimum, size + delta))}px`;
                     };
                     const up = () => {
-                        window.removeEventListener(moveEvent, move);
-                        window.removeEventListener(upEvent, up);
-                        window.removeEventListener('pointercancel', up);
-                        window.removeEventListener('blur', up);
+                        hostWindow.removeEventListener(moveEvent, move);
+                        hostWindow.removeEventListener(upEvent, up);
+                        hostWindow.removeEventListener('pointercancel', up);
+                        hostWindow.removeEventListener('blur', up);
                         if (pointerEvents && bar.hasPointerCapture?.(down.pointerId)) bar.releasePointerCapture(down.pointerId);
                         this._stopResize = null;
                     };
                     this._stopResize = up;
                     if (pointerEvents) bar.setPointerCapture?.(down.pointerId);
-                    window.addEventListener(moveEvent, move);
-                    window.addEventListener(upEvent, up);
-                    window.addEventListener('pointercancel', up);
-                    window.addEventListener('blur', up);
+                    hostWindow.addEventListener(moveEvent, move);
+                    hostWindow.addEventListener(upEvent, up);
+                    hostWindow.addEventListener('pointercancel', up);
+                    hostWindow.addEventListener('blur', up);
                 });
             }
         }
@@ -579,48 +575,6 @@ function defineComponents() {
         }
     }
 
-    /** Field layout only: data ownership and validation belong to the enclosing form. */
-    class GnrFormlet extends HTMLElement {
-        static get observedAttributes() { return ['columns', 'col_min_width']; }
-        constructor() {
-            super();
-            const shadow = this.attachShadow({mode:'open'});
-            const style = document.createElement('style');
-            style.textContent = ':host{display:block;min-width:0;box-sizing:border-box;gap:7px 20px;padding:7px}'
-                + '.fields{display:grid;min-width:0;gap:inherit;align-items:start}'
-                + 'slot{display:contents}::slotted(*){min-width:0}';
-            this._fields = document.createElement('div');
-            this._fields.className = 'fields';
-            this._fields.appendChild(document.createElement('slot'));
-            shadow.append(style, this._fields);
-        }
-        connectedCallback() { this._layout(); }
-        attributeChangedCallback() { this._layout(); }
-        _layout() {
-            const minimum = this.getAttribute('col_min_width');
-            const columns = this.getAttribute('columns') || '1';
-            this._fields.style.gridTemplateColumns = minimum
-                ? `repeat(auto-fit, minmax(min(100%, ${minimum}), 1fr))`
-                : /^\d+$/.test(columns) ? `repeat(${columns}, minmax(0, 1fr))` : columns;
-        }
-    }
-    customElements.define('gnr-formlet', GnrFormlet);
-
-    class GnrLabledBox extends HTMLElement {
-        constructor() {
-            super();
-            const root=this.attachShadow({mode:'open'});
-            const style=document.createElement('style');
-            style.textContent=':host{display:block;min-width:0}';
-            const content=document.createElement('div');
-            content.appendChild(document.createElement('slot'));
-            root.append(style,content);
-            this._widgetLabel=new WidgetLabel(this,null,content,null,{explicit:true});
-        }
-        connectedCallback() { this._widgetLabel.connect(); }
-        disconnectedCallback() { this._widgetLabel.disconnect(); }
-    }
-    customElements.define('gnr-labledbox',GnrLabledBox);
     customElements.define('gnr-panel', GnrPanel);
     customElements.define('gnr-box', GnrBox);
     customElements.define('gnr-bordercontainer', GnrBorderContainer);
@@ -631,4 +585,4 @@ function defineComponents() {
     customElements.define('gnr-contentpane', GnrContentPane);
 }
 
-registerCollection('layout', { grammar: GRAMMAR, defineComponents });
+registerComponentCollection('layout', { components: builtinComponents('layout'), defineComponents });

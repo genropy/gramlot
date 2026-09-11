@@ -12,7 +12,7 @@ const host = document.body.appendChild(document.createElement('div'));
 const app = new Application(host,builder);
 for(const field of host.querySelectorAll('[data-value-pointer]')) {
     assert.equal(field.value,null,field.localName);
-    assert.equal(field.shadowRoot.querySelector('input').classList.contains('gnr-null-value'),true);
+    assert.equal(field.shadowRoot.querySelector('input,textarea').classList.contains('gnr-null-value'),true);
 }
 const field=host.querySelector('gnr-textbox');
 const input=field.shadowRoot.querySelector('input');

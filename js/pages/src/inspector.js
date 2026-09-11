@@ -7,7 +7,7 @@ import {DeveloperTools} from './dev.js';
 import {Shortcuts} from './shortcuts.js';
 import {InspectorEditor} from './inspector-editor.js';
 
-export function mountInspector(host, source, page) {
+export function mountInspector(host, source, page, {shortcuts: enableShortcuts = true} = {}) {
     if (page._disposed || page.dev?.disposed) return null;
     page.dev ||= new DeveloperTools();
     page.dev.inspector?.dispose();
@@ -18,11 +18,11 @@ export function mountInspector(host, source, page) {
     stylesheet.rel = 'stylesheet';
     stylesheet.href = new URL('./inspector.css', import.meta.url).href;
     host.append(mount);
-    const app = new Application(mount, builder);
+    const app = new Application(mount, builder, {inspector: false});
     mount.append(stylesheet);
     const shortcuts = new Shortcuts(host.ownerDocument);
     const toggle = () => app.live(() => builder.data.setItem('opened', !builder.data.getItem('opened')));
-    shortcuts.register('inspector.toggle', 'ctrl+shift+d', toggle, {allowEditing: true});
+    if (enableShortcuts) shortcuts.register('inspector.toggle', 'ctrl+shift+d', toggle, {allowEditing: true});
     const button = mount.querySelector('[data-inspector="toggle"]');
     button.addEventListener('click', toggle);
     const subscriptions = [];

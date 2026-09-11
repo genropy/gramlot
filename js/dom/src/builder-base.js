@@ -1,3 +1,4 @@
+import {FORMATTED_CELLS} from './display-format.js';
 // Copyright 2025 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 /**
  * BuilderBase — JS port of builder/base.py + _grammar.py.
@@ -29,6 +30,8 @@ import { Bag } from 'genro-bag-js';
 import {RecipeDefaults} from './recipe-defaults.js';
 import { SourceBag, wrapSource, VALUE } from './source-bag.js';
 import { getCollection, injectCollectionCss } from './collections.js';
+import {resolveInlineExpressions} from './logic/expression.js';
+import {DATA_ELEMENT_FIELDS, LogicRuntime} from './logic/runtime.js';
 
 /** Structural segment that carries the payload source (tree-not-forest). */
 export const SOURCE_ROOT = '_root_';
@@ -52,30 +55,7 @@ const BASE_GRAMMAR = {
 };
 
 /** Schema fields of a data-element, stripped from the func bindings. */
-export const DATA_ELEMENT_FIELDS = new Set(['destination', 'formula', 'func', 'value', '_on_start']);
-
-/** A bare identifier is a func NAME (resolved via data_logic); anything
- *  else is a JS code string, compiled to a function. */
-const IDENTIFIER_RE = /^[A-Za-z_$][\w$]*$/;
-
-const _funcCache = new Map();
-
-/** Compile a JS code string to a function (memoized). The string must
- *  evaluate to a function: `'(b) => b.base * b.altezza'`,
- *  `'({qty, price}) => qty * price'`, `'(node, b) => node.SET(".x", b.y)'`.
- *  DIFF-PYTHON: a JS-only extension — the recipe can carry inline logic. */
-function compileFunc(code) {
-    let fn = _funcCache.get(code);
-    if (fn === undefined) {
-        // eslint-disable-next-line no-new-func
-        fn = new Function(`"use strict"; return (${code});`)();
-        if (typeof fn !== 'function') {
-            throw new Error(`data-element func code did not evaluate to a function: ${code}`);
-        }
-        _funcCache.set(code, fn);
-    }
-    return fn;
-}
+export {DATA_ELEMENT_FIELDS};
 
 export class BuilderBase {
     constructor(name = null) {
@@ -84,11 +64,17 @@ export class BuilderBase {
         this.handler = null;
         this.data = null;
         this.target = null;
+        // Collection and component activation is an instance concern. Keep
+        // the class schema as the immutable grammar compiled by defineGrammar.
+        this._schema = { ...(this.constructor._classSchema || {}) };
+        this._schemaTagNames = null;
         this._targetSerial = 0;
         // Expansion write-back (CMP.7): flat map (composite id → node) for
         // the mutate, segment-tree index for the O(own-subtree) purge, and
         // the per-component cell catalog (base → field → [(ordinal, op)]).
         this._defaults = new RecipeDefaults(this);
+        this._logic = new LogicRuntime(this);
+        this._pendingPreparation = new Set();
         this._writebackMap = {};
         this._writebackIndex = {};
         this._cellMap = {};
@@ -146,17 +132,17 @@ export class BuilderBase {
     }
 
     get schema() {
-        return this.constructor._classSchema || {};
+        return this._schema;
     }
 
     get schemaTagNames() {
-        let map = this.constructor._tagNames;
+        let map = this._schemaTagNames;
         if (!map) {
             map = {};
             for (const tag of Object.keys(this.schema)) {
                 map[tag.toLowerCase()] = tag;
             }
-            this.constructor._tagNames = map;
+            this._schemaTagNames = map;
         }
         return map;
     }
@@ -202,7 +188,27 @@ export class BuilderBase {
         const node = bag.setItem(label, value, attributes, nodePosition || '>');
         node.nodeTag = tag;
         node._builder = this;
+        // Bag insertion fires before these Source fields are attached. Queue
+        // the completed node; the enclosing mutation batch prepares all of its
+        // setters before defaults/providers and before DOM construction.
+        if (this._created) this._queueBranchPreparation(node);
         return node;
+    }
+
+    _queueBranchPreparation(node) {
+        this._pendingPreparation.add(node);
+    }
+
+    _preparePendingBranches() {
+        if (!this._pendingPreparation.size) return;
+        const pending = [...this._pendingPreparation];
+        this._pendingPreparation.clear();
+        try {
+            this._logic.prepareBranches(pending);
+        } catch (error) {
+            for (const node of pending) this._pendingPreparation.add(node);
+            throw error;
+        }
     }
 
     _autoLabel(bag, tag) {
@@ -231,7 +237,7 @@ export class BuilderBase {
         const policyAttrs = new RecipePolicies().getAttributes(node);
         const entries = new Map(node.runtimeToEvaluate());
         for (const [key,value] of Object.entries(policyAttrs)) {
-            if (!entries.has(key) && !["_meta","datapath","node_id","formId","form","controllerPath","store"].includes(key)) entries.set(key,value);
+            if (!entries.has(key) && !["_meta","datapath","node_id","formId","form","controllerPath","store","live"].includes(key)) entries.set(key,value);
         }
         for (const [k, v] of entries) {
             const ptype = node.pointerType(v);
@@ -253,9 +259,10 @@ export class BuilderBase {
             }
             resolved.set(k, value);
         }
-        const runtimeValue = resolved.get(VALUE);
-        resolved.delete(VALUE);
-        return [runtimeValue, Object.fromEntries(resolved)];
+        const evaluated = resolveInlineExpressions(node, resolved);
+        const runtimeValue = evaluated.get(VALUE);
+        evaluated.delete(VALUE);
+        return [runtimeValue, Object.fromEntries(evaluated)];
     }
 
     /** Source node whose serial is `targetId` (the upstream half of the
@@ -308,8 +315,9 @@ export class BuilderBase {
      *  node itself (replace). */
     _onSourceEvent(node, evt, pathlist, kw = {}) {
         if (this._disposed) return;
-        if (evt === 'ins') this._defaults.initializeNode(node);
+        if (evt === 'ins') this._queueBranchPreparation(node);
         if (evt === 'del') {
+            this.handler.application?.events?.disposeSource(node);
             this.handler._unregisterPointer(node);
         } else if (evt !== 'ins') {
             const detail = evt.startsWith('upd_') ? evt.slice(4) : evt;
@@ -320,6 +328,8 @@ export class BuilderBase {
                 this._onUpdAttrs(node, kw.attrs_diff || {});
             }
         }
+        // Logical declarations are transparent and have no DOM patch target.
+        if (node._getMeta('data_element')) return;
         // Queue key = mount name; drop the leading SOURCE_ROOT segment.
         const path = pathlist.slice(1).join('.');
         if ((evt === 'ins' || evt === 'del') && !node._getMeta('component')) {
@@ -350,6 +360,7 @@ export class BuilderBase {
             this.handler._updatePointerMap(node, [['', oldvalue]]);
         } else if (oldKind === 'bag') {
             for (const oldChild of oldvalue.getNodes()) {
+                this.handler.application?.events?.disposeSource(oldChild);
                 this.handler._unregisterPointer(oldChild);
             }
         }
@@ -389,15 +400,7 @@ export class BuilderBase {
      *    business-logic class;
      *  - any other string → a JS code string, compiled to a function. */
     _resolveLogicFunc(func) {
-        if (typeof func === 'function') {
-            return func;
-        }
-        if (typeof func !== 'string') {
-            throw new Error('data-element func must be a name, a function, or a JS code string');
-        }
-        if (!IDENTIFIER_RE.test(func)) {
-            return compileFunc(func);
-        }
+        if (typeof func === 'function') return func;
         for (const source of this.dataLogic) {
             const holder = typeof source === 'function' ? source : source.constructor;
             const fn = holder[func];
@@ -405,7 +408,7 @@ export class BuilderBase {
                 return fn;
             }
         }
-        throw new Error(`data-element func '${func}' not found on any data_logic source`);
+        return null;
     }
 
     /** A data-element node's func bindings: runtimeValues (which resolves
@@ -414,8 +417,11 @@ export class BuilderBase {
     _bindings(node) {
         const [, resolved] = this.runtimeValues(node);
         const out = {};
+        const ownFields = node.nodeTag === 'dataFormula'
+            ? new Set(['destination', 'formula', 'func', '_on_start'])
+            : new Set(['destination', 'func', '_on_start']);
         for (const [k, v] of Object.entries(resolved)) {
-            if (!DATA_ELEMENT_FIELDS.has(k)) {
+            if (!ownFields.has(k)) {
                 out[k] = v;
             }
         }
@@ -432,40 +438,20 @@ export class BuilderBase {
             if (!Object.hasOwn(attr, 'formula')) {
                 throw new Error('dataFormula requires formula');
             }
-            return this._resolveLogicFunc(attr.formula);
+            return this._logic.resolve(node);
         }
-        return this._resolveLogicFunc(attr.func);
+        return this._logic.resolve(node);
     }
 
     /** Execute a list of data-element nodes. */
-    computeLogic(nodes) {
-        for (const node of nodes) {
-            this._computeNode(node);
-        }
+    computeLogic(nodes, trigger = null) {
+        for (const node of nodes) this._logic.compute(node, trigger);
     }
 
     /** Execute one data-element by kind: setter seeds, formula computes
      *  (pure), controller runs side effects (func gets the node). */
     _computeNode(node) {
-        if (this._disposed) return;
-        const attr = node.getAttr() || {};
-        if (node.nodeTag === 'dataSetter') {
-            const attrs = {};
-            for (const [k, v] of Object.entries(attr)) {
-                if (k !== 'destination' && k !== 'value' && !k.startsWith('_')) {
-                    attrs[k] = v;
-                }
-            }
-            node.setRelativeData(attr.destination, attr.value, {
-                attributes: Object.keys(attrs).length ? attrs : null,
-            });
-        } else if (node.nodeTag === 'dataFormula') {
-            const func = this._resolveNodeLogic(node);
-            node.setRelativeData(attr.destination, func(this._bindings(node)));
-        } else if (node.nodeTag === 'dataController') {
-            const func = this._resolveNodeLogic(node);
-            func(node, this._bindings(node));
-        }
+        return this._logic.compute(node);
     }
 
     /** Source data-elements to run at create(): every setter + anything
@@ -522,8 +508,8 @@ export class BuilderBase {
         for (const name of names) {
             merged[name] = { sub_tags: '', _meta: { component: true } };
         }
-        this.constructor._classSchema = merged;
-        this.constructor._tagNames = null;
+        this._schema = merged;
+        this._schemaTagNames = null;
     }
 
     /** Fresh throw-away root for a component expansion (CMP.2): a payload
@@ -539,7 +525,11 @@ export class BuilderBase {
     }
 
     /** Fold the required collections' grammar into an own per-page schema
-     *  (additive over the inherited one) and define their custom elements. */
+     *  (additive over the inherited one) and define their custom elements.
+     *  Existing compatibility policy is retained: collections resolve in
+     *  declared order (later entries win), then components win over them.
+     *  Intentional HTML overrides therefore continue to work; a stricter
+     *  collision contract remains a separate design decision. */
     _resolveCollections() {
         if (!this._requiredCollections || this._requiredCollections.size === 0) {
             return;
@@ -554,8 +544,8 @@ export class BuilderBase {
             coll.defineComponents();
             injectCollectionCss(name, coll.css);
         }
-        this.constructor._classSchema = merged;
-        this.constructor._tagNames = null;
+        this._schema = merged;
+        this._schemaTagNames = null;
     }
 
     /** Load a TYTX recipe (or decoded Bag) before mounting this builder.
@@ -609,9 +599,8 @@ export class BuilderBase {
         } else {
             this.main(wrapSource(this.source));
         }
-        this._defaults.initializeBag(this.source);
-        // First calculation: run every setter + the _on_start formulas/controllers.
-        this.computeLogic(this._onStartDataElements());
+        this._logic.prepareBranch(this.source);
+        this._created = true;
         if (this._isReactive) {
             this._sourceroot.subscribe('builder_source', {
                 insert: (e) => this._onSourceEvent(e.node, e.evt, e.pathlist, e),
@@ -640,6 +629,7 @@ export class BuilderBase {
     /** Full render: renderer walks `source`, finalize delivers to target. */
     render(opts = {}) {
         if (this._disposed) return;
+        this._preparePendingBranches();
         const renderer = this._renderer();
         renderer.handler = this.handler;
         const target = 'target' in opts ? (opts.target || null) : this.target;
@@ -653,6 +643,7 @@ export class BuilderBase {
     /** Turn a live batch (optimized entries) into per-node patches. */
     renderNodes(entries, target = null, opts = {}) {
         if (this._disposed) return;
+        this._preparePendingBranches();
         const renderer = this._renderer();
         renderer.handler = this.handler;
         const effTarget = target || this.target;
@@ -740,7 +731,7 @@ export class BuilderBase {
                 // Value-only patch: no body, no render, no re-registration.
                 const base = node.getAttr('id') || this.targetId(node);
                 const specs = (this._cellMap[base] || {})[field];
-                if (!specs) {
+                if (!specs || this._cellMap[base]?.[FORMATTED_CELLS]) {
                     // A cell the catalog does not know (templates, checked,
                     // richer cells): fall back to the row replace.
                     const fragment = renderer.renderExpansionBlock(node, label, o);

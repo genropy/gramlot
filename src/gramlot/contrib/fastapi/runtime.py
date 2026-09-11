@@ -19,6 +19,7 @@ PACKAGE_ASSET_DIRECTORIES = {
     'bag': 'genro-bag-js/src',
     'tytx': 'genro-tytx/js/src',
     'pages': 'pages',
+    'decimal': 'decimal.js',
     'msgpack': 'genro-tytx/js/node_modules/@msgpack/msgpack/dist.esm',
 }
 
@@ -32,6 +33,7 @@ IMPORT_PATHS = {
     '#uuid': 'bag/browser-uuid.js',
     'genro-tytx': 'tytx/index.js',
     'genro-tytx/': 'tytx/',
+    'decimal.js': 'decimal/decimal.mjs',
     '@msgpack/msgpack': 'msgpack/index.mjs',
     '@xmldom/xmldom': 'pages/xmldom.js',
     'module': 'common/module.js',

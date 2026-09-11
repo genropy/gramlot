@@ -109,3 +109,25 @@ test('updateOn "input": writes live on each input event', () => {
     assert.equal(genro.data.getItem('main.form.name'), 'Ann');
     assert.equal(root.querySelector('span').textContent, 'Ann');
 });
+
+for (const live of [true, false]) {
+    test(`live=${live}: controls commit timing without leaking into markup`, () => {
+        setupDom();
+        class Page extends HtmlBuilder {
+            main(root) {
+                root.input({value: '^message', live});
+                root.span('^message');
+            }
+        }
+        const root = document.createElement('div');
+        const app = new Application(root, new Page('main'));
+        const input = root.querySelector('input');
+        assert.equal(input.hasAttribute('live'), false);
+        input.value = 'Hello';
+        fire(input, 'input');
+        assert.equal(root.querySelector('span').textContent, live ? 'Hello' : '');
+        fire(input, 'change');
+        assert.equal(root.querySelector('span').textContent, 'Hello');
+        app.dispose();
+    });
+}

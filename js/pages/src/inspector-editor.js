@@ -1,4 +1,5 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
+import {toTytx, fromTytx} from 'genro-tytx';
 /** Typed property grid. Leaving a row commits validated edits through Bag APIs. */
 export class InspectorEditor {
     constructor(host, bag, page) {
@@ -6,6 +7,7 @@ export class InspectorEditor {
         this.bag = bag;
         this.page = page;
         this.dirty = false;
+        this.knownTypes = new WeakMap();
         const root = this.getField('rows').attachShadow({mode: 'open'});
         const style = host.ownerDocument.createElement('link');
         style.rel = 'stylesheet';
@@ -16,6 +18,13 @@ export class InspectorEditor {
         this.onInput = event => {
             const row = event.composedPath()[0].closest?.('[data-property]');
             if (!row) return;
+            const control = event.composedPath()[0];
+            if (control.dataset.cell === 'type') this.configureInput(row, control.value, null);
+            else if (control.dataset.cell === 'value') {
+                row.dataset.null = 'false';
+                control.classList.remove('gnr-null-value');
+                control.indeterminate = false;
+            }
             this.dirty = true;
             row.dataset.dirty = 'true';
             this.setStatus('Unsaved changes');
@@ -32,9 +41,22 @@ export class InspectorEditor {
             if (!row || !this.dirty || this.applying) return;
             // Name, value and type form one edit; moving within it is not a commit.
             if (event.relatedTarget && row.contains(event.relatedTarget)) return;
-            if (event.relatedTarget?.closest?.('[data-command="reload"]')) return;
             try { this.apply(true); } catch (error) { this.setStatus(error.message, true); }
         };
+        this.onKeyDown = event => {
+            const input = event.target.closest?.('[data-cell="value"]');
+            if (!input || event.key !== 'Backspace' || event.repeat || event.isComposing || input.disabled) return;
+            if (input.type !== 'checkbox' && (input.value !== '' || input.validity.badInput)) return;
+            event.preventDefault();
+            const row = input.closest('[data-property]');
+            row.dataset.null = 'true';
+            row.dataset.dirty = 'true';
+            input.value = '';
+            input.indeterminate = input.type === 'checkbox';
+            input.classList.add('gnr-null-value');
+            this.dirty = true;
+        };
+        this.rows.addEventListener('keydown', this.onKeyDown);
         this.rows.addEventListener('focusout', this.onFocusOut);
         host.addEventListener('input', this.onInput);
         host.addEventListener('change', this.onInput);
@@ -44,17 +66,56 @@ export class InspectorEditor {
     setStatus(message, error = false) {
         this.getField('status').textContent = message;
         this.getField('status').dataset.error = String(error);
+        this.getField('status').hidden = !message;
     }
     getType(value) {
-        if (value === null) return 'null';
+        if (value === null) return null;
+        if (value instanceof Date && Number.isFinite(value.getTime())) {
+            const wire = toTytx(value, 'json');
+            return wire.includes('::D"') ? 'date' : wire.includes('::H"') ? 'time' : 'datetime';
+        }
         return ['string', 'number', 'boolean'].includes(typeof value) ? typeof value : null;
+    }
+    declaredType(dtype) {
+        return ({T:'string', A:'string', L:'integer', I:'integer', N:'number', R:'number',
+            B:'boolean', D:'date', H:'time', DH:'datetime', DHZ:'datetime',
+            string:'string', number:'number', boolean:'boolean', date:'date', time:'time'})[dtype];
     }
     getParsed(type, text) {
         if (type === 'string') return text;
-        if (type === 'null') return null;
-        if (type === 'boolean' && ['true', 'false'].includes(text)) return text === 'true';
-        if (type === 'number' && text.trim() && Number.isFinite(Number(text))) return Number(text);
-        throw new Error(`Invalid ${type}: ${text}. Use a finite number or true/false.`);
+        if (type === 'number' || type === 'integer') {
+            const number = Number(text);
+            if (text.trim() && Number.isFinite(number) && (type !== 'integer' || Number.isSafeInteger(number))) return number;
+        }
+        if (['date', 'time', 'datetime'].includes(type) && text) {
+            if (type === 'time' && text.length === 5) text += ':00';
+            const suffix = type === 'date' ? 'D' : type === 'time' ? 'H' : 'DHZ';
+            const date = fromTytx(JSON.stringify(text + (type === 'datetime' ? 'Z' : '') + '::' + suffix), 'json');
+            if (date instanceof Date && Number.isFinite(date.getTime())) return date;
+        }
+        throw new Error(`Invalid ${type}: ${text || '(empty)'}.`);
+    }
+    configureInput(row, type, value) {
+        row.dataset.type = type;
+        row.dataset.null = String(value === null);
+        const input = row.querySelector('[data-cell="value"]');
+        input.type = ({string:'text',number:'number',integer:'number',boolean:'checkbox',
+            date:'date',time:'time',datetime:'datetime-local'})[type] || 'text';
+        input.step = type === 'integer' ? '1' : type === 'number' ? 'any' : '0.001';
+        input.checked = value === true;
+        input.indeterminate = type === 'boolean' && value === null;
+        const iso = value instanceof Date && Number.isFinite(value.getTime()) ? value.toISOString() : null;
+        input.value = iso ? (type === 'date' ? iso.slice(0,10) : type === 'time' ? iso.slice(11,23) : iso.slice(0,23)) : String(value ?? '');
+        input.classList.toggle('gnr-null-value', value === null);
+        input.setAttribute('aria-description', value === null ? 'Null value. Backspace on an empty field sets null.' : 'Backspace on an empty field sets null.');
+    }
+    parsedRow(row) {
+        if (row.dataset.complex === 'true' || row.dataset.dirty !== 'true') return row._originalValue;
+        if (row.dataset.null === 'true') return null;
+        const input = row.querySelector('[data-cell="value"]');
+        if (row.dataset.type === 'boolean') return input.checked;
+        if (!input.validity.valid) throw new Error(`Invalid ${row.dataset.type} value.`);
+        return this.getParsed(row.dataset.type, input.value);
     }
     getCurrentNode() { return this.path ? this.bag.getNode(this.path) : null; }
     getUnchanged() {
@@ -80,7 +141,7 @@ export class InspectorEditor {
             this.setStatus(path ? 'Selected node was removed. Select another node.' : 'Select a node.', true);
         } else if (!this.getUnchanged()) {
             this.setAvailability(true);
-            if (this.dirty) this.setStatus('Node changed outside this draft. Reload before applying.', true);
+            if (this.dirty) this.setStatus('Node changed outside this draft. Select another node and return to reload its current value.', true);
             else this.reload();
         }
     }
@@ -91,11 +152,13 @@ export class InspectorEditor {
         if (this.node) {
             this.value = this.node.getValue();
             this.attrs = {...this.node.attr};
-            this.appendRow('*value', this.value, true);
-            for (const [name, value] of Object.entries(this.attrs)) this.appendRow(name, value);
+            this.appendRow('value', this.value, true);
+            for (const [name, value] of Object.entries(this.attrs)) {
+                if (name !== '_meta') this.appendRow(name, value);
+            }
         }
         this.setAvailability(Boolean(this.node));
-        this.setStatus(this.node ? 'Running instance only' : 'Select a node');
+        this.setStatus('');
     }
     appendRow(name, value, primary = false, fresh = false) {
         const row = this.getField('row-template').firstElementChild.cloneNode(true);
@@ -107,22 +170,29 @@ export class InspectorEditor {
         row.dataset.property = primary ? 'value' : 'attribute';
         row.dataset.name = name;
         row.dataset.fresh = String(fresh);
-        const type = this.getType(value);
-        row.dataset.complex = String(!type);
+        row._originalValue = value;
+        const known = this.knownTypes.get(this.node) || new Map();
+        const inferred = this.getType(value);
+        const type = (primary && this.declaredType(this.node.attr.dtype)) || inferred || known.get(name) || 'string';
+        if (inferred || (primary && this.declaredType(this.node.attr.dtype))) known.set(name, type);
+        this.knownTypes.set(this.node, known);
+        const complex = value !== null && !inferred;
+        row.dataset.complex = String(complex);
         const key = row.querySelector('[data-cell="name"]');
         key.value = name;
         key.readOnly = !fresh;
         const input = row.querySelector('[data-cell="value"]');
-        input.value = type ? String(value ?? '') : '[Complex value · read-only]';
+        this.configureInput(row, type, value);
+        if (complex) input.value = '[Complex value · read-only]';
         input.setAttribute('aria-label', primary ? 'Value' : `${name || 'New attribute'} value`);
+        if (primary) input.dataset.field = 'value';
         const select = row.querySelector('[data-cell="type"]');
-        select.value = type || 'string';
-        select.setAttribute('aria-label', primary ? 'Value type' : `${name || 'New attribute'} type`);
+        if (fresh) { select.value = type; select.setAttribute('aria-label', 'New attribute type'); }
+        else select.remove();
         const remove = row.querySelector('[data-cell="remove"]');
         remove.hidden = primary;
         remove.setAttribute('aria-label', `Remove ${name || 'new attribute'}`);
-        if (primary) { input.dataset.field = 'value'; select.dataset.field = 'value-type'; }
-        input.disabled = select.disabled = remove.disabled = !type;
+        input.disabled = remove.disabled = complex;
         this.rows.append(row);
         return row;
     }
@@ -141,19 +211,17 @@ export class InspectorEditor {
         this.setStatus('Unsaved changes');
     }
     apply(preserveRows = false) {
-        if (!this.getUnchanged()) throw new Error('Node changed or was removed. Reload before applying.');
-        const value = this.getType(this.value) ? this.getParsed(this.getField('value-type').value,
-            this.getField('value').value) : this.value;
-        const attrs = {};
+        if (!this.getUnchanged()) throw new Error('Node changed or was removed. Select another node and return to reload its current value.');
+        const value = this.parsedRow(this.rows.querySelector('[data-property="value"]'));
+        // Hidden schema metadata must survive replacement of editable attributes.
+        const attrs = Object.hasOwn(this.attrs, '_meta') ? {_meta: this.attrs._meta} : {};
         for (const row of this.rows.querySelectorAll('[data-property="attribute"]')) {
             if (row.dataset.removed === 'true') continue;
             const key = row.querySelector('[data-cell="name"]').value.trim();
             if (!key) throw new Error('Enter an attribute name.');
-            if (['__proto__', 'constructor', 'prototype'].includes(key)) throw new Error('Unsupported attribute name.');
+            if (['_meta', '__proto__', 'constructor', 'prototype'].includes(key)) throw new Error('Unsupported attribute name.');
             if (Object.hasOwn(attrs, key)) throw new Error(`Duplicate attribute: ${key}`);
-            attrs[key] = row.dataset.complex === 'true' ? this.attrs[key] :
-                this.getParsed(row.querySelector('[data-cell="type"]').value,
-                    row.querySelector('[data-cell="value"]').value);
+            attrs[key] = this.parsedRow(row);
         }
         const write = () => {
             // setAttr replacement notifies deletions too; delAttr does not emit.
@@ -184,14 +252,19 @@ export class InspectorEditor {
             this.dirty = false;
             for (const row of this.rows.querySelectorAll('[data-property]')) {
                 if (row.dataset.removed === 'true') { row.remove(); continue; }
+                row._originalValue = row.dataset.property === 'value' ? this.value : this.attrs[row.querySelector('[data-cell="name"]').value.trim()];
+                row.dataset.name = row.querySelector('[data-cell="name"]').value.trim();
+                this.knownTypes.get(this.node)?.set(row.dataset.name, row.dataset.type);
+                row.querySelector('[data-cell="type"]')?.remove();
                 row.dataset.dirty = 'false';
                 row.dataset.fresh = 'false';
                 row.querySelector('[data-cell="name"]').readOnly = true;
             }
         } else this.reload();
-        this.setStatus('Applied to the running instance.');
+        this.setStatus('');
     }
     dispose() {
+        this.rows.removeEventListener('keydown', this.onKeyDown);
         this.rows.removeEventListener('focusout', this.onFocusOut);
         this.host.removeEventListener('input', this.onInput);
         this.host.removeEventListener('change', this.onInput);

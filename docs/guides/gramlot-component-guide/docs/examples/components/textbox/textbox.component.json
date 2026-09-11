@@ -1,0 +1,77 @@
+{
+  "document_format": {
+    "name": "gramlot_component_example",
+    "version": "0.1"
+  },
+  "identity": {
+    "recipe_name": "guideTextBox",
+    "custom_tag": "gnr-textbox",
+    "python_module": "generated/textbox_declaration.py",
+    "collection": "guide-textbox-contract",
+    "implementation_module": "../../../../../js/dom/src/collections/inputs.js",
+    "implementation_collection": "inputs"
+  },
+  "summary": "An isolated textBox contract example linked to Gramlot's existing gnr-textbox implementation.",
+  "children": {
+    "sub_tags": ""
+  },
+  "parameters": [
+    {
+      "name": "placeholder",
+      "type": "string|null",
+      "default": null,
+      "doc": "Hint shown while the field has no text."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean|string|null",
+      "default": null,
+      "doc": "Disable editing; a string also permits the existing ^/= binding syntax."
+    },
+    {
+      "name": "readonly",
+      "type": "boolean|string|null",
+      "default": null,
+      "doc": "Make the inner input read-only; a string also permits ^/= binding."
+    }
+  ],
+  "shared_attributes": [
+    "gramlot.binding",
+    "gramlot.decoration",
+    "gramlot.validation"
+  ],
+  "integration": {
+    "binding": "Gramlot resolves literal, ^ and = recipe values before rendering; value write-back follows updateOn.",
+    "events": [
+      {
+        "name": "input",
+        "bubbles": true,
+        "composed": true,
+        "role": "normal value write-back"
+      },
+      {
+        "name": "change",
+        "bubbles": true,
+        "composed": true,
+        "role": "blur/change write-back"
+      }
+    ],
+    "form": "The shared form service reads node identity, validation attributes and value changes; this component does not own persistence."
+  },
+  "lifecycle": {
+    "connected": "Synchronize host attributes, connect null-state behavior and start label observation.",
+    "disconnected": "Disconnect the WidgetLabel observer so detached fields retain no observer callback."
+  },
+  "presentation": {
+    "shadow_dom": true,
+    "label_decoration": "gramlot.decoration",
+    "theme_properties": [
+      "--field-bg",
+      "--field-border",
+      "--field-focus-border",
+      "--form-field-radius"
+    ]
+  },
+  "open_attributes": true,
+  "status": "Worked example only; this descriptor format is not a frozen public Gramlot API."
+}

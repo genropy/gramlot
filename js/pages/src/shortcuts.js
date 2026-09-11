@@ -7,6 +7,7 @@ export class Shortcuts {
         this.listener = event => {
             if (event.defaultPrevented || event.repeat || event.isComposing) return;
             for (const entry of this.commands.values()) {
+                if (entry.when && !entry.when(event)) continue;
                 const keys = entry.keys.toLowerCase().split('+');
                 if (event.key.toLowerCase() !== keys.at(-1)) continue;
                 if (['ctrl', 'shift', 'alt', 'meta'].some(mod =>
@@ -21,8 +22,8 @@ export class Shortcuts {
         };
         target.addEventListener('keydown', this.listener);
     }
-    register(name, keys, action, {allowEditing = false} = {}) {
-        this.commands.set(name, {keys, action, allowEditing});
+    register(name, keys, action, {allowEditing = false, when = null} = {}) {
+        this.commands.set(name, {keys, action, allowEditing, when});
         return () => this.commands.delete(name);
     }
     execute(name) { this.commands.get(name)?.action(); }

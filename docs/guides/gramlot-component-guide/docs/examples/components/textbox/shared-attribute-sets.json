@@ -1,0 +1,80 @@
+{
+  "gramlot.binding": {
+    "summary": "Values and widget policy shared by data-aware Gramlot fields.",
+    "parameters": [
+      {
+        "name": "value",
+        "type": "any",
+        "default": null,
+        "doc": "Literal value or an existing ^/= data path expression."
+      },
+      {
+        "name": "dtype",
+        "type": "string|null",
+        "default": null,
+        "doc": "Optional dtype metadata; the component contract does not restrict its vocabulary."
+      },
+      {
+        "name": "default",
+        "type": "any",
+        "default": null,
+        "doc": "Existing default policy value, preserved without narrowing its type."
+      },
+      {
+        "name": "default_value",
+        "type": "any",
+        "default": null,
+        "doc": "Existing explicit default value, including false and empty-string values."
+      },
+      {
+        "name": "blankIsNull",
+        "type": "boolean|string|null",
+        "default": null,
+        "doc": "Blank-value policy; a string also permits the existing ^/= binding syntax."
+      },
+      {
+        "name": "updateOn",
+        "type": "string|null",
+        "default": null,
+        "doc": "Existing input/change update policy."
+      }
+    ]
+  },
+  "gramlot.decoration": {
+    "summary": "Shared widget label and box decoration.",
+    "parameters": [
+      {
+        "name": "lbl",
+        "type": "string|null",
+        "default": null,
+        "doc": "Widget label text or a ^/= data path expression."
+      },
+      {
+        "name": "lbl_position",
+        "type": "string|null",
+        "default": null,
+        "doc": "Label placement: L, R, TL, TC, TR, BL, BC or BR."
+      }
+    ],
+    "open_patterns": [
+      {
+        "pattern": "lbl_*",
+        "doc": "Additional label presentation attributes."
+      },
+      {
+        "pattern": "box_*",
+        "doc": "Additional inner-box presentation attributes."
+      }
+    ]
+  },
+  "gramlot.validation": {
+    "summary": "Validation rules consumed by the shared form service.",
+    "parameters": [],
+    "open_patterns": [
+      {
+        "pattern": "validate_*",
+        "doc": "A supported validation rule such as validate_notnull or validate_len."
+      }
+    ]
+  }
+}

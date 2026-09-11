@@ -117,8 +117,8 @@ class PageCollection:
 
     def document(self, name: str) -> HTMLResponse:
         """GET /page/hello/: send startup HTML, not the rendered heading."""
-        self.require_page(name)
-        return self.html_document(f'{self.prefix}/{name}/recipe')
+        page_class = self.require_page(name)
+        return self.html_document(f'{self.prefix}/{name}/recipe', inspector=page_class.source_inspection)
 
     def index_recipe(self) -> Response:
         """GET /page/recipe: generate navigation from the same page registry."""
@@ -142,13 +142,13 @@ class PageCollection:
             raise HTTPException(status_code=404)
         return self.page_classes[name]
 
-    def html_document(self, recipe_url: str) -> HTMLResponse:
+    def html_document(self, recipe_url: str, *, inspector: bool = True) -> HTMLResponse:
         # Escape inserted data before substitution. Values cannot introduce new
         # template substitutions, even when a title contains a placeholder name.
         replacements = {
             '__TITLE__': escape(self.title),
             '__IMPORTS__': self.script_json({'imports': self.runtime.import_map()}),
-            '__STARTUP__': self.script_json({'recipe': recipe_url}),
+            '__STARTUP__': self.script_json({'recipe': recipe_url, 'inspector': inspector}),
             '__ENTRY__': escape(self.runtime.entry_url, quote=True),
         }
         html = re.sub(r'__(?:TITLE|IMPORTS|STARTUP|ENTRY)__',

@@ -1,6 +1,8 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
-import {registerCollection, webcomponent} from '../collections.js';
-import {WidgetLabel} from '../widget-label.js';
+import {COPY_ICON, COPIED_ICON, writeClipboardText} from '../components/clipboard.js';
+import {registerComponentCollection} from '../components/registry.js';
+import {builtinComponents} from '../components/builtin-components.js';
+import {WidgetLabel} from './decoration/widget-label.js';
 
 function defineComponents() {
     if (typeof customElements === 'undefined' || customElements.get('gnr-copybutton')) return;
@@ -31,8 +33,8 @@ function defineComponents() {
             this._button.title = label;
             this._button.setAttribute('aria-label', label);
             this._button.innerHTML = copied
-                ? '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m3 10 4 4 10-10"/></svg>'
-                : '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="6" width="10" height="12" rx="1"/><path d="M4 14H2V2h10v2"/></svg>';
+                ? COPIED_ICON
+                : COPY_ICON;
             this._button.disabled = this.hasAttribute('disabled') || this._busy;
         }
         async copy() {
@@ -41,9 +43,7 @@ function defineComponents() {
             clearTimeout(this._timer);
             this._busy = true; this._show('Copying'); this._status.textContent = '';
             try {
-                const clipboard = this.ownerDocument.defaultView.navigator.clipboard;
-                if (!clipboard?.writeText) throw new Error('Clipboard API unavailable');
-                await clipboard.writeText(this.getAttribute('value') ?? '');
+                await writeClipboardText(this, this.getAttribute('value') ?? '');
                 if (!this.isConnected || generation !== this._generation) return;
                 this._busy = false; this._show('Copied', true); this._status.textContent = 'Copied';
                 this.dispatchEvent(new CustomEvent('gnr-copied', {bubbles:true, composed:true}));
@@ -57,4 +57,4 @@ function defineComponents() {
     }
     customElements.define('gnr-copybutton', CopyButton);
 }
-registerCollection('clipboard', {grammar:{elements:{copyButton:webcomponent('copybutton')}}, defineComponents});
+registerComponentCollection('clipboard', {components: builtinComponents('clipboard'), defineComponents});

@@ -13,10 +13,14 @@
  * (the walk, `_handleMeta`, `runtimeValues`, include_datapath ids and
  * `data-*-pointer` hooks) follows the Python architecture linearly.
  */
+import {createDataScopeReader} from '../../components/data-scope.js';
 import { RendererBase } from '../../renderer/base.js';
 import { BuilderBase } from '../../builder-base.js';
 import { HtmlAttributes } from './html-attributes.js';
+import {formatDisplay, displayLocale} from '../../display-format.js';
 import { HTML5_GRAMMAR } from './html5-elements.js';
+
+const displayedText = new WeakMap();
 
 /** HTML5 void elements: rendered without children/closing tag. */
 const VOID_TAGS = new Set([
@@ -40,6 +44,7 @@ export class HtmlRenderer extends RendererBase {
     /** Emit the DOM element for `node` (parity with rendered_item). */
     renderedItem(node, item, runtimeAttrs, { tag, includeDatapath = false }) {
         const el = document.createElement(tag);
+        if (node._getMeta('dataScope')) el.readDataScope = createDataScopeReader(node);
         if (node._getMeta('dataWidget') && 'store' in runtimeAttrs) {
             // data-widget (GnrStoreBag channel): hand the resolved Bag branch
             // as a JS property, never a stringified attribute. The path still
@@ -59,6 +64,7 @@ export class HtmlRenderer extends RendererBase {
             }
             runtimeAttrs={...runtimeAttrs,style:outer.cssText,box_style:inner.cssText+';'+(runtimeAttrs.box_style || '')};
         }
+        if (tag === 'gnr-numbertextbox') runtimeAttrs = {...runtimeAttrs, locale:displayLocale(node, runtimeAttrs, el.ownerDocument)};
         this._applyAttrs(el, runtimeAttrs);
         el._widgetLabel?.apply();
         el._applyRange?.();
@@ -80,14 +86,28 @@ export class HtmlRenderer extends RendererBase {
             for (const child of item) {
                 el.appendChild(child);
             }
-        } else if (item !== null && item !== undefined) {
-            el.textContent = String(item);
+        } else if (item != null || runtimeAttrs.mask != null) {
+            try {
+                el.textContent = formatDisplay(item, {...runtimeAttrs, locale:displayLocale(node, runtimeAttrs, el.ownerDocument)});
+                displayedText.set(node, el.textContent);
+            } catch (error) {
+                // A user-editable format must not abort the entire render transaction.
+                el.textContent = displayedText.get(node) ?? (item == null ? '' : String(item));
+                el.setAttribute('data-format-error', error.message);
+                el.setAttribute('title', error.message);
+                el.setAttribute('aria-invalid', 'true');
+                const message = el.ownerDocument.createElement('small');
+                message.setAttribute('role', 'status');
+                message.textContent = ` (${error.message})`;
+                el.appendChild(message);
+            }
         }
         return el;
     }
 
     /** Serialize the resolved attributes onto the element. */
     _applyAttrs(el, attrs) {
+        el._validateAttributes?.(attrs);
         for (const [name, value] of Object.entries(attrs)) {
             if (value === true) {
                 el.setAttribute(name, '');

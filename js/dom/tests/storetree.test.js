@@ -137,3 +137,21 @@ test('a reader of selectedPath updates on selection', () => {
     assert.equal(genro.data.getItem('main.ui.sel'), 'docs');
     assert.match(root.querySelector('span').textContent, /docs/, 'the reader re-rendered');
 });
+
+test('optional row actions emit node and path without selecting the row', () => {
+    const {el, genro} = mount();
+    assert.equal(el.shadowRoot.querySelector('.actions'), null);
+    el.rowActions = [{id:'edit', icon:'✎', label:'Edit parameters'}];
+    let detail;
+    el.addEventListener('tree-action', event => { detail=event.detail; });
+    el.shadowRoot.querySelector('summary button').click();
+    assert.equal(detail.action, 'edit');
+    assert.equal(detail.path, 'docs');
+    assert.equal(detail.node, el.storeBag.getNode('docs'));
+    assert.equal(genro.builder.data.getItem('ui.selected'), null);
+    genro.live(() => genro.builder.data.setItem('fs.extra', 'value'));
+    assert.equal(el.shadowRoot.querySelectorAll('.actions button').length, 4);
+    el.rowActions=[];
+    assert.equal(el.shadowRoot.querySelector('.actions'), null);
+    genro.dispose();
+});

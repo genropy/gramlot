@@ -76,3 +76,60 @@ test('reactive defaults resolve in the formlet scope and keep explicit child ove
     assert.equal(fields[1].shadowRoot.activeElement,input);
     app.dispose();
 });
+
+test('formlet position and decoration defaults reach fields and explicit boxes', () => {
+    setupDom();
+    class Page extends HtmlBuilder {
+        static wc_requires=['layout','inputs'];
+        setup() { this.setData('position','R'); this.setData('labelColor','purple'); }
+        main(root) {
+            const fields=root.formlet({lbl_position:'^position',lbl_color:'^labelColor',
+                box_padding:'5px',node_id:'shared'});
+            fields.textBox({lbl:'Inherited',node_id:'inherited'});
+            fields.textBox({lbl:'Cleared',lbl_position:'',lbl_color:'',
+                box_padding:'',node_id:'cleared'});
+            fields.labledBox({label:'Explicit inherited',node_id:'explicit'}).textBox({value:'Draft'});
+            const explicitCleared=fields.labledBox({label:'Explicit cleared',label_color:'',
+                box_padding:'',node_id:'explicitCleared'});
+            explicitCleared.setAttr({label_position:null},false,true,false);
+            explicitCleared.div('content');
+        }
+    }
+    const host=document.body.appendChild(document.createElement('div'));
+    const app=new Application(host,new Page('shared-defaults'));
+    const formlet=host.querySelector('gnr-formlet');
+    const [inherited,cleared,explicit,explicitCleared]=formlet.children;
+    const input=inherited.shadowRoot.querySelector('input');
+    input.focus(); input.value='Uncommitted';
+    assert.equal(inherited.shadowRoot.querySelector('.labledBox').style.flexDirection,'row-reverse');
+    assert.equal(inherited.shadowRoot.querySelector('.labledBox').style.padding,'5px');
+    assert.equal(inherited.shadowRoot.querySelector('label').style.color,'purple');
+    assert.equal(cleared.shadowRoot.querySelector('.labledBox').style.flexDirection,'column');
+    assert.equal(cleared.shadowRoot.querySelector('.labledBox').style.padding,'');
+    assert.equal(cleared.shadowRoot.querySelector('.labledBox_label').style.color,'');
+    assert.equal(explicit.getAttribute('label_position'),'R');
+    assert.equal(explicit.shadowRoot.querySelector('.labledBox').style.flexDirection,'row-reverse');
+    assert.equal(explicit.shadowRoot.querySelector('.labledBox').style.padding,'5px');
+    assert.equal(explicit.shadowRoot.querySelector('.labledBox_label').style.color,'purple');
+    assert.equal(explicitCleared.shadowRoot.querySelector('.labledBox').style.flexDirection,'column');
+    assert.equal(explicitCleared.shadowRoot.querySelector('.labledBox').style.padding,'');
+    assert.equal(explicitCleared.shadowRoot.querySelector('.labledBox_label').style.color,'');
+
+    app.live(()=>{
+        app.data.setItem('shared-defaults.position','TC');
+        app.data.setItem('shared-defaults.labelColor','blue');
+    });
+    assert.equal(formlet.children[0],inherited);
+    assert.equal(inherited.shadowRoot.activeElement,input);
+    assert.equal(input.value,'Uncommitted');
+    assert.equal(inherited.shadowRoot.querySelector('.labledBox').style.flexDirection,'column');
+    assert.equal(inherited.shadowRoot.querySelector('label').style.textAlign,'center');
+    assert.equal(inherited.shadowRoot.querySelector('label').style.color,'blue');
+    assert.equal(explicit.getAttribute('label_position'),'TC');
+    assert.equal(explicit.shadowRoot.querySelector('.labledBox').style.flexDirection,'column');
+    assert.equal(explicit.shadowRoot.querySelector('.labledBox_label').style.textAlign,'center');
+    assert.equal(explicit.shadowRoot.querySelector('.labledBox_label').style.color,'blue');
+    assert.equal(cleared.shadowRoot.querySelector('.labledBox').style.flexDirection,'column');
+    assert.equal(explicitCleared.shadowRoot.querySelector('.labledBox').style.flexDirection,'column');
+    app.dispose();
+});

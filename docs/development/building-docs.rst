@@ -38,3 +38,12 @@ Only ``docs/source/`` is published as the user manual. The
 See the `Sphinx getting-started guide
 <https://www.sphinx-doc.org/en/master/usage/quickstart.html>`_ for the underlying
 documentation structure and build tools.
+
+Inspector browser assets
+------------------------
+
+The asset preparation command now compiles the Python inspector recipe into
+``pages/inspector.tytx``. Run it with a Python environment containing the core
+project dependencies, for example ``.venv/bin/python scripts/prepare_assets.py``.
+The package manifest checks the Python recipe, builder and transport inputs as
+well as browser sources, so a changed recipe requires asset regeneration.

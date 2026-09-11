@@ -1,5 +1,155 @@
 # Open work retained from Pages
 
+## Context menus and symbolic-date help — deferred by owner, 2026-09-11
+
+The symbolic-date syntax menu belongs to the general menu design. The owner
+explicitly deferred it until that work is addressed. A localized, dynamically
+evaluated example menu and generic component attachment were discussed; no API
+was approved and no context-menu runtime was implemented. Resume together with
+menus, rather than adding a date-specific mechanism.
+
+## Display formatting alpha — implemented, 2026-09-11
+
+Scalar HTML content now supports reactive `format`, `mask`, and `locale`, named
+temporal styles and a bounded LDML subset. See [scope and usage](../guides/display-formatting.md).
+A bounded numeric pattern/preset formatter and precision-preserving numberTextBox
+are also implemented; see [numeric formatting](../guides/number-formatting.md).
+Independent datetime date/time styles, Data-node presentation
+metadata precedence and an explicit local datetime carrier remain open. Existing
+UTC datetime carriers display UTC; no browser-zone conversion is introduced.
+
+## Date expressions and period links — investigation, 2026-09-11
+
+Subsequent implementation: the owner requested a standalone parser agent and then
+an opt-in dateTextBox trial. The importable parser now lives at
+`gramlot-dom/date-parser`; `symbolic=True` integrates it through a separate editor
+collaborator. See [usage and limitations](../guides/date-expression-parser.md).
+The native-key buffer is deliberately limited to uninterrupted typing; pointer
+and navigation changes reset it. Owner correction: no expression button; entry
+is automatic from the buffer regex. Mobile/IME coverage remains to be verified.
+The browser test verified `o` -> text -> `oggi+15` -> date, and `1 T` buffer
+preservation -> `2 trimestre` -> 1 April. All 271 JS tests and four teaching
+Python tests passed. Real mobile and cross-browser verification remain pending,
+as does linked-period validation/commit behavior. No datetime/UTC change.
+
+See [legacy audit](../development/date-expressions-legacy-audit-2026-09-11.md).
+Legacy `period_to` links the start field to the end Data path; compact dates parse
+in JavaScript and expression fallback runs in Python. The owner suggests browser
+JavaScript evaluation and a leading `/` as an expression-entry switch. These
+remain design discussion, with no parser implementation or finalized syntax.
+The native local datetime editor decision remains definitive.
+
+Local data logic has now undergone coordinator review and corrective work:
+see [review checkpoint](../development/local-logic-review.md). The delivered
+slice covers local setters, formula/controller expressions/scripts and inline
+==. RPC, remote and broader scheduling remain pending; the full logical-block
+plan is not complete.
+
+## Gramlot API PoC — parked by owner, 2026-09-10
+
+The browser-only OpenAPI explorer experiment is parked for later resumption.
+Sources and verified capabilities are in
+[the PoC README](../examples/gramlot-api-poc/README.md).
+No further API-console development is scheduled. This does not cancel the
+separate component guide and logical-block work.
+
+## Simple component guide — immediate owner priority, 2026-09-10
+
+Delivered as [the English HTML handbook](../guides/component-development.html),
+with twelve chapters, embedded Gramlot branding and a downloadable example archive.
+Source: component-guide-content.md; renderer: scripts/build_component_guide.py.
+Native lifecycle/events and mounted reactive integration were checked; the HTML
+was reviewed at narrow and desktop widths. Recipient-specific naming was removed.
+
+Before logical-block implementation, prepare a component development guide:
+native Web Component first, then its Gramlot integration, as one progressive
+guide. The owner refined the deliverable to a professional English HTML handbook
+of approximately twelve pages with Gramlot branding and no recipient-specific
+names. Use a runnable example and distinguish verified integration
+from the proposed manifest/discovery pipeline. The guide also serves to assess
+whether the component architecture is understandable. No external delivery
+or framework implementation is implied by this documentation request.
+
+The owner-requested [logical blocks plan](../development/logical-blocks-plan.md)
+orders data preparation, local providers, RPC, optional FastAPI services and
+remote Source composition. It records open choices and acceptance checks;
+planning does not approve proposed signatures or start implementation.
+
+Owner requested sequencing this logical-block step before layout implementation.
+The plan now groups it into reviewable local Data, expression/provider, server
+call and remote-content deliveries. Use existing containers for remote tests;
+do not pull new layout work into this prerequisite.
+
+## Data providers and endpoint integration — investigation, 2026-09-10
+
+The owner requested a legacy/current comparison for data, dataController,
+dataFormula, dataRpc and remote, including page-defined Python methods versus
+host-independent endpoints. The [design audit](../development/data-services-design-audit.md)
+records execution rules, current gaps and a proposed optional page-method
+registration convention for FastAPI. No endpoint API or implementation scope
+has been approved. Keep Data results, lazy Data resolvers and remote Source
+composition distinct; page-method convenience need not imply persistent mutable
+server page instances.
+
+## Connect and topics — recovered checkpoint, 2026-09-10
+
+The owner requested recovery of the legacy's precise connect/publish/subscribe
+rules before component and container design loses them. See the
+[source audit](../development/events-legacy-audit.md): direct widget/DOM
+connections, page/node/form topics, callback scope and subscription ownership
+are distinct. Current page-local topics provide only partial coverage. Preserve
+this design input; implementation and exact compatibility APIs remain deferred.
+
+The subsequent core/adapter split is explicitly provisional and requires later
+owner confirmation: declared component events and owned, scoped topics in core;
+historical syntax, naming and arbitrary method interception in the legacy
+adapter. The audit records the full proposal. Do not treat it as an approved
+API contract or implementation authorization.
+
+## Deferred toolbar and authorization ideas — owner checkpoint, 2026-09-10
+
+The owner explicitly requires retaining FramePane as a widget in the target
+architecture: a partly preassembled border container, not merely a historical
+implementation detail. Preserve the distinction between the general
+borderContainer and the convenient frame composition with accessible regions
+and shared layout behavior. Legacy FramePane's distribution of rounded corners
+is confirmed by the owner as the intended historical mechanism. Exact new API
+and implementation scheduling remain open; this requirement does not authorize
+implementing all container features immediately.
+
+The owner supports a toolbar based on ordinary ordered children, sensible spacing
+defaults and optional named groups for extension/reuse. Toolbar implementation is
+deferred. A later compatibility wrapper should be evaluated for existing legacy
+slotBar/slotToolbar recipes, including callbacks, prefixed options and slot
+replacement, not only parsing the slots string. No replacement API is finalized.
+
+Branch authorization is also deferred. The discussed Python callback receives
+all node attributes and the page instance (which provides avatar/user context)
+and returns whether to include the branch. Naming, registration and exact
+exclusion semantics remain ideas. Legacy tags expressions belong in a possible
+compatibility wrapper, not a required new core syntax. Do not implement this
+callback or treat browser-side visibility as server authorization.
+
+For borderContainer, the owner clarified that closable implies drawer capability
+and that panel sizes can be bound to a data path in both directions: data changes
+move the splitter; dragging updates the stored dimension. Legacy regions/Bag
+hooks are recorded in the drawer audit. Preserve these as container requirements;
+current Gramlot local splitter styling does not establish that synchronization.
+
+Nested container corners are another owner-supplied destination requirement:
+when an inner container touches an enclosing rounded edge, its presentation
+should adapt without repeated recipe declarations. Consider each touching corner,
+border/padding offsets, nested layout regions and reactive changes. CSS radius
+is not inherited automatically; clipping children and adapting their own border
+geometry are different mechanisms. Avoid blanket overflow clipping that would
+cut drawer openers or other intentional protrusions. This is architectural
+context, not authorization for an immediate rounded-corner implementation.
+
+The immediate container investigation is legacy borderContainer drawers, with
+tabContainer also identified as a priority. See
+[drawer source audit](../development/drawer-legacy-audit.md). This checkpoint
+authorizes investigation, not an unsolicited container rewrite.
+
 Updated: 2026-09-08. These entries preserve discussion; they are not an automatic first-version roadmap. A historical issue link identifies provenance, not its current remote status.
 
 ## Questions requiring design work
@@ -73,3 +223,69 @@ Gramlot must not depend on Genro ASGI, including through an optional extra. A fu
 The integration has been extracted from the Python package and browser assets: application/routes, worker, server configuration, host-specific startup document, WSX/RPC client and bootstrap. Exact originals and associated host tests are preserved under docs/history/asgi-extraction-20260909 with a SHA-256 manifest, excluded from wheels and source distributions. They are recovery material for the future repository, not an active integration maintained inside Gramlot.
 
 Gramlot retains the builder, typed transport, browser runtime, widgets, inspector, recipes and host-independent tests. The CLI only serves local HTML documentation via the Python standard library; it no longer launches an application server. Rosetta owns its FastAPI integration and now installs the Gramlot wheel normally, without --no-deps. No server framework is required by Gramlot.
+
+## Rosetta comparison candidate — 2026-09-11
+
+The owner suggested adding NiceGUI to Rosetta. Record it as a candidate, not an
+instruction to modify the separate application immediately. Compare the same
+progressive examples using idiomatic implementations, with particular attention
+to transfer of learning and shared concepts. Measure production JS/CSS/assets on
+cold load and during interactions; keep development editors out of both totals.
+NiceGUI is relevant to Python authoring and has a backend-first architecture
+(FastAPI, Vue/Quasar and Socket.IO), so distinguish browser-local work from
+server-mediated interactions. No NiceGUI integration has been started.
+
+## DRY review and action/menu components — owner priority, 2026-09-11
+
+Separate owner-selected teaching example: lesson `11-source-slider` demonstrates
+a JavaScript controller inserting/removing contact-card Source nodes while keeping
+their Data. The shared field function uses relative paths under stable example
+paths `contacts.c1`, etc.; these paths do not define a store identity contract.
+The owner explicitly defers RPC-driven repetition, `_identifier` and stores until
+after this slider example. Removing Source must not delete Data. Owner correction:
+the example must be Python-authored and shown read-only. `recipe.py` now uses the
+existing HTML `script` tag to declare browser functions called by the button and
+controller. Its iframe follows content height, including the embedded inspector.
+The earlier JavaScript-only editable version is superseded.
+
+Owner clarification in the resumed conversation: this review should identify the
+architecture of Gramlot Components around reusable base classes and mixins,
+maximizing shared implementation. The owner explicitly assigns the assessment
+to a Sol agent, with coordinator review. Validation and `lbl_*`/`box_*`
+decoration are candidate shared capabilities; no particular mixin API or class
+hierarchy has been approved. Assess how mixins connect components to existing
+services rather than duplicating those services. The immediate deliverable is
+an architecture proposal grounded in current code, not a framework refactor.
+
+Assessment delivered: [Gramlot browser component architecture review](../development/gramlot-components-architecture-review-2026-09-11.md).
+Sol prepared the proposal and the coordinator reviewed the responsibility and
+lifecycle boundaries. Base/mixin names, the field adapter, and the first migration
+slice remain proposals; no runtime refactor or new test run accompanied the review.
+
+Subsequent owner correction: include `dateTextBox` and `dateTimeTextBox` as the
+guiding cases for the architecture slice; color picker is not the selected pilot.
+The owner also includes `numberTextBox`, explicitly covering decimal places and
+formatting. Assess shared typed-editor capabilities while keeping stored values,
+editing, display formatting and validation distinct; verify legacy semantics
+before proposing attribute names or rounding behavior.
+Later clarification: use GenroPy legacy as the documentation and comparison
+reference for all reviewed components, but formal compatibility with its confusing
+numeric/date formatting vocabulary is not required. Propose clearer formatting
+conventions where useful; see the formatting exception in the decision register.
+The existing date/time inputs and the missing date-time component require a
+legacy-contract check before selecting a shared base or a single/composite control
+shape. The assessment's first-slice section has been updated accordingly.
+
+Before expanding the framework much further, critically assess actual code reuse:
+shared responsibilities must have one implementation rather than being copied
+between widgets. Review input/binding/decoration/validation and provider lifecycle
+boundaries; distinguish necessary component-specific behavior from duplicated
+infrastructure. Avoid speculative abstractions that add complexity without actual
+shared responsibility. This review is a prerequisite to substantial expansion.
+
+The owner requests adding or completing buttons, dropdown buttons, menus and
+context menus as soon as practical. First inventory existing implementations and
+legacy contracts, then identify shared menu/action behavior and the missing pieces.
+Preserve prior event/topic and layout decisions; this request does not approve
+unrelated toolbar, authorization or container redesign. No implementation or
+background work started at this checkpoint.

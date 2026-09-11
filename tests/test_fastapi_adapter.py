@@ -96,3 +96,10 @@ def test_cli_directory(tmp_path, monkeypatch, explicit):
     app, options = calls[0]
     assert app.gramlot_pages.directory == tmp_path
     assert options == {'host': '127.0.0.1', 'port': 8765}
+
+
+def test_inspector_opt_out_in_startup(tmp_path):
+    page_file(tmp_path, body='from gramlot.page import WebPage\nclass Page(WebPage):\n    source_inspection = False\n    def main(self, root):\n        root.h1("Private page")\n')
+    with TestClient(GramlotApplication(tmp_path)) as client:
+        assert '\"inspector\": false' in client.get('/page/hello/').text
+        assert '\"inspector\": true' in client.get('/page/').text

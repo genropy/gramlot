@@ -295,7 +295,7 @@ test('declared date types parse to dates and reset keeps their editor text',asyn
     const {app,form,widget}=mount({},f=>f.dateTextBox({value:'^.date',dtype:'D',node_id:'date'}),
         page=>page.setData('draft.date',new Date('2026-09-08T00:00:00Z')));
     const input=widget('date').shadowRoot.querySelector('input');
-    assert.equal(input.value,'2026-09-08');
+    assert.equal(input.value,'09/08/2026');
     input.focus();input.value='2026-09-09';input.dispatchEvent(new Event('input',{bubbles:true,composed:true}));
     assert.equal((await form.save()).status,'saved');
     assert.ok(app.data.getItem('main.draft.date') instanceof Date);

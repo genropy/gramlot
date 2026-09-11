@@ -43,6 +43,8 @@ For custom servers, use `GramlotApplication` or `mount_gramlot` from
 - [FastAPI integration](docs/source/guide/fastapi.rst)
 - [Pages and reserved metadata](docs/source/reference/pages.rst)
 - [Documentation development](docs/development/building-docs.rst)
+- [Progressive Python/JavaScript teaching preview](docs/examples/teaching/README.md)
+- [Building Gramlot components](docs/source/guide/components.rst)
 
 [Gramlot 0.1.0a1 is available on PyPI](https://pypi.org/project/gramlot/0.1.0a1/). See
 [build and release instructions](docs/release.md).

@@ -74,7 +74,7 @@ export class DomTarget extends TargetWrapper {
         if (this._disposed) return true;
         const prior = this.recipes.get(el);
         if (!prior || next.nodeType !== 1 || el.localName !== next.localName) return false;
-        const container = ['gnr-formlet', 'gnr-labledbox', 'gnr-form', 'div', 'gnr-palette', 'gnr-tabcontainer', 'gnr-tab',
+        const container = ['gnr-formlet', 'gnr-labledbox', 'gnr-groupbox', 'gnr-form', 'div', 'gnr-palette', 'gnr-tabcontainer', 'gnr-tab',
             'gnr-bordercontainer', 'gnr-panel', 'gnr-box', 'gnr-stackcontainer', 'gnr-contentpane'].includes(el.localName);
         const names = new Set([...prior.attributes, ...next.attributes].map(a => a.name));
         const changes = [...names].filter(name => prior.getAttribute(name) !== next.getAttribute(name));
@@ -86,6 +86,11 @@ export class DomTarget extends TargetWrapper {
             // Decoration changes must not overwrite a focused control's uncommitted value.
             this._patchAttributes(el, next, prior, names);
             el._widgetLabel.apply();
+            return true;
+        }
+        if (el.editorPresentationAttributes && decorationChanges.every(name => el.editorPresentationAttributes.includes(name))
+            && el.innerHTML === next.innerHTML) {
+            this._patchAttributes(el,next,prior,names);
             return true;
         }
         if (el._formField && el._nullState && el.innerHTML === next.innerHTML) {
@@ -126,6 +131,7 @@ export class DomTarget extends TargetWrapper {
 
     /** Patch recipe-owned attributes without replacing the existing element. */
     _patchAttributes(el, next, prior, names) {
+        if (next.readDataScope) el.readDataScope = next.readDataScope;
         for (const name of names) {
             if (this._disposed) return true;
             if (prior.getAttribute(name) === next.getAttribute(name)) continue;

@@ -2,14 +2,17 @@
 """Recipe for the split tree/property inspector; inspected Bags keep their owner."""
 
 
-def build_inspector(root):
+def build_inspector(root, *, presentation="floating"):
     """Compose a compact floating inspector with independent Data/Source views."""
+    if presentation not in ("floating", "embedded"):
+        raise ValueError("Inspector presentation must be floating or embedded")
     root.data("opened", False)
     root.button("Inspector · Ctrl+Shift+D", **{
         "data-inspector": "toggle", "aria-keyshortcuts": "Control+Shift+D"})
-    palette = root.palette(title="Developer tools · Page", value="^opened",
-                           width="640px", height="640px", left="90px", top="24px")
-    tabs = palette.tabContainer(height="100%")
+    container = root if presentation == "embedded" else root.palette(title="Inspector", value="^opened", collapsible=True,
+                           width="min(640px, calc(100vw - 32px))",
+                           height="min(640px, calc(100vh - 32px))", left="16px", top="16px")
+    tabs = container.tabContainer(height="100%")
     for kind in ("data", "source"):
         build_view(tabs.tab(key=kind, label=kind.title(), height="100%"), kind)
 
@@ -29,10 +32,8 @@ def build_view(pane, kind):
     viewport = properties.div(class_="inspector-grid-scroll")
     viewport.div(role="table", **{"aria-label": "Node properties", "data-field": "rows"})
     footer = split.div(slot="bottom", class_="inspector-footer")
-    actions = footer.div(class_="inspector-actions")
-    actions.button("Apply", type="button", **{"data-command": "apply"})
-    actions.button("Discard", type="button", **{"data-command": "reload"})
-    actions.span("", role="status", **{"aria-live": "polite", "data-field": "status"})
+    footer.div("", role="status", hidden=True, **{
+        "aria-live": "polite", "data-field": "status"})
     path = footer.div(class_="inspector-path", **{"data-field": "path"})
     path.span("Path: ")
     path.span(f"^{kind}Path")
@@ -43,7 +44,7 @@ def build_view(pane, kind):
     cell = row.div(role="cell", class_="inspector-property-value")
     cell.input(type="text", **{"data-cell": "value"})
     choice = cell.select(**{"data-cell": "type"})
-    for dtype in ("string", "number", "boolean", "null"):
+    for dtype in ("string", "number", "boolean", "date", "time", "datetime"):
         choice.option(dtype, value=dtype)
     cell.button("−", type="button", **{"data-cell": "remove", "title": "Remove attribute"})
     pane.data(f"{kind}Detail", "Select a node")

@@ -25,6 +25,7 @@ See :doc:`guide/fastapi`.
 
    guide/overview
    guide/first-page
+   guide/components
    guide/fastapi
 
 .. toctree::
@@ -33,6 +34,12 @@ See :doc:`guide/fastapi`.
 
    reference/pages
    reference/fastapi
+   reference/labled-box
+   reference/formlet
+   reference/validation
+   reference/textbox-area
+   reference/inspector
+   reference/local-logic
 
 For a first runnable example, follow :doc:`guide/first-page`. For an existing
 FastAPI project, go directly to :doc:`guide/fastapi`.

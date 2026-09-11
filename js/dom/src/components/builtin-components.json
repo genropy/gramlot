@@ -1,0 +1,351 @@
+{
+  "schema": "gramlot-components/0.1",
+  "collections": [
+    {
+      "name": "inputs",
+      "components": [
+        {
+          "name": "textBox",
+          "tag": "gnr-textbox",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "textBoxArea",
+          "tag": "gnr-textboxarea",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "filteringSelect",
+          "tag": "gnr-filteringselect",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "comboBox",
+          "tag": "gnr-combobox",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "passwordbox",
+          "tag": "gnr-passwordbox",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "numberTextBox",
+          "tag": "gnr-numbertextbox",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "dateTextBox",
+          "tag": "gnr-datetextbox",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "timeTextBox",
+          "tag": "gnr-timetextbox",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "horizontalSlider",
+          "tag": "gnr-horizontalslider",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "verticalSlider",
+          "tag": "gnr-verticalslider",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "checkbox",
+          "tag": "gnr-checkbox",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        },
+        {
+          "name": "dateCalendar",
+          "tag": "gnr-datecalendar",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "calendar"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "colorpicker",
+      "components": [
+        {
+          "name": "colorpicker",
+          "tag": "gnr-colorpicker",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "layout",
+      "components": [
+        {
+          "name": "formlet",
+          "tag": "gnr-formlet",
+          "subTags": "*",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "labledBox",
+          "tag": "gnr-labledbox",
+          "subTags": "*",
+          "pythonGroup": "DecorationDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "panel",
+          "tag": "gnr-panel",
+          "subTags": "*",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "box",
+          "tag": "gnr-box",
+          "subTags": "*",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "borderContainer",
+          "tag": "gnr-bordercontainer",
+          "subTags": "*",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "tabContainer",
+          "tag": "gnr-tabcontainer",
+          "subTags": "*",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "tab",
+          "tag": "gnr-tab",
+          "subTags": "*",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "contentPane",
+          "tag": "gnr-contentpane",
+          "subTags": "*",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "stackContainer",
+          "tag": "gnr-stackcontainer",
+          "subTags": "*",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "stackButtons",
+          "tag": "gnr-stackbuttons",
+          "subTags": "",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        },
+        {
+          "name": "groupBox",
+          "tag": "gnr-groupbox",
+          "subTags": "*",
+          "pythonGroup": "LayoutDeclarations",
+          "capabilities": [
+            "decoration",
+            "data-scope",
+            "clipboard",
+            "drag-source"
+          ],
+          "meta": {
+            "dataScope": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "clipboard",
+      "components": [
+        {
+          "name": "copyButton",
+          "tag": "gnr-copybutton",
+          "subTags": "",
+          "pythonGroup": "AdjacentWidgetDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "palette",
+      "components": [
+        {
+          "name": "palette",
+          "tag": "gnr-palette",
+          "subTags": "*",
+          "pythonGroup": "AdjacentWidgetDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "storeTree",
+      "components": [
+        {
+          "name": "storeTree",
+          "tag": "gnr-storetree",
+          "subTags": "",
+          "pythonGroup": "AdjacentWidgetDeclarations",
+          "capabilities": [
+            "adapter"
+          ],
+          "meta": {
+            "dataWidget": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "forms",
+      "components": [
+        {
+          "name": "form",
+          "tag": "gnr-form",
+          "subTags": "*",
+          "pythonGroup": "FormDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "labEditors",
+      "components": [
+        {
+          "name": "codeMirror",
+          "tag": "gnr-codemirror",
+          "subTags": "",
+          "pythonGroup": "AdjacentWidgetDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        }
+      ]
+    }
+  ]
+}

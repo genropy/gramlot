@@ -1,0 +1,93 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Studio API",
+    "version": "0.1",
+    "description": "Explore a small catalogue and calculate a quotation."
+  },
+  "paths": {
+    "/api/products": {
+      "get": {
+        "summary": "Browse products",
+        "description": "Filter the catalogue by name and availability. This request reads local demo data.",
+        "tags": [
+          "Catalogue"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Part of the product name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "available",
+            "in": "query",
+            "description": "Only products with this availability",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching products"
+          }
+        }
+      }
+    },
+    "/api/quote": {
+      "post": {
+        "summary": "Calculate a quote",
+        "description": "Calculate a total without saving an order. Product IDs: 1 lamp, 2 notebook, 3 desk.",
+        "tags": [
+          "Quotes"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "productId",
+                  "quantity"
+                ],
+                "properties": {
+                  "productId": {
+                    "type": "integer",
+                    "enum": [
+                      1,
+                      2,
+                      3
+                    ],
+                    "description": "Product"
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 2
+                  },
+                  "note": {
+                    "type": "string",
+                    "description": "Optional note"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Calculated quotation"
+          },
+          "422": {
+            "description": "Invalid product or quantity"
+          }
+        }
+      }
+    }
+  }
+}

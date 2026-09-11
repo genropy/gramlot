@@ -5,11 +5,11 @@ export class RecipePolicies {
     localAttributes(node) {
         const local = node.getAttr();
         if (node.nodeTag !== 'formlet') return local;
-        const aliases = {lbl_side: 'top'};
+        const aliases = {lbl_position: 'TL'};
         for (const [key, value] of Object.entries(local)) {
             if (!key.startsWith('item_')) continue;
             const name = key.slice(5);
-            if (!/^(lbl_|fld_|box_)/.test(name)) {
+            if (!/^(lbl_|fld_|box_)/.test(name) || name === 'lbl_side') {
                 throw new Error(`Unsupported formlet default: ${key}`);
             }
             aliases[name] = value;
@@ -38,13 +38,13 @@ export class RecipePolicies {
                 attrs[name]=this.getValue(node,value);
             }
         }
-        const inheritedNames=new Set(['blankIsNull','label_side','lbl_side']);
+        const inheritedNames=new Set(['blankIsNull']);
         for(let current=node.parentNode;current;current=current.parentNode) {
-            for(const name of Object.keys(this.localAttributes(current))) if(name.startsWith('lbl_'))inheritedNames.add(name);
+            for(const name of Object.keys(this.localAttributes(current))) {
+                if(name.startsWith('lbl_') && name !== 'lbl_side')inheritedNames.add(name);
+            }
         }
         for (const name of inheritedNames) {
-            if (name==='lbl_side' && node.nodeTag==='labledBox' && Object.hasOwn(node.getAttr(),'side')
-                && !Object.hasOwn(node.getAttr(),'lbl_side'))continue;
             for(let current=node;current;current=current.parentNode) {
                 if (Object.hasOwn(this.localAttributes(current),name)) {
                     attrs[name]=this.getValue(current,this.localAttributes(current)[name]);break;
@@ -60,7 +60,18 @@ export class RecipePolicies {
             }
             if (local.wrap != null && local.wrap !== false) throw new Error('formlet wrap is not supported yet');
         }
-        return {...attrs,...local};
+        const result = {...attrs,...local};
+        if (node.nodeTag === 'labledBox') {
+            const inheritedPosition = Object.hasOwn(attrs, 'lbl_position')
+                ? attrs.lbl_position : undefined;
+            const blocksInheritance = Object.hasOwn(local, 'label_position')
+                || Object.hasOwn(local, 'lbl_position');
+            delete result.lbl_position;
+            if (!blocksInheritance && inheritedPosition !== undefined) {
+                result.label_position = inheritedPosition;
+            }
+        }
+        return result;
     }
     getValue(node,value) {
         return node.pointerType(value) ? node.builder.handler.data.getItem(node.absDatapath(value)) : value;

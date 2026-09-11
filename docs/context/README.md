@@ -1,5 +1,64 @@
 # Gramlot project memory
 
+Publish/subscribe uses the application-local `genro` coordinator, with declarative
+controller subscriptions and Source-owned callback cleanup. See
+[publish and subscribe](../guides/publish-subscribe.md).
+
+Latest numeric addition: numberTextBox uses a free text Decimal-aware draft and
+shared numeric formatting with reactive format/places/locale. Places affects only
+display precision. Lesson 13 compares displayed and stored values. See
+[numeric formatting](../guides/number-formatting.md).
+
+Latest display addition: scalar HTML content accepts reactive `format`, `mask` and
+`locale`, with named temporal styles and a bounded LDML subset. Raw Bag values
+remain unchanged. See [display formatting](../guides/display-formatting.md).
+
+Latest component implementation: the owner authorized a practical alpha. Current
+Web Components now have description/registration adapters; inputs and colorpicker
+share ControlElement, with Decorated and FieldState capabilities and existing
+shared services. The catalogue generates production Python declarations. The
+rebuilt developer handbook includes executable shared-base examples. See
+[alpha implementation and limits](../development/component-alpha-implementation-2026-09-11.md).
+
+Latest experiment: `dateTextBox(symbolic=True)` uses the standalone JavaScript
+date parser, with `locale`/`workdate`, ordinary free text editing, a reusable calendar popup,
+Enter/blur confirmation and Escape cancellation. Native date segments and switching
+are superseded by the owner-authorized text-editor alpha. See
+[parser and field usage](../guides/date-expression-parser.md#experimental-datetextbox-integration)
+and teaching lesson `12-symbolic-date`. Periods currently select their start;
+`period_to` remains unimplemented. The option and editor integration are a
+prototype, not the proposed component base/mixin migration.
+
+Latest owner decision: `dateTimeTextBox` uses native `datetime-local` for local
+date/time editing; the consuming server converts to UTC for storage. This
+supersedes the assessment's composite datetime and browser UTC conversion
+proposal. See [decisions](decisions.md#local-datetime-editor--owner-decision-2026-09-11).
+
+**Current handoff:** [Component architecture and Python Source slider — 2026-09-11](../development/handoff-components-source-slider-2026-09-11.md). Read this first when resuming.
+
+Latest implementation: teaching lesson 11 is Python-authored and read-only, with
+an embedded controller receiving the contact Bag, slider count and trigger context,
+one `script` function for panel construction, externally injected contact generation
+and population, Source-only slider changes, responsive
+titled cards, a resizable example/code split and an embedded inspector. Store and
+`_identifier` work is explicitly deferred. Sol's architecture assessments are
+complete proposals awaiting further discussion, not active background work.
+
+Next-session owner priorities: assess DRY/shared implementations before substantial
+expansion, then prioritize buttons, dropdown buttons, menus and context menus.
+See [open work](open-work.md#dry-review-and-actionmenu-components--owner-priority-2026-09-11).
+
+Latest discussion checkpoint: [resolver grammar and transfer of learning](../development/data-resolver-legacy-audit.md#owner-discussion-checkpoint--resume-after-2026-09-11). Resume this discussion before implementing resolver integration.
+
+Earlier implementation checkpoint: [local logic, component handbook and parked API
+PoC — 2026-09-10](../development/handoff-local-logic-components-2026-09-10.md).
+Teaching lesson 10 now contains four independent examples with 3–4 relevant
+statements each: reactive formula, passive read, inline expression and controller.
+Explanations live outside recipes. Python appears above JavaScript, each with
+the example on the left and code shown once on the right. JavaScript has a
+CodeMirror laboratory with Run and Reset.
+All 13 Python/JavaScript pairs and browser checks passed; see the handoff update.
+
 Updated: 2026-09-08. This is a record of owner decisions and inherited work, not a new API specification.
 
 Read [decisions](decisions.md), [conversation summaries](conversations.md), [open work](open-work.md), and the [first-version scope](first-version.md) before continuing implementation. [Historical documents](../history/README.md) retain detailed source evidence. New user instructions take precedence over every historical record.
@@ -13,6 +72,9 @@ See the [legacy data and remote service inventory](legacy-data-remote-services.m
 Read [development transition and next-task handoff](transition-to-gramlot.md) to continue directly in Gramlot while keeping release and cleanup gates separate.
 
 Read the latest **Server independence** decision in [decisions](decisions.md): no Genro ASGI dependency or extra belongs in Gramlot; the later optional FastAPI decision is separate. The old integration is archived for a separate application repository.
+
+
+Latest inspector/gallery checkpoint: [framework handoff, 2026-09-09](../development/handoff-inspector-gallery-2026-09-09.md). Read it before resuming the uncommitted inspector work or the input grammar discussion.
 
 ## Current direction
 
@@ -60,3 +122,9 @@ The optional FastAPI adapter and `gramlot fastapi serve [directory]` are now
 implemented. This supersedes earlier statements that all server adapters are
 external or that the CLI only serves manuals. Genro ASGI remains excluded.
 See [FastAPI guide](../fastapi.md).
+
+Latest textBox checkpoint: [legacy compatibility audit, 2026-09-10](../development/textbox-legacy-audit.md) and [revised contract proposal](../development/textbox-contract-proposal.md). The owner requires legacy syntax/names/behavior unless a change is indispensable; the earlier restrictive draft is superseded.
+
+Maintain the [intentional legacy differences register](legacy-differences.md) for owner-approved exceptions, including continuous-update naming and label placement. It separates approved decisions from pending implementation and unresolved spelling.
+
+See [module, gallery and progressive-learning analysis](../development/module-gallery-learning-organization.md) for the proposed organization around inputs, labledBox, formlet, validation and form. It is analysis, not an approved module migration.

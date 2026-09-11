@@ -63,14 +63,23 @@ for (const [tag,value,next] of [['numberTextBox',0,42],['checkbox',false,true],
     ['horizontalSlider',0,35],['colorpicker','#000000','#ff0000'],['dateTextBox','2026-09-08','2026-09-09']]) {
     test(`${tag}: Backspace preserves real scalar values on the next interaction`, () => {
         const {app,field,input}=mount(tag,value);
-        assert.equal(field.value,value);
+        assert.equal(tag==='dateTextBox' ? field.value.toISOString().slice(0,10) : field.value,value);
         if (!['checkbox','horizontalSlider','colorpicker'].includes(tag)) { input.value=''; fire(input,'input'); }
-        back(input); fire(input,'blur');
+        back(input);
+        if(tag==='dateTextBox') {
+            input.focus();
+            document.body.appendChild(document.createElement('button')).focus();
+        } else fire(input,'blur');
         assert.equal(app.data.getItem('form.value'),null);
         if(tag==='checkbox') input.checked=next;
         else input.value=String(next);
         fire(input,'input'); fire(input,'change');
-        assert.equal(app.data.getItem('form.value'),next);
+        if(tag==='dateTextBox') {
+            input.focus();
+            document.body.appendChild(document.createElement('button')).focus();
+        }
+        const committed=app.data.getItem('form.value');
+        assert.equal(tag==='dateTextBox' ? committed.toISOString().slice(0,10) : committed,next);
         app.dispose();
     });
 }

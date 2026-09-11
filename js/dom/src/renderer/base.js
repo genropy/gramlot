@@ -1,3 +1,4 @@
+import {FORMATTED_CELLS} from '../display-format.js';
 // Copyright 2025 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 /**
  * RendererBase — JS port of renderer/base.py.
@@ -296,6 +297,9 @@ export class RendererBase {
         const builder = compNode.builder;
         const base = compNode.getAttr('id') || builder.targetId(compNode);
         const specs = builder._cellMap[base] || (builder._cellMap[base] = {});
+        if (['format', 'mask', 'places'].some(name => current.getAttr(name) != null)) {
+            specs[FORMATTED_CELLS] = true;
+        }
         const anchor = compNode.absDatapath(compNode.getAttr('iterate'));
         const rowPrefix = `${anchor}.${labels[0]}.`;
         const inRowField = (pointer) => {

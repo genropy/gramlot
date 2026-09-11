@@ -1,9 +1,9 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
-import {registerCollection, webcomponent} from 'gramlot-dom';
+import {registerComponentCollection, builtinComponents} from 'gramlot-dom';
 import {WidgetLabel} from '/_assets/dom/widget-label.js';
 
-registerCollection('labEditors', {
-    grammar: {elements: {codeMirror: webcomponent('codeMirror')}},
+registerComponentCollection('labEditors', {
+    components: builtinComponents('labEditors'),
     defineComponents() {
         if (customElements.get('gnr-codemirror')) { return; }
         class CodeMirrorElement extends HTMLElement {

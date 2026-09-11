@@ -47,6 +47,66 @@ for (const [position, direction, alignment] of [
     });
 }
 
+test('explicit labledBox uses label_position for all supported positions', () => {
+    setupDom();
+    class Page extends HtmlBuilder {
+        static wc_requires = ['layout'];
+        main(root) {
+            for (const position of ['L','R','TL','TC','TR','BL','BC','BR']) {
+                root.labledBox({label: position, label_position: position,
+                    node_id: `box-${position}`}).div(position);
+            }
+            root.labledBox({label: 'Old names', side: 'right', lbl_side: 'right',
+                label_side: 'right', node_id: 'old'}).div('content');
+        }
+    }
+    const host = document.body.appendChild(document.createElement('div'));
+    const app = new Application(host, new Page('explicit-positions'));
+    const expected = {
+        L: ['row', 'left'], R: ['row-reverse', 'left'],
+        TL: ['column', 'left'], TC: ['column', 'center'], TR: ['column', 'right'],
+        BL: ['column-reverse', 'left'], BC: ['column-reverse', 'center'], BR: ['column-reverse', 'right'],
+    };
+    for (const box of host.querySelectorAll('gnr-labledbox')) {
+        const label = box.shadowRoot.querySelector('.labledBox_label');
+        const wrapper = box.shadowRoot.querySelector('.labledBox');
+        if (label.textContent === 'Old names') {
+            assert.equal(wrapper.style.flexDirection, 'column');
+            continue;
+        }
+        const [direction, alignment] = expected[label.textContent];
+        assert.equal(wrapper.style.flexDirection, direction);
+        assert.equal(label.style.textAlign, alignment);
+        assert.equal(label.hasAttribute('position'), false);
+    }
+    app.dispose();
+});
+
+test('explicit and shorthand decoration route equivalent wrapper and label styles', () => {
+    setupDom();
+    class Page extends HtmlBuilder {
+        static wc_requires = ['layout', 'inputs'];
+        main(root) {
+            root.textBox({lbl: 'Short', lbl_color: 'green', box_padding: '6px',
+                box_l_background: 'silver', box_c_margin: '2px'});
+            root.labledBox({label: 'Explicit', label_color: 'green', padding: '6px',
+                box_l_background: 'silver', box_c_margin: '2px'}).textBox({value: 'value'});
+        }
+    }
+    const host = document.body.appendChild(document.createElement('div'));
+    const app = new Application(host, new Page('routing'));
+    const [short, explicit] = [host.querySelector('gnr-textbox'), host.querySelector('gnr-labledbox')];
+    for (const widget of [short, explicit]) {
+        const shadow = widget.shadowRoot;
+        assert.equal(shadow.querySelector('.labledBox').style.padding, '6px');
+        assert.equal(shadow.querySelector('.labledBox_label').style.color, 'green');
+        assert.equal(shadow.querySelector('.labledBox_labelRegion').style.background, 'silver');
+        assert.equal(shadow.querySelector('.labledBox_content').style.margin, '2px');
+    }
+    assert.equal(explicit.style.padding, '');
+    app.dispose();
+});
+
 test('label and box data updates preserve host, focused input, selection and uncommitted draft', () => {
     const {host, field, app} = mounted({lbl: '^form.caption', lbl_color: '^form.color',
         box_padding: '^form.padding', value: '^form.value'});
@@ -117,14 +177,35 @@ test('readonly textBox retains its value and an associated visible label', () =>
     app.dispose();
 });
 
-test('default L, side compatibility and explicit position precedence are consistent', () => {
-    const {field, app} = mounted({lbl: 'Name', side: 'bottom', lbl_side: 'top', lbl_position: 'R'});
+test('default TL and the position-only widget syntax are consistent', () => {
+    const {field, app} = mounted({lbl: 'Name', side: 'bottom', lbl_side: 'left', lbl_position: 'R'});
     assert.equal(field.shadowRoot.querySelector('.labledBox').style.flexDirection, 'row-reverse');
     app.dispose();
     const plain = mounted({lbl: 'Name'});
-    assert.equal(plain.field.shadowRoot.querySelector('.labledBox').style.alignItems, 'center');
-    assert.equal(plain.field.shadowRoot.querySelector('.labledBox').style.flexDirection, 'row');
+    assert.equal(plain.field.shadowRoot.querySelector('.labledBox').style.alignItems, 'stretch');
+    assert.equal(plain.field.shadowRoot.querySelector('.labledBox').style.flexDirection, 'column');
     plain.app.dispose();
+    const removed = mounted({lbl: 'Name', side: 'right', lbl_side: 'right'});
+    assert.equal(removed.field.getAttribute('side'), 'right');
+    assert.equal(removed.field.shadowRoot.querySelector('.labledBox').style.flexDirection, 'column');
+    removed.app.dispose();
+});
+
+test('all input collections share the legacy top placement default', () => {
+    setupDom();
+    const tags = ['textBox','textBoxArea','passwordbox','numberTextBox','dateTextBox','timeTextBox',
+        'filteringSelect','comboBox','checkbox','horizontalSlider','verticalSlider','colorpicker'];
+    class Page extends HtmlBuilder {
+        static wc_requires = ['inputs','colorpicker'];
+        main(root) { for (const tag of tags) root[tag]({lbl: tag}); }
+    }
+    const host = document.body.appendChild(document.createElement('div'));
+    const app = new Application(host, new Page('all-input-labels'));
+    assert.equal(host.children.length, tags.length);
+    for (const widget of host.children) {
+        assert.equal(widget.shadowRoot.querySelector('.labledBox').style.flexDirection, 'column');
+    }
+    app.dispose();
 });
 
 test('invalid position fails before mounting any output', () => {

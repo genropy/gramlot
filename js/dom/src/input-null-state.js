@@ -10,10 +10,10 @@ export class InputNullState {
         const style = host.ownerDocument.createElement('style');
         style.textContent = `
 .gnr-null-editor{position:relative}
-.gnr-null-editor:has(input.gnr-null-value[type=range])::after{content:'∅';position:absolute;left:3px;top:0;color:#949ca6;background:var(--field-bg,#fff);font:19px sans-serif;pointer-events:none}
-input.gnr-null-value{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ctext x='5' y='18' fill='%23949ca6' font-size='19'%3E%E2%88%85%3C/text%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:left center!important}
-input.gnr-null-value::placeholder{color:transparent}
-input.gnr-null-value[type=checkbox]{appearance:none;width:24px;height:24px;border:1px solid #c8c8c8}
+.gnr-null-editor:has(input.gnr-null-value[type=range])::after{content:var(--gramlot-null-marker,none);position:absolute;left:3px;top:0;color:#949ca6;background:var(--field-bg,#fff);font:19px sans-serif;pointer-events:none}
+:is(input,textarea).gnr-null-value{background-image:var(--gramlot-null-background,none)!important;background-repeat:no-repeat!important;background-position:left center!important}
+:is(input,textarea).gnr-null-value::placeholder{color:var(--gramlot-null-placeholder-color,revert)}
+input.gnr-null-value[type=checkbox]{appearance:var(--gramlot-null-checkbox-appearance,none);width:16px;height:16px;min-width:16px;min-height:16px;border:1px solid #b7bec7;border-radius:3px;background-color:var(--field-bg,#fff);background-image:linear-gradient(#89929e,#89929e)!important;background-size:6px 2px;background-position:center!important}
 input.gnr-null-value[type=color]::-webkit-color-swatch{opacity:0}
 input.gnr-null-value[type=color]::-moz-color-swatch{opacity:0}
 input.gnr-null-value[type=range]::-webkit-slider-thumb{opacity:.2}

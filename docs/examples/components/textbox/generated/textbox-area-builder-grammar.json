@@ -1,0 +1,60 @@
+{
+  "document_format": {
+    "name": "builder_grammar",
+    "version": "1.0"
+  },
+  "grammar": {
+    "name": "gramlot_guidetextboxarea_guide",
+    "version": null,
+    "title": null,
+    "description": null
+  },
+  "abstracts": {},
+  "elements": {
+    "guideTextBoxArea": {
+      "doc": "An isolated textBoxArea contract linked to Gramlot's production gnr-textboxarea implementation.\n\nExplicit parameters come from the component descriptor and its\nreferenced shared attribute sets. ``**kwargs`` preserves the open\nGramlot attribute families documented by those sets.\n",
+      "sub_tags": "",
+      "parent_tags": null,
+      "inherits_from": null,
+      "ns": null,
+      "attributes": null,
+      "_meta": {
+        "webcomponent": true,
+        "render_tag": "gnr-textboxarea"
+      }
+    },
+    "dataSetter": {
+      "doc": null,
+      "sub_tags": "",
+      "parent_tags": null,
+      "inherits_from": null,
+      "ns": null,
+      "attributes": null,
+      "_meta": {
+        "data_element": true
+      }
+    },
+    "dataFormula": {
+      "doc": null,
+      "sub_tags": "",
+      "parent_tags": null,
+      "inherits_from": null,
+      "ns": null,
+      "attributes": null,
+      "_meta": {
+        "data_element": true
+      }
+    },
+    "dataController": {
+      "doc": null,
+      "sub_tags": "",
+      "parent_tags": null,
+      "inherits_from": null,
+      "ns": null,
+      "attributes": null,
+      "_meta": {
+        "data_element": true
+      }
+    }
+  }
+}

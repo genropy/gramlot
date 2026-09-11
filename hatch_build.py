@@ -22,7 +22,11 @@ class CustomBuildHook(BuildHookInterface):
                     raise RuntimeError(f"Missing or stale asset input: {name}; rerun scripts/prepare_assets.py")
         inputs = {str(p.relative_to(root)) for folder in (root / 'js/dom/src', root / 'js/pages/src')
                   for p in folder.rglob('*') if p.is_file()}
-        inputs.update({'js/dom/package.json', 'js/dom/package-lock.json'})
+        inputs.update(str(p.relative_to(root))
+                      for p in (root / 'src/gramlot/grammar').rglob('*.py') if p.is_file())
+        inputs.update({'js/dom/package.json', 'js/dom/package-lock.json',
+                       'src/gramlot/inspector.py', 'src/gramlot/builder.py',
+                       'src/gramlot/transport.py'})
         if inputs != set(manifest['sources']):
             raise RuntimeError('JavaScript source inventory changed; rerun scripts/prepare_assets.py')
         actual = {str(p.relative_to(resources)) for p in resources.rglob('*') if p.is_file()}

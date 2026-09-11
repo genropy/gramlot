@@ -10,7 +10,7 @@ from gramlot.builder import GramlotBuilder
 
 def test_python_null_inputs():
     builder = GramlotBuilder("main")
-    tags = ("textBox", "numberTextBox", "checkbox", "dateTextBox", "timeTextBox",
+    tags = ("textBox", "textBoxArea", "numberTextBox", "checkbox", "dateTextBox", "timeTextBox",
                 "passwordbox", "comboBox", "filteringSelect", "horizontalSlider",
                 "verticalSlider", "colorpicker")
     builder.root.data("sample", Bag(dict.fromkeys(tags)))

@@ -16,6 +16,7 @@ class AssetPreparation:
             root / "js/pages/src": "pages",
             modules / "genro-bag-js/src": "genro-bag-js/src",
             modules / "genro-tytx/js/src": "genro-tytx/js/src",
+            modules / "decimal.js": "decimal.js",
             modules / "@msgpack/msgpack/dist.esm": "genro-tytx/js/node_modules/@msgpack/msgpack/dist.esm",
         }
         for source in copies:
@@ -25,22 +26,36 @@ class AssetPreparation:
             shutil.rmtree(target)
         for source, destination in copies.items():
             shutil.copytree(source, target / destination)
-        for package in ("genro-bag-js", "genro-tytx", "@msgpack/msgpack"):
+        # Build the inspector from its authoritative Python recipe, not a second JS UI.
+        import sys
+        sys.path.insert(0, str(root / "src"))
+        from gramlot.builder import GramlotBuilder
+        from gramlot.inspector import build_inspector
+        from gramlot.transport import to_tytx
+        for presentation, filename in (("floating", "inspector.tytx"),
+                                       ("embedded", "inspector-embedded.tytx")):
+            inspector = GramlotBuilder()
+            build_inspector(inspector.root, presentation=presentation)
+            (target / "pages" / filename).write_text(to_tytx(inspector.source, "json"))
+        for package in ("genro-bag-js", "genro-tytx", "@msgpack/msgpack", "decimal.js"):
             source = modules / package
             destination = target / "licenses" / package
             destination.mkdir(parents=True)
             shutil.copy2(source / "package.json", destination / "package.json")
-            for name in ("LICENSE", "NOTICE"):
+            for name in ("LICENSE", "LICENCE.md", "NOTICE"):
                 if (source / name).is_file():
                     shutil.copy2(source / name, destination / name)
-            if not (destination / "LICENSE").exists():
+            if not (destination / "LICENSE").exists() and not (destination / "LICENCE.md").exists():
                 metadata = json.loads((source / "package.json").read_text())
                 if metadata["license"] != "Apache-2.0":
                     raise SystemExit(f"Missing license text for {package}")
                 shutil.copy2(root / "LICENSE", destination / "LICENSE")
         paths = [p for folder in (root / "js/dom/src", root / "js/pages/src")
                  for p in folder.rglob('*') if p.is_file()]
-        paths += [root / "js/dom/package.json", root / "js/dom/package-lock.json"]
+        paths += [p for p in (root / "src/gramlot/grammar").rglob("*.py") if p.is_file()]
+        paths += [root / "js/dom/package.json", root / "js/dom/package-lock.json",
+                  root / "src/gramlot/inspector.py", root / "src/gramlot/builder.py",
+                  root / "src/gramlot/transport.py"]
         manifest = {
             "sources": {str(p.relative_to(root)): sha256(p.read_bytes()).hexdigest() for p in sorted(paths)},
             "assets": {str(p.relative_to(target)): sha256(p.read_bytes()).hexdigest()

@@ -97,7 +97,7 @@ test('lbl styles target the label and support updates and removal', async () => 
         static wc_requires = ['inputs'];
         main(root) {
             root.textBox({lbl: 'Title', color: 'red', lbl_color: 'green',
-                lbl_font_size: '20px', lbl_font_weight: 'bold', lbl_side: 'top'});
+                lbl_font_size: '20px', lbl_font_weight: 'bold', lbl_position: 'TL'});
         }
     }
     new Application(host, new LabelPage('labels'));

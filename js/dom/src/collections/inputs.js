@@ -14,134 +14,128 @@
  * elements are defined lazily (in defineComponents), so importing this
  * module needs no DOM.
  */
-import {InputNullState} from '../input-null-state.js';
-import {WidgetLabel, WIDGET_LABEL_CSS} from '../widget-label.js';
-import { registerCollection, webcomponent } from '../collections.js';
+import {getComponentBases} from '../components/bases.js';
+import {defineDateCalendar} from './date-calendar.js';
+import {NumberEditor} from './number-editor.js';
+import {SymbolicDateEditor} from './symbolic-date-editor.js';
+import {registerComponentCollection} from '../components/registry.js';
+import {builtinComponents} from '../components/builtin-components.js';
 
-const GRAMMAR = {
-    elements: {
-        textBox: webcomponent('textBox'),
-        filteringSelect: webcomponent('filteringSelect'),
-        comboBox: webcomponent('comboBox'),
-        passwordbox: webcomponent('passwordbox'),
-        numberTextBox: webcomponent('numberTextBox'),
-        dateTextBox: webcomponent('dateTextBox'),
-        timeTextBox: webcomponent('timeTextBox'),
-        horizontalSlider: webcomponent('horizontalSlider'),
-        verticalSlider: webcomponent('verticalSlider'),
-        checkbox: webcomponent('checkbox'),
-    },
-};
 
-const CSS =
-    ':host { display: inline-block; }'
-    + WIDGET_LABEL_CSS
-    + 'input { font: inherit; color: inherit; box-sizing: border-box; width: 100%;'
-    + '  background: var(--field-bg, #fff); border: 1px solid var(--field-border, #c8c8c8);'
-    + '  border-radius: var(--form-field-radius, 3px); padding: 3px 6px; min-height: 25px; }'
-    + 'input:focus { outline: none; border-color: var(--field-focus-border, #4a90d9); }'
-    + '.gnr-checkbox-content { display: flex; align-items: center; gap: 6px; }'
-    + '.gnr-checkbox-content input { width: auto; flex: none; min-height: 0; accent-color: var(--accent-color, #356f9f); }';
 
 function defineComponents() {
     if (typeof customElements === 'undefined' || customElements.get('gnr-textbox')) {
         return;
     }
 
-    class GnrInput extends HTMLElement {
+    const {ControlElement: GnrInput} = getComponentBases();
+    defineDateCalendar();
+
+    class GnrTextBox extends GnrInput { get inputType() { return 'text'; } }
+
+    class GnrTextBoxArea extends GnrInput {
         static get observedAttributes() {
-            return ['value', 'placeholder', 'lbl', 'side', 'disabled', 'readonly'];
+            return [...super.observedAttributes, 'rows', 'cols', 'maxlength', 'minlength',
+                'wrap', 'autocomplete', 'remaininghint'];
         }
 
-        get inputType() { return 'text'; }
+        static get forwardedAttributes() {
+            return new Set(['rows', 'cols', 'maxlength', 'minlength', 'wrap', 'autocomplete']);
+        }
 
-        _configure(_input) {}
+        get inputType() { return null; }
 
-        _buildContent(content) { content.appendChild(this._input); }
+        _createControl() { return document.createElement('textarea'); }
 
-        constructor() {
-            super();
-            const root = this.attachShadow({ mode: 'open' });
-            const style = document.createElement('style');
-            style.textContent = CSS;
-            root.appendChild(style);
+        static remainingThreshold(hint, maximum) {
+            if (maximum === null || maximum === undefined || maximum === '') return null;
+            const limit = Number(maximum);
+            if (!Number.isInteger(limit) || limit < 0 || hint === null || hint === undefined) {
+                return null;
+            }
+            const source = String(hint).trim();
+            const percentage = source.match(/^(\d+(?:\.\d+)?)%$/);
+            if (percentage) {
+                const amount = Number(percentage[1]);
+                if (amount > 100) throw new Error(`Invalid remainingHint percentage: ${hint}`);
+                return limit * amount / 100;
+            }
+            if (/^\d+$/.test(source)) {
+                const threshold = Number(source);
+                if (Number.isSafeInteger(threshold)) return threshold;
+                throw new Error(`Invalid remainingHint integer: ${hint}`);
+            }
+            throw new Error(`Invalid remainingHint: ${hint}`);
+        }
 
-            this._box = document.createElement('div');
-            this._box.className = 'labledBox labledBox_left';
-            this._label = document.createElement('label');
-            this._label.className = 'labledBox_label';
-            this._label.htmlFor = 'f';
-            this._content = document.createElement('div');
-            this._content.className = 'labledBox_content';
-            this._input = document.createElement('input');
-            this._input.id = 'f';
-            this._input.type = this.inputType;
-            this._configure(this._input);
-            this._buildContent(this._content);
-            this._nullState = new InputNullState(this, this._input);
+        _validateAttributes(attrs) {
+            this.constructor.remainingThreshold(attrs.remainingHint, attrs.maxlength);
+        }
 
-            // `input` is composed and crosses the shadow on its own; `change`
-            // is NOT composed, so re-emit it on the host so `updateOn:'blur'`
-            // and the checkbox reach the kernel's delegated listener.
-            this._input.addEventListener('change', () => {
-                this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-            });
-
-            this._box.appendChild(this._label);
-            this._box.appendChild(this._content);
-            root.appendChild(this._box);
-            this._widgetLabel = new WidgetLabel(this, this._input, this._content, {box: this._box, label: this._label});
+        _buildContent(content) {
+            super._buildContent(content);
+            this._remaining = document.createElement('small');
+            this._remaining.id = 'remaining';
+            this._remaining.hidden = true;
+            this._remaining.style.cssText = 'display:block;margin-top:2px;text-align:right;'
+                + 'color:var(--field-hint-color,#626770);font-size:var(--field-hint-font-size,11px)';
+            content.appendChild(this._remaining);
+            this._input.addEventListener('input', () => this._updateRemaining());
         }
 
         connectedCallback() {
-            if (this.hasAttribute('value') && !this._nullState.isNull) { this.value = this.getAttribute('value'); }
-            if (this.hasAttribute('placeholder')) {
-                this._input.placeholder = this.getAttribute('placeholder');
+            super.connectedCallback();
+            for (const name of this.constructor.forwardedAttributes) {
+                this._forwardAttribute(name, this.getAttribute(name));
             }
-            this._applyLbl();
-            this._applySide();
-            this._watchLabelAttributes();
-            this._input.disabled = this.hasAttribute('disabled');
-            this._input.readOnly = this.hasAttribute('readonly');
-            this._nullState.connect();
+            this._updateRemaining();
         }
 
-        attributeChangedCallback(name, _old, fresh) {
-            if (name === 'value') {
-                // Focused inner input is sovereign: never overwrite typing.
-                const focused = this.shadowRoot && this.shadowRoot.activeElement === this._input;
-                if (!focused && this._input.value !== fresh) {
-                    this.value = fresh;
-                }
-            } else if (name === 'placeholder') {
-                this._input.placeholder = fresh == null ? '' : fresh;
-            } else if (name === 'lbl') {
-                this._applyLbl();
-            } else if (name === 'side') {
-                this._applySide();
-            } else if (name === 'disabled') {
-                this._input.disabled = fresh !== null;
-            } else if (name === 'readonly') {
-                this._input.readOnly = fresh !== null;
+        attributeChangedCallback(name, oldValue, fresh) {
+            if (this.constructor.forwardedAttributes.has(name)) {
+                this._forwardAttribute(name, fresh);
+                this._updateRemaining();
+                return;
             }
+            super.attributeChangedCallback(name, oldValue, fresh);
+            this._updateRemaining();
         }
 
-        _watchLabelAttributes() { this._widgetLabel.connect(); }
+        _forwardAttribute(name, value) {
+            if (!this._input) return;
+            if (value === null) this._input.removeAttribute(name);
+            else this._input.setAttribute(name, value);
+        }
 
-        disconnectedCallback() { this._widgetLabel.disconnect(); }
+        _updateRemaining() {
+            if (!this._remaining || !this._input) return;
+            const raw = this.getAttribute('maxlength');
+            const maximum = raw === null ? NaN : Number(raw);
+            const hasLimit = Number.isInteger(maximum) && maximum >= 0;
+            const hint = this.getAttribute('remaininghint');
+            const threshold = this.constructor.remainingThreshold(hint, raw);
+            const remaining = hasLimit ? maximum - this._input.value.length : null;
+            const enabled = threshold !== null && remaining <= threshold;
+            this._remaining.hidden = !enabled;
+            const described = new Set((this._input.getAttribute('aria-describedby') || '')
+                .split(/\s+/).filter(Boolean));
+            if (!enabled) {
+                described.delete(this._remaining.id);
+                this._remaining.textContent = '';
+            } else {
+                described.add(this._remaining.id);
+                this._remaining.textContent = remaining >= 0
+                    ? `${remaining} character${remaining === 1 ? '' : 's'} remaining`
+                    : `${-remaining} character${remaining === -1 ? '' : 's'} over limit`;
+            }
+            if (described.size) this._input.setAttribute('aria-describedby', [...described].join(' '));
+            else this._input.removeAttribute('aria-describedby');
+        }
 
-        _applyLabelAttributes() { this._widgetLabel?.apply(); }
+        get value() { return super.value; }
 
-        _applyLbl() { this._widgetLabel?.apply(); }
-
-        _applySide() { this._widgetLabel?.apply(); }
-
-        get value() { return this._nullState.isNull ? null : this._input.value; }
-
-        set value(v) { this._input.value = v == null ? '' : v; this._nullState.setNull(v === null); }
+        set value(value) { super.value = value; this._updateRemaining(); }
     }
-
-    class GnrTextBox extends GnrInput { get inputType() { return 'text'; } }
 
     /** Local legacy values syntax: code:caption pairs separated by comma/newline.
      * A themed listbox supplies suggestions; filteringSelect commits only known
@@ -357,11 +351,36 @@ function defineComponents() {
     class GnrFilteringSelect extends GnrComboBox { get constrained() { return true; } }
     class GnrPasswordbox extends GnrInput { get inputType() { return 'password'; } }
     class GnrNumberTextBox extends GnrInput {
-        get inputType() { return 'number'; }
-        get value() { return this._nullState.isNull ? null : (this._input.value === '' ? '' : this._input.valueAsNumber); }
-        set value(value) { super.value = value; }
+        static get observedAttributes() { return [...super.observedAttributes, 'format', 'places', 'locale', 'dtype', 'min', 'max', 'step']; }
+        _configure(input) { this._number = new NumberEditor(this, input); }
+        _buildContent(content) { super._buildContent(content); content.append(this._number.message); }
+        connectedCallback() { super.connectedCallback(); this._number.sync(); }
+        attributeChangedCallback(name, old, fresh) { super.attributeChangedCallback(name, old, fresh); this._number?.sync(); }
+        get editorPresentationAttributes() { return ['format', 'places', 'locale']; }
+        get commitOnChange() { return true; }
+        readEditorCandidate() { return this._number.accept(); }
+        get value() { return this._number.committed; }
+        set value(value) { this._number.setValue(value); }
     }
-    class GnrDateTextBox extends GnrInput { get inputType() { return 'date'; } }
+    class GnrDateTextBox extends GnrInput {
+        static get observedAttributes() { return [...super.observedAttributes, 'symbolic', 'locale', 'workdate']; }
+        _configure(input) { this._symbolic = new SymbolicDateEditor(this, input); }
+        _buildContent(content) {
+            super._buildContent(content);
+            content.append(this._symbolic.message);
+        }
+        connectedCallback() { super.connectedCallback(); this._symbolic.sync(); }
+        disconnectedCallback() { this._symbolic.close(); super.disconnectedCallback(); }
+        attributeChangedCallback(name, old, fresh) {
+            super.attributeChangedCallback(name, old, fresh);
+            this._symbolic?.sync();
+        }
+        get symbolicEditing() { return this._symbolic.editing; }
+        get commitOnChange() { return true; }
+        readEditorCandidate() { return this._symbolic.accept(); }
+        get value() { return this._symbolic.committed; }
+        set value(value) { this._symbolic.setValue(value); }
+    }
     class GnrTimeTextBox extends GnrInput { get inputType() { return 'time'; } }
     /** Legacy bounds and discreteValues expressed through a native range control. */
     class GnrHorizontalSlider extends GnrInput {
@@ -431,7 +450,7 @@ function defineComponents() {
 
     class GnrCheckbox extends GnrInput {
         static get observedAttributes() {
-            return ['checked', 'value', 'lbl', 'side', 'disabled', 'readonly', 'label'];
+            return ['checked', 'value', 'lbl', 'disabled', 'readonly', 'label'];
         }
 
         get inputType() { return 'checkbox'; }
@@ -448,9 +467,7 @@ function defineComponents() {
         }
 
         connectedCallback() {
-            this._applyLbl();
-            this._applySide();
-            this._watchLabelAttributes();
+            super.connectedCallback();
             this._input.disabled = this.hasAttribute('disabled');
             if (!this._nullState.isNull && this.hasAttribute('checked')) {
                 this._input.checked = GnrCheckbox.truthy(this.getAttribute('checked'));
@@ -483,6 +500,7 @@ function defineComponents() {
     }
 
     customElements.define('gnr-textbox', GnrTextBox);
+    customElements.define('gnr-textboxarea', GnrTextBoxArea);
     customElements.define('gnr-filteringselect', GnrFilteringSelect);
     customElements.define('gnr-combobox', GnrComboBox);
     customElements.define('gnr-passwordbox', GnrPasswordbox);
@@ -494,4 +512,4 @@ function defineComponents() {
     customElements.define('gnr-checkbox', GnrCheckbox);
 }
 
-registerCollection('inputs', { grammar: GRAMMAR, defineComponents });
+registerComponentCollection('inputs', { components: builtinComponents('inputs'), defineComponents });

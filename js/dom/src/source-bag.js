@@ -27,7 +27,7 @@ export const VALUE = Symbol('value');
 
 /** Structural attributes that never reach the rendered markup. */
 export const META_ATTRS = new Set([
-    '_meta', 'datapath', 'node_id', 'ns', 'form', 'formId', '_anchor', 'updateOn', 'controllerPath',
+    '_meta', 'datapath', 'node_id', 'ns', 'form', 'formId', '_anchor', 'updateOn', 'live', 'controllerPath',
 ]);
 
 /** Strip a trailing `_` when the bare name is a reserved word. */
@@ -45,6 +45,19 @@ export class SourceBagNode extends BagNode {
         super(parentBag, label, value, attr, resolver, nodeTag, xmlTag);
         this._builder = null;
         this._targetId = null;
+    }
+
+    /** Node-qualified topics share the owning application's genro coordinator. */
+    publish(message, payload) {
+        const events = this.builder?.handler?.application?.events;
+        if (!events) throw new Error('Source publication requires a mounted application');
+        return events.publish(events.nodeTopic(this, message), payload);
+    }
+
+    subscribe(message, callback, options = {}) {
+        const events = this.builder?.handler?.application?.events;
+        if (!events) throw new Error('Source subscription requires a mounted application');
+        return events.subscribe(events.nodeTopic(this, message), callback, {...options, sourceNode:this});
     }
 
     getFormHandler() { return this.builder?.handler?.application?._forms.getForm(this) || null; }
@@ -89,6 +102,7 @@ export class SourceBagNode extends BagNode {
 
     /** Return "^" (reactive), "=" (passive) or null. */
     pointerType(v) {
+        if (typeof v === 'string' && v.startsWith('==')) return null;
         if (typeof v === 'string' && (v[0] === '^' || v[0] === '=')) {
             return v[0];
         }
@@ -268,6 +282,28 @@ export class SourceBagNode extends BagNode {
     PUT(path, value) { this.setRelativeData(path, value, { reason: false }); }
 
     FIRE(path, value = true) { this.setRelativeData(path, value, { fired: true }); }
+
+    /**
+     * Attach validation rules to this declaration and keep the fluent source API.
+     * `validate({notnull:true})` writes `validate_notnull:true` on this same node;
+     * the existing field/Validator path remains the only runtime mechanism.
+     */
+    validate(rules = {}) {
+        if (rules === null || typeof rules !== 'object' || Array.isArray(rules)) {
+            throw new TypeError('validate() expects an object of unprefixed rule names');
+        }
+        const attrs = {};
+        for (const [name, value] of Object.entries(rules)) {
+            if (!name || name.startsWith('validate_')) {
+                throw new TypeError(
+                    `validate() expects unprefixed rule names; use ${name || '(empty key)'} as a direct attribute`
+                );
+            }
+            attrs[`validate_${name}`] = value;
+        }
+        this.setAttr(attrs);
+        return wrapSource(this);
+    }
 }
 
 /** Bag subclass: dispatches tag names to the active builder. */

@@ -1,11 +1,29 @@
 # Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 """Gramlot authoring dialect on the public HTML builder."""
-from genro_builders.builder import SourceBag, SourceBagNode, element
+from genro_builders.builder import SourceBag, SourceBagNode
 from genro_bag import Bag
 from genro_builders.contrib.html.html_builder import HtmlBuilder
 
+from .grammar import (
+    AdjacentWidgetDeclarations,
+    DecorationDeclarations,
+    FormDeclarations,
+    InputDeclarations,
+    LayoutDeclarations,
+    LogicDeclarations,
+    NativeHtmlDeclarations,
+)
 
-class GramlotBuilder(HtmlBuilder):
+
+class GramlotBuilder(
+    FormDeclarations,
+    DecorationDeclarations,
+    InputDeclarations,
+    LayoutDeclarations,
+    AdjacentWidgetDeclarations,
+    NativeHtmlDeclarations,
+    HtmlBuilder,
+):
     def __init__(self, name=None):
         super().__init__(name)
         self._authoring_nodes = {}
@@ -38,92 +56,7 @@ class GramlotBuilder(HtmlBuilder):
         """Browser runtime owns execution of declarative logic."""
 
 
-    @element(sub_tags="*")
-    def form(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def labledBox(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def copyButton(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def palette(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def codeMirror(self, **kwargs): ...
-
-    @element(sub_tags="summary,div")
-    def details(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def div(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def textBox(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def filteringSelect(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def comboBox(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def passwordbox(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def numberTextBox(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def dateTextBox(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def timeTextBox(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def horizontalSlider(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def verticalSlider(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def checkbox(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def formlet(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def panel(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def box(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def borderContainer(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def tabContainer(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def stackContainer(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def contentPane(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def stackButtons(self, **kwargs): ...
-
-    @element(sub_tags="*")
-    def tab(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def colorpicker(self, **kwargs): ...
-
-    @element(sub_tags="")
-    def storeTree(self, **kwargs): ...
-
-
-class AuthoringNode:
+class AuthoringNode(LogicDeclarations):
     """Recipe facade: names do not replace properties on generic source nodes.
 
     Pass this surface to helpers to build into an existing parent. ``node`` is
@@ -146,24 +79,24 @@ class AuthoringNode:
             target = target.value
         return self.builder._wrap(self.builder.set_child(target, tag, **attrs))
 
-    def data(self, destination, value, **attrs):
-        if not isinstance(destination, str) or not destination:
-            raise TypeError('data destination must be a nonempty string')
-        return self._declaration('dataSetter', destination=destination, value=value, **attrs)
+    def validate(self, **rules):
+        """Attach validation rules to this declaration and return it.
 
-    def dataFormula(self, destination, formula, **attrs):
-        if 'func' in attrs:
-            raise TypeError('dataFormula uses formula; func is not supported')
-        if not isinstance(destination, str) or not destination:
-            raise TypeError('dataFormula destination must be a nonempty string')
-        if not isinstance(formula, str) or not formula:
-            raise TypeError('dataFormula requires browser code as a nonempty string')
-        return self._declaration('dataFormula', destination=destination, formula=formula, **attrs)
-
-    def dataController(self, func, **attrs):
-        if not isinstance(func, str) or not func:
-            raise TypeError('dataController requires browser code as a nonempty string')
-        return self._declaration('dataController', func=func, **attrs)
+        ``validate(notnull=True)`` is authoring shorthand for setting
+        ``validate_notnull=True`` on the same source node.  The browser
+        validator therefore receives exactly the attributes used by inline
+        declarations; this method does not introduce a validation child node.
+        """
+        if not isinstance(self.node, SourceBagNode):
+            raise TypeError('validate() is available only on declared elements')
+        invalid = [name for name in rules if not name or name.startswith('validate_')]
+        if invalid:
+            names = ', '.join(sorted(name or '(empty key)' for name in invalid))
+            raise TypeError(
+                f'validate() expects unprefixed rule names; use {names} as direct attributes'
+            )
+        self.node.set_attr({f'validate_{name}': value for name, value in rules.items()})
+        return self
 
     def __getattr__(self, name):
         member = getattr(self.node, name)

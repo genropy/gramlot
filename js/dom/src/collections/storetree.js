@@ -24,27 +24,32 @@
  */
 import { Bag } from 'genro-bag-js';
 
-import { registerCollection, webcomponent } from '../collections.js';
-import {WidgetLabel} from '../widget-label.js';
+import {registerComponentCollection} from '../components/registry.js';
+import {builtinComponents} from '../components/builtin-components.js';
+import {WidgetLabel} from './decoration/widget-label.js';
 
-const GRAMMAR = {
-    elements: {
-        storeTree: webcomponent('storeTree', { dataWidget: true }),
-    },
-};
+
 
 const CSS = `
 :host { display:block; font:inherit; color:inherit; }
 ul { list-style:none; margin:0; padding-left:17px; }
 div > ul { padding-left:2px; }
-li { line-height:1.7; }
-summary { display:flex; align-items:center; gap:7px; padding:2px 5px; cursor:pointer; user-select:none; list-style:none; }
+li { line-height:var(--tree-line-height,1.7); }
+summary { display:flex; align-items:center; gap:7px; padding:var(--tree-row-padding,2px) 5px; cursor:pointer; user-select:none; list-style:none; }
 summary::-webkit-details-marker { display:none; }
 summary::before { content:''; width:5px; height:5px; border-right:1.5px solid #78818a; border-bottom:1.5px solid #78818a; transform:rotate(-45deg); flex:none; margin:0 3px; }
 details[open] > summary::before { transform:rotate(45deg); }
-.leaf { padding:2px 5px 2px 23px; cursor:pointer; }
+.leaf { padding:var(--tree-row-padding,2px) 5px var(--tree-row-padding,2px) 23px; cursor:pointer; }
 summary:hover,.leaf:hover { background:#f0f3f6; }
-.selected { background:var(--tree-selected-bg,#e4edf6); border-radius:2px; }
+.selected,.selected:hover { background:var(--tree-selected-bg,#e4edf6); color:var(--tree-selected-color,inherit); font-weight:var(--tree-selected-weight,inherit); border-radius:2px; }
+.leaf { display:flex; align-items:center; gap:7px; }
+.caption { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.actions { display:inline-flex; gap:2px; margin-left:auto; opacity:0; pointer-events:none; }
+summary:hover > .actions, .leaf:hover > .actions, summary:focus-within > .actions, .leaf:focus-within > .actions { opacity:1; pointer-events:auto; }
+.actions button { border:0; background:transparent; color:var(--tree-action-color,#7b8490); font:inherit; font-size:12px; line-height:18px; padding:0 3px; cursor:pointer; border-radius:3px; }
+.actions button:hover { background:#e4e9ef; color:#34445c; }
+.actions button:focus-visible { outline:2px solid #356f9f; }
+@media (hover:none) { .actions { opacity:1; pointer-events:auto; } }
 summary:focus-visible { outline:2px solid var(--accent-color,#356f9f); outline-offset:-2px; }
 `;
 
@@ -70,6 +75,39 @@ function defineComponents() {
             this._selectedEl = null;
             seq += 1;
             this._subId = `gnr-storetree-${seq}`;
+        }
+
+        /** Optional [{id, icon, label}]. Actions emit tree-action; the consumer owns behavior. */
+        get rowActions() { return this._rowActions || []; }
+        set rowActions(actions) {
+            if (!Array.isArray(actions) || actions.some(a => !a || typeof a.id !== 'string' || !a.id || typeof a.label !== 'string' || !a.label)) {
+                throw new TypeError('rowActions requires actions with id and label');
+            }
+            this._rowActions = actions.map(a => ({...a}));
+            if (this.isConnected) this._render();
+        }
+
+        _caption(row, caption, path) {
+            const text = document.createElement('span');
+            text.className = 'caption'; text.textContent = caption; row.append(text);
+            if (!this.rowActions.length) return;
+            const actions = document.createElement('span'); actions.className = 'actions';
+            for (const action of this.rowActions) {
+                const button = document.createElement('button');
+                button.type = 'button'; button.textContent = action.icon || action.label;
+                button.title = action.label; button.setAttribute('aria-label', action.label);
+                button.dataset.action = action.id;
+                button.addEventListener('click', event => {
+                    event.preventDefault(); event.stopPropagation();
+                    this.dispatchEvent(new CustomEvent('tree-action', {
+                        bubbles:true, composed:true,
+                        detail:{action:action.id, path, node:this._store.getNode(path)},
+                    }));
+                });
+                button.addEventListener('dragstart', event => event.preventDefault());
+                actions.append(button);
+            }
+            row.append(actions);
         }
 
         get storeBag() { return this._store; }
@@ -132,7 +170,7 @@ function defineComponents() {
                 if (details.open) { this._expanded.add(path); } else { this._expanded.delete(path); }
             });
             const summary = document.createElement('summary');
-            summary.textContent = caption;
+            this._caption(summary, caption, path);
             if (path === this._selectedPath) { summary.classList.add('selected'); }
             summary.addEventListener('click', () => this._select(path, summary));
             details.appendChild(summary);
@@ -144,7 +182,7 @@ function defineComponents() {
         _leaf(caption, path) {
             const li = document.createElement('li');
             li.className = 'leaf';
-            li.textContent = caption;
+            this._caption(li, caption, path);
             if (path === this._selectedPath) { li.classList.add('selected'); }
             li.addEventListener('click', () => this._select(path, li));
             return li;
@@ -171,4 +209,4 @@ function defineComponents() {
     customElements.define('gnr-storetree', GnrStoreTree);
 }
 
-registerCollection('storeTree', { grammar: GRAMMAR, defineComponents });
+registerComponentCollection('storeTree', { components: builtinComponents('storeTree'), defineComponents });

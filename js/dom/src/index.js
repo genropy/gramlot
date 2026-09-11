@@ -11,3 +11,8 @@ export { HTML5_GRAMMAR } from './contrib/html/html5-elements.js';
 export { SVG_GRAMMAR } from './contrib/svg/svg-elements.js';
 export { Application } from './application.js';
 export { registerCollection, getCollection, webcomponent } from './collections.js';
+
+export {ControlTools} from './components/control-tools.js';
+export {getComponentBases, Decorated, FieldState} from './components/bases.js';
+export {registerComponentCollection, getComponentDescriptions} from './components/registry.js';
+export {builtinComponents} from './components/builtin-components.js';

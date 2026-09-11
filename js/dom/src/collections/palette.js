@@ -1,26 +1,37 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 /** Non-modal floating container. Closing hides slotted content without destroying it. */
-import {registerCollection, webcomponent} from '../collections.js';
-import {WidgetLabel} from '../widget-label.js';
+import {registerComponentCollection} from '../components/registry.js';
+import {builtinComponents} from '../components/builtin-components.js';
+import {WidgetLabel} from './decoration/widget-label.js';
 
 function defineComponents() {
     if (customElements.get('gnr-palette')) { return; }
     class Palette extends HTMLElement {
         static level = 1000;
-        static get observedAttributes() { return ['value', 'title', 'keyboard']; }
+        static get observedAttributes() { return ['value', 'title', 'keyboard', 'collapsible', 'collapsed']; }
         constructor() {
             super();
             const shadow = this.attachShadow({mode: 'open'});
             shadow.innerHTML = `<style>
-:host{position:fixed;left:80px;top:90px;width:480px;height:320px;min-width:260px;min-height:160px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);display:block;font:var(--font-size,13px)/1.45 var(--font-family,Arial,sans-serif);background:var(--palette-background,white);color:var(--palette-color,#3a3a3c);border:1px solid var(--palette-border,#b9bec5);border-radius:5px;box-shadow:var(--palette-shadow,0 6px 22px #20283026);overflow:hidden}
-:host([hidden]){display:none!important}*{box-sizing:border-box}.frame{height:100%;display:flex;flex-direction:column}.bar{display:flex;align-items:center;gap:6px;height:var(--palette-header-height,24px);min-height:var(--palette-header-height,24px);padding:0 4px 0 9px;border-bottom:1px solid var(--gray-300,#d8d8dc);background:var(--palette-header-background,#eceef1);cursor:move;touch-action:none;user-select:none}.title{flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.body{flex:1;min-height:0;overflow:auto;padding:12px 12px 18px}.resize{position:absolute;right:2px;bottom:2px;width:18px;height:18px;padding:0;cursor:nwse-resize;touch-action:none;background:repeating-linear-gradient(135deg,transparent 0 3px,#aab0b8 3px 4px,transparent 4px 6px);clip-path:polygon(100% 0,100% 100%,0 100%)}button{font:inherit;color:#69727c;background:transparent;border:0;cursor:pointer}.close{width:22px;height:22px;position:relative;border-radius:3px;font-size:0}.close:before,.close:after{content:"";position:absolute;left:6px;top:10px;width:10px;height:1px;background:currentColor;transform:rotate(45deg)}.close:after{transform:rotate(-45deg)}.close:hover{background:#dce1e7;color:#243c53}.bar:focus{outline:none}.bar:focus-visible{background:var(--palette-header-focus-background,#e1e5eb)}button:focus-visible{outline:2px solid var(--accent-color,#356f9f);outline-offset:-2px}.resize:focus-visible{clip-path:none}::slotted(p){font-size:12px;line-height:1.45;margin:0 0 12px;color:#636366}
+:host{box-sizing:border-box;position:fixed;left:80px;top:90px;width:480px;height:320px;min-width:min(260px,calc(100vw - 16px));min-height:min(160px,calc(100vh - 16px));max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);display:block;font:var(--font-size,13px)/1.45 var(--font-family,Arial,sans-serif);background:var(--palette-background,white);color:var(--palette-color,#3a3a3c);border:1px solid var(--palette-border,#b9bec5);border-radius:var(--palette-radius,5px);box-shadow:var(--palette-shadow,0 6px 22px #20283026);overflow:hidden}
+:host([hidden]){display:none!important}*{box-sizing:border-box}.frame{height:100%;display:flex;flex-direction:column}.bar{display:flex;align-items:center;gap:6px;height:var(--palette-header-height,24px);min-height:var(--palette-header-height,24px);padding:0 4px 0 9px;border-bottom:1px solid var(--gray-300,#d8d8dc);background:var(--palette-header-background,#eceef1);cursor:move;touch-action:none;user-select:none}.title{color:var(--palette-title-color,inherit);flex:1;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.body{flex:1;min-height:0;overflow:auto;padding:var(--palette-body-padding,12px 12px 18px)}.resize{position:absolute;right:2px;bottom:2px;width:18px;height:18px;padding:0;cursor:nwse-resize;touch-action:none;background:repeating-linear-gradient(135deg,transparent 0 3px,#aab0b8 3px 4px,transparent 4px 6px);clip-path:polygon(100% 0,100% 100%,0 100%)}button{font:inherit;color:var(--palette-button-color,#69727c);background:transparent;border:0;cursor:pointer}.close{width:22px;height:22px;position:relative;border-radius:3px;font-size:0}.close:before,.close:after{content:"";position:absolute;left:6px;top:10px;width:10px;height:1px;background:currentColor;transform:rotate(45deg)}.close:after{transform:rotate(-45deg)}.close:hover{background:var(--palette-button-hover,#dce1e7);color:var(--palette-color,#243c53)}.bar:focus{outline:none}.bar:focus-visible{background:var(--palette-header-focus-background,#e1e5eb)}button:focus-visible{outline:2px solid var(--accent-color,#356f9f);outline-offset:-2px}.resize:focus-visible{clip-path:none}::slotted(p){font-size:12px;line-height:1.45;margin:0 0 12px;color:#636366}
+:host([collapsed]){height:calc(var(--palette-header-height,24px) + 2px)!important;min-height:0!important}
+:host([collapsed]) .body,:host([collapsed]) .resize{display:none}
+.collapse{width:22px;height:22px;position:relative;padding:0;border-radius:3px}
+.collapse::before{content:'';position:absolute;left:6px;top:10px;width:10px;border-top:1px solid currentColor}
+:host([collapsed]) .collapse::before{top:6px;height:8px;border:1px solid currentColor;border-radius:1px}
+.collapse:hover{background:var(--palette-button-hover,#dce1e7)}
+.collapse[hidden]{display:none}
 </style>
 <div class="frame" role="dialog" aria-modal="false" aria-labelledby="title">
-<div class="bar" tabindex="0" aria-label="Move palette with arrow keys"><span id="title" class="title"></span><button class="close" aria-label="Close palette">×</button></div>
+<div class="bar" tabindex="0" aria-label="Move palette with arrow keys"><span id="title" class="title"></span><button class="collapse" type="button" aria-label="Collapse palette" hidden></button><button class="close" aria-label="Close palette">×</button></div>
 <div class="body"><slot></slot></div><button class="resize" aria-label="Resize palette with arrow keys"></button></div>`;
+            this._fitViewport = () => this.fitViewport();
             this.bar = shadow.querySelector('.bar');
             this.grip = shadow.querySelector('.resize');
             this._widgetLabel = new WidgetLabel(this, null, shadow.querySelector('.frame'), null, {fill: true});
+            this.collapseButton = shadow.querySelector('.collapse');
+            this.collapseButton.onclick = () => this.toggleAttribute('collapsed');
             shadow.querySelector('.close').onclick = () => this.close();
             this.addEventListener('pointerdown', () => this.bringToFront());
             this.addEventListener('focusin', () => this.bringToFront());
@@ -48,11 +59,28 @@ function defineComponents() {
             });
         }
         connectedCallback() {
+            this._viewport = this.ownerDocument.defaultView;
+            this._viewport.addEventListener('resize', this._fitViewport);
             this._widgetLabel.connect();
             this.sync();
             if (this.value) { this.bringToFront(); }
+            this._viewport.requestAnimationFrame(this._fitViewport);
         }
-        disconnectedCallback() { this._widgetLabel.disconnect(); this.gesture = null; }
+        disconnectedCallback() {
+            this._viewport?.removeEventListener('resize', this._fitViewport);
+            this._widgetLabel.disconnect(); this.gesture = null;
+        }
+        fitViewport() {
+            if (this.hidden || !this.isConnected) return;
+            const doc = this.ownerDocument;
+            const width = doc.documentElement.clientWidth || doc.defaultView.innerWidth;
+            const height = doc.documentElement.clientHeight || doc.defaultView.innerHeight;
+            this.style.maxWidth = Math.max(0, width - 16) + 'px';
+            this.style.maxHeight = Math.max(0, height - 16) + 'px';
+            const rect = this.getBoundingClientRect();
+            this.style.left = Math.max(8, Math.min(rect.left, width - rect.width - 8)) + 'px';
+            this.style.top = Math.max(8, Math.min(rect.top, height - rect.height - 8)) + 'px';
+        }
         get value() { return this.getAttribute('value') !== null && !['false', 'False', '0'].includes(this.getAttribute('value')); }
         set value(value) { this.setAttribute('value', value === true || value === 'true' ? 'true' : 'false'); }
         attributeChangedCallback() { if (this.bar) { this.sync(); } }
@@ -60,11 +88,19 @@ function defineComponents() {
             return this.hasAttribute('keyboard') && !['false', 'False', '0'].includes(this.getAttribute('keyboard'));
         }
         sync() {
+            this.collapseButton.hidden = !this.hasAttribute('collapsible') || ['false', 'False', '0'].includes(this.getAttribute('collapsible'));
+            const collapsed = this.hasAttribute('collapsed');
+            this.collapseButton.setAttribute('aria-label', collapsed ? 'Restore palette' : 'Collapse palette');
+            this.collapseButton.setAttribute('aria-expanded', String(!collapsed));
+            this.collapseButton.title = collapsed ? 'Restore palette' : 'Collapse to title bar';
             this.bar.tabIndex = this.keyboardEnabled ? 0 : -1;
             this.grip.tabIndex = this.keyboardEnabled ? 0 : -1;
             this.shadowRoot.querySelector('.title').textContent = this.getAttribute('title') || 'Palette';
             const wasHidden = this.hidden;
             this.hidden = !this.value;
+            if (this.isConnected && this.value) {
+                this.ownerDocument.defaultView.requestAnimationFrame(this._fitViewport);
+            }
             if (this.isConnected && wasHidden && this.value) {
                 this.previousFocus = this.ownerDocument.activeElement;
                 this.bringToFront();
@@ -102,4 +138,4 @@ function defineComponents() {
     }
     customElements.define('gnr-palette', Palette);
 }
-registerCollection('palette', {grammar: {elements: {palette: webcomponent('palette', {subTags: '*'})}}, defineComponents});
+registerComponentCollection('palette', {components: builtinComponents('palette'), defineComponents});

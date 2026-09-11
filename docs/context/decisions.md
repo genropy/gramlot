@@ -1,5 +1,137 @@
 # Recorded decisions and corrections
 
+## Installable example applications — owner decision, 2026-09-11
+
+User-facing applications produced here should be installable from Chrome, as in
+Rosetta. Tutorial and gallery now have separate PWA identities, manifests, icons
+and install prompts. Their service workers fetch live content and show recovery
+instructions if the local server is unavailable; installation does not bundle
+or start the server. Chrome exposed the Install app button for both applications
+in the browser verification. No installation was performed on the user's behalf.
+
+## Display format, mask and locale — owner decision, 2026-09-11
+
+Keep `format` and `mask`: resolve the typed Bag value, convert it to text according
+to format, then insert that text into mask at `%s`. Presentation never changes
+the stored value. Locale defaults to the page unless overridden on the display
+node. Locale, format and mask can all be literal values or ordinary reactive/passive
+pointers, preserving existing `^` / `=` semantics. Date/time named styles follow
+short/medium/long/full conventions. The alpha implements these plus a documented
+bounded LDML subset; see [display formatting](../guides/display-formatting.md).
+Data-node metadata precedence and a local datetime transport remain unsettled.
+
+## Group boxes — owner decision, 2026-09-11
+
+Add `groupBox` using the existing `lbl` vocabulary and shared label decoration.
+A centered title bar (white on dark) and an underline variant distinguish a
+labeled group from a simple field label. Optional copy exports the group's
+associated Data branch as JSON; the branch is defined by the group's datapath,
+not reconstructed from its rendered children. Optional drag is useful for future
+collections and floating groups containing charts or tables. These are separate
+capabilities: initial drag supplies a transferable payload; automatic collection
+reordering, drop handling and floating-window behavior remain future work.
+
+## Field tools and calendar confirmation — owner decision, 2026-09-11
+
+Expansion icons belong inside the field's visual border. Tool attachment must be
+shared by compatible components, rather than implemented separately for dates,
+keypads or color pickers. The first consumer is the date calendar; this does not
+authorize implementing the other tools yet. Label decoration, tool presentation,
+popup lifecycle and editor validation retain separate responsibilities.
+
+Selecting a calendar day changes the editor draft and leaves the popup open.
+Leaving the combined field/tool focus region, including clicking outside,
+confirms through the field's normal parsing and validation path. Moving between
+the textbox, trigger and calendar must not commit. Escape cancels the draft.
+This supersedes the alpha's immediate commit and close on day selection.
+
+## Free text date editor — owner decision, 2026-09-11
+
+`dateTextBox` uses an ordinary text input with unrestricted text selection and
+caret movement. This supersedes native segmented date editing and regex-based
+native/text switching. An internal draft is parsed on Enter/blur; Data receives
+only the committed typed date. `symbolic` enables expressions; compact/local/ISO
+dates work without it. A reusable calendar provides optional pointer selection.
+The local `dateTimeTextBox` decision below is unchanged.
+
+
+## Local datetime editor — owner decision, 2026-09-11
+
+`dateTimeTextBox` uses one native `input[type=datetime-local]` and edits a local
+date and time without a timezone offset. The consuming server owns conversion
+to UTC for persistence. The browser field must not implicitly convert the value
+to UTC or treat it as an already established UTC instant.
+
+This supersedes the typed-component assessment's proposed UTC model and
+two-control datetime editor. A composite-field base is not required for this
+pilot. Local datetime transport representation, server timezone context and
+daylight-saving ambiguity handling still need explicit contracts; this decision
+does not select a TYTX type or add server dependencies to Gramlot core.
+
+## Numeric and temporal formatting — owner clarification, 2026-09-11
+
+For `numberTextBox` and the other components under review, GenroPy legacy is
+the reference for documentation and behavioral comparison. Inspect its actual
+contracts rather than treating current Gramlot behavior as the specification.
+The owner identifies historical formatting vocabulary and syntax as confusing,
+including `pattern` and ambiguity about the kind of format being declared.
+Formal continuity with those historical conventions is not required when a
+clearer, more elegant solution is available. Propose coherent numeric and temporal
+formatting terminology and syntax, distinguishing stored values, editing,
+display formatting, parsing and precision/rounding behavior.
+
+This supersedes the earlier strict legacy-naming policy for the formatting
+contract under discussion. It authorizes exploring improved APIs, not treating
+any proposed spelling, formatting language or rounding policy as already approved,
+nor an unrelated redesign of all legacy authoring conventions.
+
+## Input presentation preferences — owner decisions, 2026-09-11
+
+The null background decoration must appear only when explicitly enabled through
+a preference. The shared input decoration now defaults off; the teaching preview
+offers a persistent Show null values checkbox. This affects presentation, not
+null data, editing, accessibility descriptions or native checkbox indeterminacy.
+
+numberTextBox values must align right by default. This is implemented in the
+shared input stylesheet, without adding alignment attributes to examples.
+
+## Inline expressions — owner decision, 2026-09-10
+
+Retain `==expression` in Gramlot for computed attribute values and service-call
+parameters. Expressions use other named parameters; reactive inputs cause
+dependent attribute values to update. Unlike dataFormula, an inline expression
+does not create a separate Data destination. Keep ^ reactive paths and = passive
+reads distinct. Implementation remains pending; dependency analysis, expressions
+referencing other expressions, cycles and errors still need explicit rules.
+The preceding question about implicit provider startup was not answered by this
+approval and remains open.
+
+## Logical declaration syntax — owner decision, 2026-09-10
+
+dataFormula accepts a JavaScript expression, for example `price * quantity`,
+with named inputs declared as attributes. dataController accepts a JavaScript
+script. Authors need not wrap either in a complete JavaScript function. This
+changes the intended contract from the current function-string convention;
+implementation and migration of existing recipes remain pending. It does not
+approve legacy macros, hook names or automatic startup behavior. See the
+[logical blocks plan](../development/logical-blocks-plan.md).
+
+## dataSetter assignment — owner decision, 2026-09-10
+
+The owner also confirmed initialization order for the branch being built:
+all its dataSetters first, then missing-only defaults, then formulas/controllers
+explicitly requested before build, then widget construction, then logic requiring
+built widgets. This approves the order, not automatic execution of every provider,
+hook spelling, forced construction of lazy branches or remote replacement details.
+
+dataSetter assigns the declared value unconditionally, including Python None
+and JavaScript null. Defaults separately initialize missing data only, preserving
+existing null, false, zero and empty strings. The legacy data declaration's
+special rule that null preserves an existing node is not retained. This settles
+assignment semantics, not whether setters replay on rebuild or the remaining
+logical-block API and scheduling choices. See the
+[logical blocks plan](../development/logical-blocks-plan.md).
+
 Updated: 2026-09-08. Sources: the [five conversation summaries](conversations.md), preserved project documents, and the current Gramlot conversation. Message references identify the local historical archive; statements below do not establish untested implementation claims.
 
 ## Server independence — owner decision, 2026-09-09
@@ -106,3 +238,181 @@ reference in an English Sphinx manual in Gramlot. Use genro_toolbox.metadata
 (already available in 0.14.0); do not duplicate the decorator. It sets class
 attributes directly. Only title is currently interpreted as page metadata.
 Docstrings describe pages but are not rendered by the current adapter.
+
+## Binding syntax preserved — owner decision, 2026-09-10
+
+The owner rejects binding syntax changes in the textBox contract proposal. Keep
+`^path` and `=path` and their existing Source representation; do not introduce
+`bind()`, `read()`, `literal()`, or tagged binding/literal objects. An escape
+mechanism may be considered in the future if needed, but none is specified or
+authorized for implementation now. This decision does not approve the other
+proposed textBox restrictions or attribute changes.
+
+## Legacy compatibility priority — owner decision, 2026-09-10
+
+Preserve GenroPy legacy authoring syntax, attribute names and behavior unless a
+change is absolutely indispensable. This supersedes earlier latitude to replace
+legacy choices for modernization or API tidiness alone. Verify the relevant
+legacy implementation before proposing a difference; document the concrete
+necessity and discuss any indispensable incompatibility with the owner before
+implementation. Existing explicit owner corrections remain in force.
+
+For the textBox proposal, new restrictions, default-name removal, dtype limits
+and passive-binding restrictions are not approved. The current Gramlot behavior
+is not itself proof of legacy compatibility. Improve contracts and documentation
+around verified legacy semantics rather than redesigning the public API.
+
+## Live update naming exception and decoration review — 2026-09-10
+
+The owner permits replacing intermediateChanges with liveUpdate or possibly
+live as the explicit exception to legacy naming preservation. The assistant
+recommended live; do not record that recommendation as final owner selection.
+Alias handling and interaction with existing updateOn remain to be settled.
+The owner also requested a review of common lbl/lbl_*/box attributes in relation
+to the explicit labeled container. See the development label-decoration audit;
+this does not itself authorize renaming labledBox or introducing new syntax.
+
+## Label and box compatibility precedence — owner decision, 2026-09-10
+
+For common label/box meta-attributes, prioritize legacy behavior when resolving
+the differences identified in the label-decoration audit. The current Gramlot
+host/inner-box split and passing regression tests do not establish the desired
+public contract. Align label placement defaults, attribute destinations and the
+relationship between lbl shorthand and explicit labledBox with verified legacy
+behavior. Preserve earlier explicit owner corrections; implementation details
+may differ where they preserve the same author-visible behavior.
+
+## Label position syntax replaces side — owner decision, 2026-09-10
+
+Use only the new label position syntax: lbl_position on decorated widgets and
+label_position on explicit labledBox, with L, R, TL, TC, TR, BL, BC and BR.
+The owner rejected retaining the old label-placement lbl_side/side syntax as
+compatibility aliases; migrate affected label-placement recipes instead. No
+precedence rule between old and new spellings is needed. This applies to label
+placement, not unrelated uses of side in other APIs. It supersedes the earlier
+recommendation to keep both forms and is an explicit exception to legacy syntax
+preservation. Omitted placement retains the agreed legacy default direction;
+this decision does not approve unrelated changes to label/box behavior.
+
+The local runtime migration is implemented. Decorated widgets use lbl_position,
+explicit labledBox uses label_position, and omitted placement defaults to TL.
+The layout collection keeps its public ID while sharing one decoration runtime;
+focused regressions cover all eight positions and the original eleven inputs;
+the later `textBoxArea` input is covered by the same regression.
+
+## Shared label/box documentation — owner decision, 2026-09-10
+
+Individual widget references should contain only basic label usage and a link
+to a dedicated labeled-container widget reference. Do not repeat the history,
+full lbl/box attribute families, inheritance or routing discussion in each widget.
+The dedicated reference explains both explicit composition and how its shared
+attributes can be applied across widgets through the decoration syntax. Use one
+shared attribute description rather than per-widget copies. Public documentation
+explains usage; legacy differences belong in the internal differences register.
+
+The owner referred to the container as labelbox; this documentation organization
+does not itself rename the recorded labledBox API. Describe actual coverage and
+record unsupported targets as gaps: current plain HTML nodes do not automatically
+acquire widget label decoration. Do not claim universal runtime support before
+verification.
+
+## Shared learning context — owner direction, 2026-09-10
+
+Treat formlet, validations and form alongside labledBox as shared explanatory
+contexts. Widgets are frequently used in formlet. Keep widget-specific reference
+concise and explain common layout, validation and form ownership in dedicated
+sections. The subsequent module/gallery analysis proposes a progressive learning
+sequence; its exact module paths and sequence remain recommendations.
+
+## Experimental teaching pages — owner sequence, 2026-09-10
+
+The first experimental pages must follow this sequence:
+
+1. One text element.
+2. One standalone widget.
+3. One widget inside an explicit labledBox.
+4. Three widgets with their own labels, using the shared decoration attributes
+   on the widgets.
+5. Five labeled widgets inside a formlet.
+
+The formlet normally declares label placement, box attributes and shared styles
+for its widgets. Page 5 must demonstrate those defaults on the formlet instead
+of repeating them on every child; explicit child overrides remain supported.
+These pages serve to assess Python/JS module organization and the progressive
+authoring model, not merely the appearance of a finished data-entry screen.
+Validation and form remain in the overall first-phase scope, to follow this
+foundation; their exact experimental pages have not yet been specified.
+
+## Component-description-first direction — owner decision, 2026-09-10
+
+Gramlot component work should start from an explicit component description
+covering recipe/custom-element/module identity, parameters and documentation,
+shared attributes, child composition, data/event/binding integration, lifecycle
+cleanup, CSS/themes and label decoration. Generate compatible Python
+declarations from that description; Builders composes them and exports the
+resulting grammar for association with JavaScript implementations. This
+supersedes the earlier assumption that independently handwritten Python
+declarations must originate every contract. Existing ``^``/``=`` syntax and
+the open dtype/default contracts remain unchanged.
+
+The initial isolated textBox worked example proves this direction within the
+current Builders exporter limits. Its local descriptor/envelope shape is an
+implementation experiment, not an owner-approved public format.
+
+Automatic recognition of compliant Gramlot Components is an acceptance target,
+not a claim about the current registry. A component-authored manifest is the
+preferred contract source to evaluate: Python integrates declarations from a
+trusted, explicitly selected manifest, Builders composes and exports the final
+grammar, and JavaScript associates it with the selected implementation module
+and collection. Recognition, loading, registration and grammar export remain
+distinct stages. The exact manifest schema is still an implementation proposal;
+do not add arbitrary filesystem/network scanning or execute browser code while
+generating Python declarations.
+
+## Dedicated multiline input — owner decision, 2026-09-10
+
+Use ``textBoxArea`` for Gramlot's dedicated multiline input, backed by native
+``textarea`` inside its web component. Do not replace or alias the native HTML
+``textarea`` recipe. It shares value binding, focus-out commit, null/blank,
+labels, formlet defaults, validation and form behavior with other inputs and
+forwards the applicable native textarea parameters.
+
+``remainingHint`` is an optional remaining-character threshold tied to
+``maxlength``. A nonnegative integer is an absolute threshold; a percentage
+string from 0% through 100% is relative to ``maxlength``. It updates from the
+current editor draft, follows native UTF-16 length, handles over-limit external
+values explicitly and stays hidden when omitted or without a limit.
+
+## Teaching recipe minimalism — owner decision, 2026-09-10
+
+Subsequent owner correction: individual teaching examples should contain only
+three or four relevant lines. Put explanations in the hosting page and separate
+different concepts into independent examples. Keep the executed code visible;
+the import/class/function wrapper may be available separately as the complete
+file. Do not compress unrelated statements onto one line to meet this target.
+
+Later presentation correction: show the code only once. Use a Python row followed
+by a JavaScript row, each with the live example on the left and code on the right.
+JavaScript should be editable in CodeMirror and runnable as a laboratory. The
+duplicate complete-file disclosure is superseded by this instruction.
+
+Python must also use CodeMirror, in read-only mode; JavaScript remains editable.
+
+Executable teaching recipes express choices and deviations rather than restating
+defaults the framework already supplies. Keep an explicit default only when the
+lesson is specifically demonstrating that value, inheritance or an override.
+Python and JavaScript examples must remain behaviorally equivalent and the source
+shown in the preview must remain the source that actually executes.
+
+## Textbox live option and Rosetta focus-out lesson — owner correction, 2026-09-11
+
+The owner specifies `live=True` (JavaScript `live: true`) as the intended option
+for real-time textbox updates, superseding the proposed `updateOn='input'`
+authoring spelling. This records the API decision, not verification that the
+runtime implements it yet. Rosetta lesson 02 currently uses the default
+focus-out commit, with no live option, in all five compared implementations.
+
+Implementation follow-up: `live=True` / `live: true` now selects input-event
+write-back, while absent or false keeps focus-out behavior. The earlier
+`updateOn` spelling remains a compatibility fallback when `live` is absent.
+Rosetta lesson 02 now shows two independent stacked pairs to compare both modes.

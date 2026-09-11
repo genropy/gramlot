@@ -196,6 +196,10 @@ export class BuilderHandler {
 
     /** Drop `node` (and its subtree) from the pointer_map. */
     _unregisterPointer(node) {
+        // A removed provider may already be queued by an earlier write in the
+        // same live batch. Teardown must remove that pending execution too.
+        this._pendingFormulas.delete(node);
+        this._formulaQueue = this._formulaQueue.filter(entry => entry.key !== node);
         this._updatePointerMap(node, node.pointers());
         if (node.value instanceof Bag) {
             for (const child of node.value.getNodes()) {
@@ -206,11 +210,8 @@ export class BuilderHandler {
 
     /** Remove `pointers` of `node` from the pointer_map. */
     _updatePointerMap(node, pointers) {
-        for (const [attrname, pointer] of pointers) {
-            let path = node.absDatapath(pointer);
-            if (attrname) {
-                path = `${path}?${attrname}`;
-            }
+        for (const [, pointer] of pointers) {
+            const path = node.absDatapath(pointer);
             const inner = this.pointerMap.get(path);
             if (inner) {
                 inner.delete(node);
@@ -276,10 +277,10 @@ export class BuilderHandler {
      *  Inside a live section formulas do NOT compute: they queue (dedup
      *  on the node) for the flush drain; controllers/setters stay
      *  synchronous. Plain view readers are skipped (they only re-render). */
-    executeLogic(relevant) {
+    executeLogic(relevant, event = null) {
         if (this._disposed) return;
         for (const [builder, items] of relevant) {
-            for (const [, node] of items) {
+            for (const [kind, node] of items) {
                 if (this._disposed) return;
                 if (!node._getMeta('data_element')) {
                     continue;
@@ -287,7 +288,7 @@ export class BuilderHandler {
                 if (node.nodeTag === 'dataFormula' && this._liveDepth) {
                     this._enqueueFormula(node, 'node', builder, node);
                 } else {
-                    builder.computeLogic([node]);
+                    builder.computeLogic([node], event ? {kw: event, trigger_reason: kind} : null);
                 }
             }
         }
@@ -576,9 +577,10 @@ export class BuilderHandler {
         // depend on their writes), then the page data-element readers
         // (their writes re-enter here and cascade), then the view readers.
         this._runComponentRules(path);
-        this.executeLogic(relevant);
+        this.executeLogic(relevant, e);
         for (const [, items] of relevant) {
             for (const [, viewNode] of items) {
+                if (viewNode._getMeta('data_element')) continue;
                 // Anti-echo (legacy gnrdomsource `if (kw.reason != this)`):
                 // the node that originated the write does not re-render.
                 if (viewNode === reason) {
@@ -802,18 +804,28 @@ export class BuilderHandler {
             fn();
         } finally {
             if (this._liveDepth === 1) {
+                let flushReady = false;
                 try {
+                    // Source insertions are complete now. Prepare every
+                    // surviving branch as one batch while writes can still
+                    // participate in this live flush.
+                    for (const builder of Object.values(this.builders)) {
+                        builder._preparePendingBranches();
+                    }
                     // Drain with depth still 1, so the formulas' writes queue
                     // their render paths and re-queue further formulas.
                     this._drainFormulas();
+                    flushReady = true;
                 } finally {
                     this._liveDepth -= 1;
                     try {
-                        for (const [name, entries] of Object.entries(this._nodesToRender)) {
-                            if (!this._disposed && entries.length) {
-                                this.builders[name].renderNodes(
-                                    this._optimizeRender(entries), this._liveTarget,
-                                );
+                        if (flushReady) {
+                            for (const [name, entries] of Object.entries(this._nodesToRender)) {
+                                if (!this._disposed && entries.length) {
+                                    this.builders[name].renderNodes(
+                                        this._optimizeRender(entries), this._liveTarget,
+                                    );
+                                }
                             }
                         }
                     } finally {

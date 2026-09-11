@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8">
+  <title>Minimal Web Component</title>
+  <body>
+    <gnr-guidegreeting name="Ada"></gnr-guidegreeting>
+    <script type="module">
+      import {defineGreeting} from './greeting-element.js';
+      defineGreeting();
+      document.querySelector('gnr-guidegreeting').addEventListener('greet', event => {
+        console.log('Greeting requested for', event.detail.name);
+      });
+    </script>
+  </body>
+</html>

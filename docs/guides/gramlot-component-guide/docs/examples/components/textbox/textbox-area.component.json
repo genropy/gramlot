@@ -1,0 +1,121 @@
+{
+  "document_format": {
+    "name": "gramlot_component_example",
+    "version": "0.1"
+  },
+  "identity": {
+    "recipe_name": "guideTextBoxArea",
+    "custom_tag": "gnr-textboxarea",
+    "python_module": "generated/textbox_area_declaration.py",
+    "collection": "guide-textbox-area-contract",
+    "implementation_module": "../../../../../js/dom/src/collections/inputs.js",
+    "implementation_collection": "inputs"
+  },
+  "summary": "An isolated textBoxArea contract linked to Gramlot's production gnr-textboxarea implementation.",
+  "children": {
+    "sub_tags": ""
+  },
+  "parameters": [
+    {
+      "name": "rows",
+      "type": "integer|string|null",
+      "default": null,
+      "doc": "Native textarea row hint; a string also permits ^/= binding."
+    },
+    {
+      "name": "cols",
+      "type": "integer|string|null",
+      "default": null,
+      "doc": "Native textarea column hint; a string also permits ^/= binding."
+    },
+    {
+      "name": "placeholder",
+      "type": "string|null",
+      "default": null,
+      "doc": "Hint shown while the native textarea has no text."
+    },
+    {
+      "name": "maxlength",
+      "type": "integer|string|null",
+      "default": null,
+      "doc": "Native maximum length in UTF-16 code units; a string also permits ^/= binding."
+    },
+    {
+      "name": "minlength",
+      "type": "integer|string|null",
+      "default": null,
+      "doc": "Native minimum length; a string also permits ^/= binding."
+    },
+    {
+      "name": "readonly",
+      "type": "boolean|string|null",
+      "default": null,
+      "doc": "Make the native editor read-only; a string also permits ^/= binding."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean|string|null",
+      "default": null,
+      "doc": "Disable editing; a string also permits ^/= binding."
+    },
+    {
+      "name": "wrap",
+      "type": "string|null",
+      "default": null,
+      "doc": "Native textarea wrap policy."
+    },
+    {
+      "name": "autocomplete",
+      "type": "string|null",
+      "default": null,
+      "doc": "Native textarea autocomplete hint."
+    },
+    {
+      "name": "remainingHint",
+      "type": "integer|string|null",
+      "default": null,
+      "doc": "Absolute integer or 0..100 percentage threshold for the optional live remaining count; requires maxlength."
+    }
+  ],
+  "shared_attributes": [
+    "gramlot.binding",
+    "gramlot.decoration",
+    "gramlot.validation"
+  ],
+  "integration": {
+    "binding": "Gramlot resolves literal, ^ and = values; native drafts stay local until the updateOn-selected event.",
+    "events": [
+      {
+        "name": "input",
+        "bubbles": true,
+        "composed": true,
+        "role": "live draft and optional input write-back"
+      },
+      {
+        "name": "change",
+        "bubbles": true,
+        "composed": true,
+        "role": "default focus-out write-back"
+      }
+    ],
+    "form": "The shared form service owns validation, dirty state and persistence; the component exposes its native draft."
+  },
+  "lifecycle": {
+    "connected": "Synchronize native textarea attributes, null state, remaining hint and label observer.",
+    "disconnected": "Disconnect the shared WidgetLabel observer; internal listeners remain owned by the retained shadow tree."
+  },
+  "presentation": {
+    "shadow_dom": true,
+    "label_decoration": "gramlot.decoration",
+    "theme_properties": [
+      "--field-bg",
+      "--field-border",
+      "--field-focus-border",
+      "--field-hint-color",
+      "--field-hint-font-size",
+      "--form-field-radius"
+    ]
+  },
+  "open_attributes": true,
+  "status": "Worked example only; this descriptor format is not a frozen public Gramlot API."
+}

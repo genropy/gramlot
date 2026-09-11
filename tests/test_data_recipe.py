@@ -17,6 +17,15 @@ def test_gui_data_alias():
     assert pane.get_relative_data(".direct") == "working"
 
 
+def test_data_setter_is_public_and_data_remains_compatible():
+    builder = GramlotBuilder("main")
+    explicit = builder.root.dataSetter("value", None)
+    compatible = builder.root.data("other", False)
+    assert explicit.node.node_tag == compatible.node.node_tag == "dataSetter"
+    assert explicit.node.attr["value"] is None
+    assert compatible.node.attr["value"] is False
+
+
 def test_generic_node_keeps_datastore_property():
     builder = HtmlBuilder("main")
     pane = builder.source.div()

@@ -1,0 +1,158 @@
+[
+  {
+    "slug": "01-text",
+    "title": "Start with text",
+    "description": "A page begins with one visible text element.",
+    "kind": "progression",
+    "group": "First steps"
+  },
+  {
+    "slug": "02-standalone-widget",
+    "title": "Add one widget",
+    "description": "A textBox can stand on its own before labels and layout are introduced.",
+    "kind": "progression",
+    "group": "First steps"
+  },
+  {
+    "slug": "03-explicit-labled-box",
+    "title": "Compose an explicit label",
+    "description": "labledBox owns the caption and position while textBox remains the child control.",
+    "kind": "progression",
+    "reference": "labled-box",
+    "group": "First steps"
+  },
+  {
+    "slug": "04-shared-decoration",
+    "title": "Decorate three widgets",
+    "description": "The same lbl_* and box_* families apply directly to different widgets.",
+    "kind": "progression",
+    "reference": "labled-box",
+    "group": "First steps"
+  },
+  {
+    "slug": "05-formlet",
+    "title": "Arrange five fields",
+    "description": "formlet supplies columns and shared presentation defaults; one child overrides them.",
+    "kind": "progression",
+    "reference": "formlet",
+    "group": "First steps"
+  },
+  {
+    "slug": "06-validation",
+    "title": "Validate one field",
+    "description": "Local field validation works without a form or persistence layer.",
+    "kind": "follow-on",
+    "reference": "validation",
+    "group": "Validation and forms"
+  },
+  {
+    "slug": "07-memory-form",
+    "title": "Save a memory form",
+    "description": "A form reports dirty, valid and pending state, saves to MemoryStore and restores its saved baseline.",
+    "kind": "follow-on",
+    "reference": "formlet",
+    "group": "Validation and forms"
+  },
+  {
+    "slug": "08-textbox-area",
+    "title": "Edit multiline text",
+    "description": "textBoxArea is a dedicated Gramlot field backed by a native textarea, with the same binding, label, validation and formlet behavior as other inputs.",
+    "kind": "supplemental",
+    "reference": "labled-box",
+    "group": "Inputs"
+  },
+  {
+    "slug": "09-shared-validation",
+    "title": "Reuse validation rules",
+    "description": "An ordinary dictionary or object can apply the same validation rules to several fields without introducing a validation class.",
+    "kind": "supplemental",
+    "reference": "validation",
+    "group": "Validation and forms"
+  },
+  {
+    "slug": "10-local-logic",
+    "title": "Data and local logic",
+    "description": "One small example per concept. Enter values in the fields to run the logic. Each example has its own Data.",
+    "kind": "supplemental",
+    "examples": [
+      {
+        "path": ".",
+        "title": "Reactive formula",
+        "description": "Enter quantity and price. Changing either field recalculates the total: both formula inputs use ^."
+      },
+      {
+        "path": "passive",
+        "title": "Passive price",
+        "description": "Enter price first, then quantity. Only quantity triggers the formula. The = input reads the current local price at execution time; it is a passive/lazy read, not a remote resolver."
+      },
+      {
+        "path": "inline",
+        "title": "Inline expression",
+        "description": "Enter quantity and price. The == expression computes the displayed value directly, without a separate total in Data."
+      },
+      {
+        "path": "controller",
+        "title": "Controller",
+        "description": "Type a name. The controller runs a JavaScript script when name changes and writes a message into Data."
+      }
+    ],
+    "group": "Data and logic"
+  },
+  {
+    "slug": "11-source-slider",
+    "support": "contact-data.js",
+    "resizable": true,
+    "inspector": true,
+    "title": "Change Source, keep Data",
+    "description": "Generate contacts replaces the contact Data with 1\u201310 fictional contacts and moves the slider to that count. The slider only changes the visible cards: hidden contacts keep their data, and the visible count is limited to the contacts in the Bag. Open the inspector below the cards to explore Data and Source. Drag the divider to make room for more columns.",
+    "kind": "supplemental",
+    "languages": [
+      "python"
+    ],
+    "group": "Data and logic"
+  },
+  {
+    "slug": "12-symbolic-date",
+    "title": "Symbolic date entry",
+    "description": "Edit the date as ordinary text, or open the calendar. Type symbolic expressions such as oggi+15 directly. Calendar selection stays provisional: click outside the field and calendar to confirm. Enter in the text field also confirms; Escape cancels. Try 010325, ieri, mese scorso or 2 trimestre. Periods use their starting date. This example uses Italian and a fixed reference date of 11 September 2026. The stored date changes only after a valid entry.",
+    "kind": "supplemental",
+    "languages": [
+      "python"
+    ],
+    "inspector": true,
+    "group": "Inputs"
+  },
+  {
+    "slug": "13-number-format",
+    "title": "Number formatting and precision",
+    "description": "Change format, decimal places and locale. Places controls presentation only: focus Amount to edit its full precision, then press Enter or leave the field to confirm. Escape restores the stored value. The Result box compares formatted text with the exact stored Decimal. Percent edits use the underlying fraction: 0.15 displays as 15%. Enter numbers without grouping separators.",
+    "kind": "supplemental",
+    "languages": [
+      "python"
+    ],
+    "inspector": true,
+    "group": "Inputs"
+  },
+  {
+    "slug": "14-publish-subscribe",
+    "title": "Publish and subscribe",
+    "description": "Edit Name and publish a greeting: two independent controllers receive the same message. Typing alone does not publish. The second button uses this.publish: its nodeId sender qualifies ready as sender_ready. Topics belong to this mounted application.",
+    "kind": "supplemental",
+    "languages": [
+      "python"
+    ],
+    "inspector": true,
+    "group": "Messages and containers"
+  },
+  {
+    "slug": "15-stack-topics",
+    "title": "Stack buttons and page topics",
+    "description": "Select a page with the external stackButtons or publish a switchPage command. The showing subscriber reports the visible page and counts History activations. Selecting History again while it is already visible does not add an activation. Initial visibility also emits showing; this example starts on Details.",
+    "kind": "supplemental",
+    "languages": [
+      "python"
+    ],
+    "inspector": true,
+    "group": "Messages and containers"
+  }
+]

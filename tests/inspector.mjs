@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {setupDom} from '../../gramlot-dom/tests/dom.js';
+import {setupDom} from '../js/dom/tests/dom.js';
 setupDom();
 const {fromTytx} = await import('genro-tytx');
 const {Bag} = await import('genro-bag-js');

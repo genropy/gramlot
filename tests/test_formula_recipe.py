@@ -10,7 +10,7 @@ from gramlot.builder import GramlotBuilder
 def test_python_formula_runs_in_browser_runtime():
     builder = GramlotBuilder("main")
     builder.root.data("size", 14)
-    builder.root.dataFormula(destination="css", formula="({size}) => size + 'px'",
+    builder.root.dataFormula(destination="css", formula="size + 'px'",
                                size="^size", _on_start=True)
     builder.root.div("^css")
     folder = Path(__file__).parent

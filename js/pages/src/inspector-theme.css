@@ -1,0 +1,71 @@
+/* Inherits the page color-scheme; custom properties allow exact application themes. */
+:host {
+ --inspector-bg: var(--gramlot-inspector-bg, light-dark(#ffffff,#152136));
+ --inspector-surface: var(--gramlot-inspector-surface, light-dark(#f2f4f8,#1e2d45));
+ --inspector-selected: var(--gramlot-inspector-selected, light-dark(#e5edff,#304869));
+ --inspector-line: var(--gramlot-inspector-line, light-dark(#d5dce7,#394c68));
+ --inspector-text: var(--gramlot-inspector-text, light-dark(#26344b,#dce7f8));
+ --inspector-muted: var(--gramlot-inspector-muted, light-dark(#68768c,#a5b7d0));
+ --inspector-accent: var(--gramlot-inspector-accent, light-dark(#315dbd,#a1bfff));
+ font:13px/1.45 system-ui;color:var(--inspector-text);
+ --palette-background:var(--inspector-bg);--palette-color:var(--inspector-text);
+ --palette-border:var(--inspector-line);--palette-header-background:var(--inspector-surface);
+ --palette-header-focus-background:var(--inspector-selected);--palette-header-height:34px;
+ --palette-button-color:var(--inspector-muted);--palette-button-hover:var(--inspector-selected);
+ --gray-300:var(--inspector-line);--splitter-bg:var(--inspector-line);
+ --tree-selected-bg:var(--inspector-selected);--accent-color:var(--inspector-accent);
+ --tab-border:var(--inspector-line);--tab-background:var(--inspector-surface);
+ --tab-color:var(--inspector-muted);--tab-active-background:var(--inspector-bg);
+ --tab-active-color:var(--inspector-accent);
+}
+:host-context([data-theme="dark"]) {color-scheme:dark;}
+:host-context([data-theme="light"]) {color-scheme:light;}
+
+:host([presentation="embedded"]) {display:block;height:100%;min-height:0;min-width:0;background:var(--inspector-bg);}
+:host([presentation="embedded"]) > div {height:100%;min-height:0;}
+:host([hidden]) {display:none!important;}
+
+/* Compact floating tools with a restrained raised surface. */
+:host {
+ --palette-radius:9px;
+ --palette-shadow:0 4px 18px #20304a18,0 1px 3px #20304a12;
+ --palette-body-padding:8px;
+ --palette-header-height:30px;
+ --palette-header-background:var(--inspector-bg);
+ --tab-pane-padding:8px 0 0;
+ --splitter-bg:transparent;
+ --splitter-hover:var(--inspector-selected);
+}
+gnr-palette { border:1px solid var(--inspector-line); }
+.inspector-editor { --splitter-bg:transparent; }
+.inspector-editor [slot="top"], .inspector-properties {
+ border:1px solid var(--inspector-line); border-radius:5px;
+ background:var(--inspector-bg); overflow:hidden;
+}
+.inspector-editor [slot="top"] { padding:5px; }
+.inspector-properties { margin-top:0; }
+.inspector-toolbar { min-height:27px; background:var(--inspector-surface); }
+.inspector-footer { border:0; background:transparent; }
+.inspector-path { border:0; padding:5px 2px 0; background:transparent; font-style:italic; font-size:11px; opacity:.8; }
+
+/* Developer tools favour working space over decorative chrome. */
+:host {
+ --palette-header-background:#29384d;
+ --palette-title-color:#fff;
+ --palette-header-height:24px;
+ --palette-header-focus-background:#354a65;
+ --palette-button-color:#fff;
+ --palette-button-hover:#ffffff25;
+ --palette-body-padding:5px;
+ --tab-padding:2px 9px;
+ --tab-font-size:11px;
+ --tab-font-weight:700;
+ --tab-pane-padding:5px 0 0;
+}
+.inspector-editor [slot="top"] { padding:3px; }
+.inspector-toolbar { min-height:23px; padding:0 4px 0 6px; }
+.inspector-editor button { min-height:20px; padding:0 5px; }
+.inspector-property-row { min-height:20px; }
+.inspector-editor input { height:19px; padding:1px 5px; font-size:11px; }
+.inspector-actions { gap:4px; padding:3px; }
+.inspector-path { padding:3px 1px 0; }

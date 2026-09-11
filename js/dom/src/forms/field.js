@@ -2,6 +2,7 @@
 /** One source-owned field lifecycle. Parsed invalid drafts can enter a form Bag;
  * parse failures cannot. Generation/signature checks protect every async effect. */
 import {fromTytx} from 'genro-tytx';
+import {setFieldState, clearFieldState} from '../components/field-state.js';
 
 export class FormField {
     constructor(service,node,form,property) {
@@ -42,14 +43,16 @@ export class FormField {
     }
     readCandidate() {
         const widget=this.widget;
-        const control=widget?._input || widget;
+        const control=widget?.fieldControl || widget?._input || widget;
         if (!control) return {ok:false,message:'The editor is unavailable.'};
+        const editorCandidate = widget.readEditorCandidate?.();
+        if (editorCandidate) return editorCandidate;
         if (control.validity?.badInput) return {ok:false,message:'Complete the value before saving.'};
         let value=widget[this.property];
         if (widget.constrained) {
             const matches=widget.options.filter(option=>option.caption===control.value);
             if (control.value && matches.length!==1) return {ok:false,message:'Select one of the available values.'};
-            value=widget._nullState.isNull ? null : (matches[0]?.id ?? '');
+            value=widget.isNullValue ? null : (matches[0]?.id ?? '');
         } else if (control.validity?.customError) return {ok:false,message:control.validationMessage};
         if (typeof value==='number' && !Number.isFinite(value)) return {ok:false,message:'Enter a finite number.'};
         const dtype=this.attrs.dtype;
@@ -76,7 +79,7 @@ export class FormField {
         this.validate(parsed.value,true);
     }
     flushEditor() {
-        const widget=this.widget, control=widget?._input || widget;
+        const widget=this.widget, control=widget?.fieldControl || widget?._input || widget;
         const focused=widget?.shadowRoot?.activeElement===control || this.application.target.root.ownerDocument.activeElement===control;
         if (this.editorDirty || focused) {
             const parsed=this.readCandidate();
@@ -158,58 +161,40 @@ export class FormField {
         const widget=this.widget;
         if (widget && !this.editorDirty) {
             let display=value;
-            if (value instanceof Date && widget._input) {
-                if (widget._input.type==='date') display=value.toISOString().slice(0,10);
-                if (widget._input.type==='time') display=value.toISOString().slice(11,23);
+            const control = widget.fieldControl || widget._input;
+            if (value instanceof Date && control) {
+                if (control.type==='date') display=value.toISOString().slice(0,10);
+                if (control.type==='time') display=value.toISOString().slice(11,23);
             }
             widget[this.property]=display;
         }
     }
+    markEdited(event) {
+        if (this.locked || (event && this.lastEditEvent === event)) return;
+        this.lastEditEvent = event;
+        this.invalidate(); this.editorDirty = true; this.service.publishState();
+    }
     render() {
-        const widget=this.widget, input=widget?._input || widget;
+        const widget=this.widget, input=widget?.fieldControl || widget?._input || widget;
         if (!input) return;
         widget._formField=this;
         if (this.input!==input) {
             this.input?.removeEventListener('input',this.onEdit,true);
             this.input=input;
-            this.onEdit=()=>{if(this.locked)return;this.invalidate();this.editorDirty=true;this.service.publishState();};
+            this.onEdit=event=>this.markEdited(event);
             input.addEventListener('input',this.onEdit,true);
         }
-        if (widget._input) input.disabled=Boolean(this.attrs.disabled || this.form?.locked || this.form?.loading);
+        if (widget.fieldControl || widget._input) input.disabled=Boolean(this.attrs.disabled || this.form?.locked || this.form?.loading);
         const invalid=this.issues.some(issue=>issue.severity==='error');
-        input.setAttribute('aria-invalid',String(invalid));
-        input.setAttribute('aria-busy',String(this.pending));
-        widget.toggleAttribute('data-invalid',invalid);
-        widget._widgetLabel?.box?.classList.toggle('innerLblWrapper_error',invalid);
-        if (widget.shadowRoot) {
-            let message=widget.shadowRoot.querySelector('[data-validation-message]');
-            if (!message) {
-                message=widget.ownerDocument.createElement('div');
-                message.id='gnr-validation-message';message.setAttribute('data-validation-message','');
-                message.setAttribute('aria-live','polite');widget.shadowRoot.appendChild(message);
-                const style=widget.ownerDocument.createElement('style');
-                style.textContent='input[aria-invalid=true]{background-color:var(--field-invalid-bg,#fff0f0)}[data-validation-message]{color:var(--field-error-color,#9e2525);font-size:12px}';
-                widget.shadowRoot.appendChild(style);
-            }
-            const text=this.issues.map(issue=>issue.message).join(' ');
-            if (message.textContent!==text) message.textContent=text;
-            message.hidden=!text;
-            const ids=new Set((input.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean));
-            if (text) ids.add(message.id);else ids.delete(message.id);
-            if (ids.size) input.setAttribute('aria-describedby',[...ids].join(' '));else input.removeAttribute('aria-describedby');
-        }
+        if (widget.setFieldState) widget.setFieldState({invalid, pending:this.pending, issues:this.issues});
+        else setFieldState(widget, {invalid, pending:this.pending, issues:this.issues});
     }
     dispose() {
         this.disposed=true;this.invalidate();
         this.input?.removeEventListener('input',this.onEdit,true);
         const widget=this.widget;
         if (!widget) return;
-        widget._formField=null;widget.removeAttribute('data-invalid');
-        widget._widgetLabel?.box?.classList.remove('innerLblWrapper_error');
-        widget.shadowRoot?.querySelector('[data-validation-message]')?.remove();
-        this.input?.removeAttribute('aria-invalid');this.input?.removeAttribute('aria-busy');
-        const ids=(this.input?.getAttribute('aria-describedby') || '').split(/\s+/).filter(id=>id && id!=='gnr-validation-message');
-        if(ids.length)this.input.setAttribute('aria-describedby',ids.join(' '));
-        else this.input?.removeAttribute('aria-describedby');
+        widget._formField=null;
+        clearFieldState(widget);
     }
 }

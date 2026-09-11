@@ -33,7 +33,8 @@ export class Application {
      * @param {Element} rootElement host element for the render.
      * @param {BuilderBase} builder a builder instance (its class defines main).
      */
-    constructor(rootElement, builder = null) {
+    constructor(rootElement, builder = null, options = {}) {
+        this.options = options;
         this._disposed = false;
         this._domListeners = [];
         this.events = new TopicService(this);
@@ -58,6 +59,7 @@ export class Application {
             this._enableInput();
             this._enableCommands();
             this._forms.start();
+            this._builderApplicationCleanup = builder.attachApplication?.(this);
         } catch (error) {
             this.dispose();
             throw error;
@@ -73,6 +75,7 @@ export class Application {
             this.target.root.removeEventListener(type, callback);
         }
         this._domListeners = [];
+        this._builderApplicationCleanup?.();
         this.dev?.dispose();
         this.events.dispose();
         this._forms.dispose();
@@ -180,7 +183,8 @@ export class Application {
     }
 
     /** Wire delegated input listeners on the DOM target (client side).
-     *  A value-bound element writes on the event its `updateOn` selects:
+     *  A value-bound element writes per keystroke with `live: true`, otherwise
+     *  on focus loss. The older `updateOn` option remains a fallback:
      *  `blur` (default → the native `change` event, fired on focus loss /
      *  tab / click-out) or `input` (live, per keystroke). */
     _enableInput() {
@@ -208,10 +212,14 @@ export class Application {
             const slider = ['gnr-horizontalslider', 'gnr-verticalslider'].includes(el.localName);
             if ((slider || el._nullState) && (el.hasAttribute('disabled') || el.hasAttribute('readonly'))) return;
             const continuous = intermediate !== null && !['false', 'False', '0'].includes(intermediate);
-            const updateOn = node.getAttr('updateOn') || (slider && continuous ? 'input' : 'blur');
-            const wantEvent = updateOn === 'input' ? 'input' : 'change';
+            const live = node.getAttr('live');
+            const updateOn = live != null
+                ? ([true, 'true', 'True', 1, '1'].includes(live) ? 'input' : 'blur')
+                : node.getAttr('updateOn') || (slider && continuous ? 'input' : 'blur');
+            const wantEvent = el.commitOnChange ? 'change' : updateOn === 'input' ? 'input' : 'change';
             const field=this._forms.fields.get(node);
-            if (field && e.type==='input') {field.invalidate();field.editorDirty=true;this._forms.publishState();}
+            if (field && e.type==='input') field.markEdited(e);
+            if (el.symbolicEditing && e.type==='input') return;
             if (e.type === wantEvent) {
                 if (!this._forms.commit(node,null,true)) this._writeMutation(node, isChecked ? el.checked : el.value);
             }

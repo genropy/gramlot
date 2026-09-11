@@ -27,13 +27,13 @@ def test_parent_and_generic_datastore_are_independent():
 def test_browser_logic_is_only_declared_and_invalid_calls_are_atomic():
     class Recipe(GramlotBuilder):
         def main(self, root):
-            root.dataFormula('.total', '({qty}) => qty * 2', qty='^.qty')
-            root.dataController('(node) => node.SET("ran", true)', _on_start=True)
+            root.dataFormula('.total', 'qty * 2', qty='^.qty')
+            root.dataController('sourceNode.SET("ran", true)', _on_start=True)
     builder = Recipe()
     builder.create()
     assert builder.data.get_item('ran') is None
     assert len(builder.source) == 2
-    assert builder.source.get_nodes()[0].attr['formula'].startswith('({qty})')
+    assert builder.source.get_nodes()[0].attr['formula'] == 'qty * 2'
     with pytest.raises(TypeError):
         builder.root.dataFormula('.x', '() => 1', func='wrong')
     assert len(builder.source) == 2
@@ -55,3 +55,10 @@ def test_snapshot_preserves_source_and_ordinary_data_types(transport):
     assert result['data'].get_item('false') is False
     assert result['data'].get_item('zero') == 0
     assert type(builder.source).__name__ == 'SourceBag'
+
+
+def test_controller_keeps_func_keyword_and_allows_script_named_input():
+    builder = GramlotBuilder()
+    controller = builder.root.dataController(func='this.SET("result", script)', script='=input')
+    assert controller.node.attr['func'] == 'this.SET("result", script)'
+    assert controller.node.attr['script'] == '=input'

@@ -1,10 +1,11 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 /** Explicit portable form scope. Requiring this collection selects the controller
  * contract; ordinary HTML form elements and formId markers remain unchanged. */
-import {registerCollection, webcomponent} from '../collections.js';
+import {registerComponentCollection} from '../components/registry.js';
+import {builtinComponents} from '../components/builtin-components.js';
 
-registerCollection('forms', {
-    grammar:{elements:{form:webcomponent('form',{subTags:'*'})}},
+registerComponentCollection('forms', {
+    components: builtinComponents('forms'),
     defineComponents() {
         if (customElements.get('gnr-form')) return;
         class GnrForm extends HTMLElement {
