@@ -22,6 +22,7 @@ html_theme_options = {
         'color-sidebar-background': '#f5f7fc',
     },
     'dark_css_variables': {
+        'color-sidebar-background': '#161a24',
         'color-brand-primary': '#ffcc43',
         'color-brand-content': '#8fb2ff',
     },
