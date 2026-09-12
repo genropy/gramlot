@@ -38,40 +38,62 @@
     "group": "First steps"
   },
   {
-    "slug": "06-validation",
-    "title": "Validate one field",
-    "description": "Local field validation works without a form or persistence layer.",
-    "kind": "follow-on",
-    "reference": "validation",
-    "group": "Validation and forms"
-  },
-  {
-    "slug": "07-memory-form",
-    "title": "Save a memory form",
-    "description": "A form reports dirty, valid and pending state, saves to MemoryStore and restores its saved baseline.",
-    "kind": "follow-on",
-    "reference": "formlet",
-    "group": "Validation and forms"
-  },
-  {
     "slug": "08-textbox-area",
     "title": "Edit multiline text",
     "description": "textBoxArea is a dedicated Gramlot field backed by a native textarea, with the same binding, label, validation and formlet behavior as other inputs.",
     "kind": "supplemental",
     "reference": "labled-box",
-    "group": "Inputs"
+    "group": "Widgets / Other inputs"
   },
   {
-    "slug": "09-shared-validation",
-    "title": "Reuse validation rules",
-    "description": "An ordinary dictionary or object can apply the same validation rules to several fields without introducing a validation class.",
+    "slug": "12-symbolic-date",
+    "title": "Symbolic date entry",
+    "description": "Edit the date as ordinary text, or open the calendar. Type symbolic expressions such as oggi+15 directly. Calendar selection stays provisional: click outside the field and calendar to confirm. Enter in the text field also confirms; Escape cancels. Try 010325, ieri, mese scorso or 2 trimestre. Periods use their starting date. This example uses Italian and a fixed reference date of 11 September 2026. The stored date changes only after a valid entry.",
     "kind": "supplemental",
-    "reference": "validation",
-    "group": "Validation and forms"
+    "languages": [
+      "python"
+    ],
+    "inspector": true,
+    "group": "Widgets / Dates and time"
+  },
+  {
+    "slug": "16-date-input",
+    "title": "Enter a date",
+    "group": "Widgets / Dates and time",
+    "description": "Choose a date, then leave the field. The output subscribes to the same typed Data value. The symbolic-date lesson adds natural-language entry; this example introduces only the date widget.",
+    "kind": "supplemental",
+    "inspector": true
+  },
+  {
+    "slug": "13-number-format",
+    "title": "Number formatting and precision",
+    "description": "Change format, decimal places and locale. Places controls presentation only: focus Amount to edit its full precision, then press Enter or leave the field to confirm. Escape restores the stored value. The Result box compares formatted text with the exact stored Decimal. Percent edits use the underlying fraction: 0.15 displays as 15%. Enter numbers without grouping separators.",
+    "kind": "supplemental",
+    "languages": [
+      "python"
+    ],
+    "inspector": true,
+    "group": "Formatting / Numbers"
+  },
+  {
+    "slug": "17-text-mask",
+    "title": "Add a display mask",
+    "group": "Formatting / Text",
+    "description": "Type a name. mask substitutes the displayed value for %s; it does not modify Data or interpret HTML. An empty value still displays the surrounding mask.",
+    "kind": "supplemental",
+    "inspector": true
+  },
+  {
+    "slug": "18-date-format",
+    "title": "Format the same date twice",
+    "group": "Formatting / Dates",
+    "description": "Choose a date and compare the numeric pattern with a localized long date. format runs before mask. Both outputs read the same typed date; formatting leaves the stored value unchanged.",
+    "kind": "supplemental",
+    "inspector": true
   },
   {
     "slug": "10-local-logic",
-    "title": "Data and local logic",
+    "title": "dataFormula and dataController",
     "description": "One small example per concept. Enter values in the fields to run the logic. Each example has its own Data.",
     "kind": "supplemental",
     "examples": [
@@ -96,7 +118,8 @@
         "description": "Type a name. The controller runs a JavaScript script when name changes and writes a message into Data."
       }
     ],
-    "group": "Data and logic"
+    "group": "Data and logic / Formulas and controllers",
+    "inspector": true
   },
   {
     "slug": "11-source-slider",
@@ -110,28 +133,6 @@
       "python"
     ],
     "group": "Data and logic"
-  },
-  {
-    "slug": "12-symbolic-date",
-    "title": "Symbolic date entry",
-    "description": "Edit the date as ordinary text, or open the calendar. Type symbolic expressions such as oggi+15 directly. Calendar selection stays provisional: click outside the field and calendar to confirm. Enter in the text field also confirms; Escape cancels. Try 010325, ieri, mese scorso or 2 trimestre. Periods use their starting date. This example uses Italian and a fixed reference date of 11 September 2026. The stored date changes only after a valid entry.",
-    "kind": "supplemental",
-    "languages": [
-      "python"
-    ],
-    "inspector": true,
-    "group": "Inputs"
-  },
-  {
-    "slug": "13-number-format",
-    "title": "Number formatting and precision",
-    "description": "Change format, decimal places and locale. Places controls presentation only: focus Amount to edit its full precision, then press Enter or leave the field to confirm. Escape restores the stored value. The Result box compares formatted text with the exact stored Decimal. Percent edits use the underlying fraction: 0.15 displays as 15%. Enter numbers without grouping separators.",
-    "kind": "supplemental",
-    "languages": [
-      "python"
-    ],
-    "inspector": true,
-    "group": "Inputs"
   },
   {
     "slug": "14-publish-subscribe",
@@ -154,5 +155,77 @@
     ],
     "inspector": true,
     "group": "Messages and containers"
+  },
+  {
+    "slug": "06-validation",
+    "title": "Validate one field",
+    "description": "Local field validation works without a form or persistence layer.",
+    "kind": "follow-on",
+    "reference": "validation",
+    "group": "Validation / Forms"
+  },
+  {
+    "slug": "07-memory-form",
+    "title": "Save a memory form",
+    "description": "A form reports dirty, valid and pending state, saves to MemoryStore and restores its saved baseline.",
+    "kind": "follow-on",
+    "reference": "formlet",
+    "group": "Validation / Forms"
+  },
+  {
+    "slug": "09-shared-validation",
+    "title": "Reuse validation rules",
+    "description": "An ordinary dictionary or object can apply the same validation rules to several fields without introducing a validation class.",
+    "kind": "supplemental",
+    "reference": "validation",
+    "group": "Validation / Forms"
+  },
+  {
+    "slug": "19-required-validation",
+    "title": "Required and length rules",
+    "group": "Validation / Field rules",
+    "description": "Enter fewer than three characters, then leave the field. The widget reports the failed rule. Validation describes field state; it is not server-side validation or a persistence guarantee.",
+    "kind": "supplemental",
+    "inspector": true
+  },
+  {
+    "slug": "23-email-validation",
+    "title": "Validate an email",
+    "description": "Enter an incomplete address, leave the field, then correct it. The built-in email rule checks syntax locally; it does not verify that a mailbox exists.",
+    "group": "Validation / Field rules",
+    "kind": "supplemental",
+    "inspector": true
+  },
+  {
+    "slug": "24-number-validation",
+    "title": "Validate a numeric range",
+    "description": "Enter a number outside 1\u201310 and leave the field. min and max constrain the value; they are independent from display formatting and decimal places.",
+    "group": "Validation / Field rules",
+    "kind": "supplemental",
+    "inspector": true
+  },
+  {
+    "slug": "20-tree-selection",
+    "title": "A Bag as a tree",
+    "group": "Trees / Hierarchy",
+    "description": "Expand people and select Ada or Grace. storeTree reads the nested Bag and writes the selected relative path into Data. Captions belong to node attributes; the path uses node labels.",
+    "kind": "supplemental",
+    "inspector": true
+  },
+  {
+    "slug": "21-grid-records",
+    "title": "Display records in a grid",
+    "group": "Grids / Resident data",
+    "description": "Each child Bag is one record. Select a row: selectedKey contains its stable Bag label, not its visible position. This is a resident display grid; cells are not editable in this lesson.",
+    "kind": "supplemental",
+    "inspector": true
+  },
+  {
+    "slug": "22-grid-attributes",
+    "title": "Rows stored as attributes",
+    "group": "Grids / Resident data",
+    "description": "datamode=\"attr\" reads fields from row-node attributes instead of child Bags. The amount column formats numbers to two displayed decimal places; Data retains its original precision.",
+    "kind": "supplemental",
+    "inspector": true
   }
 ]

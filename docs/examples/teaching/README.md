@@ -1,6 +1,6 @@
 # Progressive teaching preview
 
-These ten lessons use the same source files for execution and display. The
+These lessons use the same source files for execution and display. The
 first five are the progressive module-organization sequence. Standalone
 validation and a memory-backed form follow separately; ``textBoxArea`` is a
 supplemental input example and does not change the five-step sequence.
@@ -77,3 +77,20 @@ HTML is grouped into nested sections (text, forms, media, tables, etc.); Gramlot
 widgets are grouped by registered collection. Document-level/specialized elements
 and collections not loaded in the playground are listed but disabled with a reason.
 This inventories the current grammar, not every possible browser extension.
+
+## Expanded chapter navigation
+
+The manifest now contains 24 lessons, grouped into nested chapters: First steps,
+Widgets, Formatting, Data and logic, Messages and containers, Validation, Trees,
+and Grids. Nine new lessons (16–24) have Python and JavaScript recipes and an
+inspector. Existing local-logic examples now use `live` instead of `updateOn`.
+
+New cases separate basic date entry, text masks, date patterns, required/length
+rules, email rules, numeric limits, Bag-tree selection, Bag-record grids and
+attribute-record grids. `mask` is the supported spelling; `%s` wraps formatted
+text without changing Data. Email explicitly sets `email_iswarning=False` to
+turn the built-in warning into an error. Grid examples cover resident display and
+selection, not cell editing, filtering or server pagination.
+
+Checks: `tests/browser/tutorial-chapters.spec.js` covers both languages, display,
+validation feedback/recovery, tree selection, grid selection and nested navigation.

@@ -39,10 +39,12 @@ def test_five_progressive_python_recipes_keep_each_step_bounded():
     ]
     assert len([lesson for lesson in lessons if lesson["kind"] == "progression"]) == 5
     assert len([lesson for lesson in lessons if lesson["kind"] == "follow-on"]) == 2
-    assert [lesson["slug"] for lesson in lessons if lesson["kind"] == "supplemental"] == [
-        "08-textbox-area", "09-shared-validation", "10-local-logic", "11-source-slider",
-        "12-symbolic-date", "13-number-format", "14-publish-subscribe", "15-stack-topics",
-    ]
+    supplemental = {lesson["slug"] for lesson in lessons if lesson["kind"] == "supplemental"}
+    assert {"08-textbox-area", "09-shared-validation", "10-local-logic", "11-source-slider",
+            "12-symbolic-date", "13-number-format", "14-publish-subscribe", "15-stack-topics",
+            "16-date-input", "17-text-mask", "18-date-format", "19-required-validation",
+            "20-tree-selection", "21-grid-records", "22-grid-attributes",
+            "23-email-validation", "24-number-validation"} == supplemental
 
     builders = []
     for lesson in lessons[:5]:
@@ -91,7 +93,7 @@ def test_python_and_javascript_recipes_build_the_same_live_source():
         cwd=modules, input=json.dumps(payload), text=True, capture_output=True, timeout=30,
     )
     assert result.returncode == 0, result.stderr
-    assert "13 Python/JavaScript pairs passed" in result.stdout
+    assert f"{len(payload)} Python/JavaScript pairs passed" in result.stdout
 
 
 def test_preview_build_uses_the_executed_sources(tmp_path):
