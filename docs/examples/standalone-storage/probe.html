@@ -1,0 +1,19 @@
+<!doctype html><meta charset="utf-8"><title>Gramlot local persistence probe</title>
+<h1>Local persistence probe</h1><pre id="result">Ready</pre>
+<script>
+window.probe = async function(value) {
+ const db = await new Promise((resolve,reject)=>{
+  const r=indexedDB.open('gramlot-standalone-probe',1);
+  r.onupgradeneeded=()=>r.result.createObjectStore('data');
+  r.onsuccess=()=>resolve(r.result); r.onerror=()=>reject(r.error);
+ });
+ const result = await new Promise((resolve,reject)=>{
+  const t=db.transaction('data',value===undefined?'readonly':'readwrite');
+  const s=t.objectStore('data'); let read;
+  if(value!==undefined)s.put(value,'sample');
+  const r=s.get('sample'); r.onsuccess=()=>read=r.result;
+  t.oncomplete=()=>resolve(read??null);t.onerror=()=>reject(t.error);
+ });
+ db.close(); document.querySelector('#result').textContent=JSON.stringify(result);return result;
+};
+</script>

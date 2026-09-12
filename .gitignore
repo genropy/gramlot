@@ -23,6 +23,7 @@ node_modules/
 .ruff_cache/
 .coverage
 htmlcov/
+test-results/
 
 # Prepared browser assets (included explicitly in distributions)
 src/gramlot/resources/
