@@ -2,8 +2,8 @@
 
 The application is authored in **page.py**. It contains Python layout, Data,
 resolver and component declarations, plus small button-action JavaScript snippets.
-There is no application JavaScript module. The Source button displays page.py
-in readonly CodeMirror with Python syntax highlighting.
+There is no application JavaScript module. The shared example panel displays page.py beside the live application
+in dark, read-only CodeMirror. Open inspector sits immediately below the live border.
 
 `root.openApiClient()` installs reusable browser client behavior, while
 `content.openApiForm()` generates bound form Source from the selected operation.

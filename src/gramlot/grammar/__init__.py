@@ -5,7 +5,7 @@ from .decoration import DecorationDeclarations
 from .forms import FormDeclarations
 from .inputs import InputDeclarations
 from .layout import LayoutDeclarations
-from .logic import LogicDeclarations
+from .logic import LogicDeclarations, LogicElementDeclarations
 from .native_html import NativeHtmlDeclarations
 from .widgets import AdjacentWidgetDeclarations
 
@@ -16,5 +16,6 @@ __all__ = [
     "InputDeclarations",
     "LayoutDeclarations",
     "LogicDeclarations",
+    "LogicElementDeclarations",
     "NativeHtmlDeclarations",
 ]

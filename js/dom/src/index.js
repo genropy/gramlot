@@ -20,3 +20,4 @@ export {BagRows, ValuesBagRows, AttributesBagRows} from './stores/bag-rows.js';
 export {GridChangeManager} from './collections/grid-formulas.js';
 export {GridStruct} from './collections/grid-authoring.js';
 export {UrlResolver, OpenApiResolver, jsonBag, plainJson} from './resolvers/http.js';
+export {ServerCallService, ServerCallError} from './services/server-call.js';

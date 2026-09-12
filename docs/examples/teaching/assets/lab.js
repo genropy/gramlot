@@ -82,9 +82,10 @@ async function installEditor(row, textarea) {
     const label = readonly ? 'Python code (read only)' : 'JavaScript code';
     try {
         const deps = '?deps=@codemirror/state@6.7.4,@codemirror/view@6.43.11';
-        const [{EditorView, basicSetup}, {EditorState}, language] = await Promise.all([
+        const [{EditorView, basicSetup}, {EditorState}, {oneDark}, language] = await Promise.all([
             import('https://esm.sh/codemirror@6.0.2' + deps),
             import('https://esm.sh/@codemirror/state@6.7.4'),
+            import('https://esm.sh/@codemirror/theme-one-dark@6.1.3' + deps),
             readonly
                 ? import('https://esm.sh/@codemirror/lang-python@6.2.1' + deps)
                 : import('https://esm.sh/@codemirror/lang-javascript@6.2.3' + deps),
@@ -97,7 +98,7 @@ async function installEditor(row, textarea) {
             parent: host,
             doc: textarea.value,
             extensions: [
-                basicSetup,
+                basicSetup, oneDark,
                 (readonly ? language.python : language.javascript)(),
                 EditorState.readOnly.of(readonly),
                 EditorView.editable.of(!readonly),
@@ -114,7 +115,7 @@ async function installEditor(row, textarea) {
         row.dataset.editorReady = 'true';
         if (row.dataset.frameReady === 'true') {
             setControlsEnabled(row, true);
-            setStatus(row, 'Ready to run.', 'ready');
+            setStatus(row, 'Runs when you leave the editor.', 'ready');
         } else setStatus(row, 'Waiting for the live example…');
     } catch (error) {
         textarea.hidden = false;
@@ -150,7 +151,11 @@ function initializeRow(row) {
     const iframe = row.querySelector('iframe');
     textarea.setAttribute('aria-label', 'JavaScript code');
     setControlsEnabled(row, false);
-    row.querySelector('[data-action="run"]')?.addEventListener('click', () => run(row));
+    row.querySelector('.code-pane').addEventListener('focusout', event => {
+        const editorHost = event.target.closest('.recipe-editor-codemirror, textarea.recipe-editor');
+        if (!editorHost || editorHost.contains(event.relatedTarget)) return;
+        run(row);
+    });
     row.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
         replaceValue(textarea, original);
         run(row);
@@ -178,7 +183,7 @@ window.addEventListener('message', event => {
         row.dataset.frameReady = 'true';
         if (row.dataset.editorReady) setControlsEnabled(row, true);
         if (!row.dataset.runId && row.dataset.editorReady === 'true') {
-            setStatus(row, 'Ready to run.', 'ready');
+            setStatus(row, 'Runs when you leave the editor.', 'ready');
         }
         return;
     }

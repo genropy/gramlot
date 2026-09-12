@@ -48,6 +48,30 @@ export class SourceBagNode extends BagNode {
         this._targetId = null;
     }
 
+    /** Runtime-only ownership: timers and requests never enter Source attributes. */
+    get rpcPending() { return Boolean(this._rpcState?.pending); }
+
+    delayedCall(callback, delay = 1, code = 'delayedCall') {
+        const wait = Number(delay || 1);
+        if (!Number.isFinite(wait) || wait < 0) throw new TypeError('Delay must be nonnegative milliseconds');
+        this._delayedCalls ??= new Map();
+        clearTimeout(this._delayedCalls.get(code));
+        const timer = setTimeout(() => {
+            this._delayedCalls.delete(code);
+            if (!this.builder?._disposed) callback.call(this);
+        }, wait);
+        this._delayedCalls.set(code, timer);
+        return timer;
+    }
+
+    cancelDelayedCalls() {
+        for (const timer of this._delayedCalls?.values() || []) clearTimeout(timer);
+        this._delayedCalls?.clear();
+        this.pendingFire = null;
+        this._pendingClickCount = 0;
+        this._clickBlocked = false;
+    }
+
     /** Node-qualified topics share the owning application's genro coordinator. */
     publish(message, payload) {
         const events = this.builder?.handler?.application?.events;

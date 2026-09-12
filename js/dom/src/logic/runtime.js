@@ -3,7 +3,13 @@
 import {SourceBag, wrapSource} from '../source-bag.js';
 import {compileFunctionText, evaluateExpression, executeScript, isFunctionText} from './expression.js';
 
-export const DATA_ELEMENT_FIELDS = new Set(['destination', 'formula', 'func', '_on_start']);
+export const DATA_ELEMENT_FIELDS = new Set([
+    'destination', 'formula', 'func', '_on_start', '_delay',
+]);
+export const RPC_ELEMENT_FIELDS = new Set([
+    'destination', 'method', '_on_start', '_onCalling', '_onResult', '_onError',
+    '_timeout', '_delay', '_lockScreen',
+]);
 
 export class LogicRuntime {
     constructor(builder) {
@@ -52,14 +58,22 @@ export class LogicRuntime {
             }
         }
         for (const node of fresh) this.builder._defaults.initializeNode(node);
-        const providers = fresh.filter(node => ['dataFormula', 'dataController'].includes(node.nodeTag));
+        const providers = fresh.filter(node =>
+            ['dataFormula', 'dataController', 'dataRpc', 'remoteSource'].includes(node.nodeTag));
         for (const node of fresh) {
             if (node.nodeTag !== 'dataSetter' && !providers.includes(node)) {
                 this.installed.add(node);
             }
         }
         // Register ^ dependencies even when startup is opt-in.
-        for (const node of providers) this.builder._bindings(node);
+        for (const node of providers) {
+            if (['dataRpc', 'remoteSource'].includes(node.nodeTag)) {
+                const service = node.handler?.application?.server;
+                if (!service) throw new Error(`${node.nodeTag} requires an Application RPC service`);
+                service.prepareProvider(node, node.nodeTag === 'remoteSource' ? 'source' : 'data');
+            }
+            this.builder._bindings(node);
+        }
         const startup = providers.filter(node => node.getAttr('_on_start'));
         for (const node of providers) {
             if (!startup.includes(node)) this.installed.add(node);
@@ -92,6 +106,10 @@ export class LogicRuntime {
         }
         for (const node of nodes) {
             if (node.nodeTag === 'dataController') {
+                this.compute(node);
+                this.installed.add(node);
+            }
+            if (['dataRpc', 'remoteSource'].includes(node.nodeTag)) {
                 this.compute(node);
                 this.installed.add(node);
             }
@@ -134,6 +152,26 @@ export class LogicRuntime {
 
     compute(node, trigger = null, extra = {}) {
         if (this.builder._disposed) return;
+        // Reject while occupied at the trigger boundary, never queue for later.
+        if (node.nodeTag === 'dataRpc' && node.rpcPending) {
+            node.handler?.application?.feedback.busy(node);
+            return Promise.resolve({status: 'busy'});
+        }
+        const [, values] = this.builder.runtimeValues(node);
+        const delay = values._delay;
+        if (node.nodeTag !== 'dataSetter' && delay != null && delay !== false && delay !== 0 && delay !== 'auto') {
+            node.delayedCall(() => {
+                node.pendingFire = null;
+                node.handler.application.live(() => this.computeNow(node, trigger, extra));
+            }, delay, 'provider');
+            node.pendingFire = node._delayedCalls.get('provider');
+            return;
+        }
+        return this.computeNow(node, trigger, extra);
+    }
+
+    computeNow(node, trigger = null, extra = {}) {
+        if (this.builder._disposed) return;
         const attr = node.getAttr() || {};
         if (node.nodeTag === 'dataSetter') {
             const attrs = {};
@@ -165,10 +203,27 @@ export class LogicRuntime {
             } finally {
                 this.executing.delete(node);
             }
+        } else if (node.nodeTag === 'dataRpc') {
+            if (typeof attr.method !== 'string' || !attr.method) {
+                throw new Error('dataRpc requires method');
+            }
+            return node.handler?.application?.server.invokeProvider(
+                node, this.builder._bindings(node),
+            );
+        } else if (node.nodeTag === 'remoteSource') {
+            if (typeof attr.method !== 'string' || !attr.method) {
+                throw new Error('remoteSource requires method');
+            }
+            return node.handler?.application?.server.invokeSourceProvider(
+                node, this.builder._bindings(node),
+            );
         }
     }
 
     disposeNode(node) {
+        if (['dataRpc', 'remoteSource'].includes(node.nodeTag)) {
+            node.handler?.application?.server.cancel(node);
+        }
         this.builder.handler?._unregisterPointer(node);
     }
 }

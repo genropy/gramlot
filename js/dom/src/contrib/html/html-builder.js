@@ -131,7 +131,8 @@ export class HtmlRenderer extends RendererBase {
             if (Object.hasOwn(runtimeAttrs, 'checked')) el.checked = runtimeAttrs.checked;
             else if (Object.hasOwn(runtimeAttrs, 'value')) el.value = runtimeAttrs.value;
         }
-        if (tag === 'button' && (runtimeAttrs.action || runtimeAttrs.publish)) {
+        if (tag === 'button' && (runtimeAttrs.action || runtimeAttrs.publish || runtimeAttrs.fire
+                || Object.keys(runtimeAttrs).some(key => key.startsWith('fire_')))) {
             el.setAttribute('data-command-node', this.builder.targetId(node));
         }
         if (includeDatapath) {

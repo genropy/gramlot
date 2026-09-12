@@ -14,6 +14,7 @@ from .grammar import (
     FormDeclarations,
     InputDeclarations,
     LayoutDeclarations,
+    LogicElementDeclarations,
     LogicDeclarations,
     NativeHtmlDeclarations,
 )
@@ -25,6 +26,7 @@ class GramlotBuilder(
     DecorationDeclarations,
     InputDeclarations,
     LayoutDeclarations,
+    LogicElementDeclarations,
     AdjacentWidgetDeclarations,
     NativeHtmlDeclarations,
     HtmlBuilder,

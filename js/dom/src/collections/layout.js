@@ -217,8 +217,8 @@ function defineComponents() {
                 const size = next.style[dimension];
                 cell.style[dimension] = size.endsWith('%')
                     ? `${this.getBoundingClientRect()[dimension] * parseFloat(size) / 100}px` : size;
-                child.style[dimension] = '100%';
             }
+            child.style[dimension] = '100%';
             if (next.style.display !== prior.style.display) cell.style.display = next.style.display;
         }
 
@@ -239,7 +239,11 @@ function defineComponents() {
                 cell._handled = true;
                 cell.classList.add(`split-${name}`);
                 const dimension = axis[name] === 'x' ? 'width' : 'height';
-                if (child.style[dimension]) cell.style[dimension] = child.style[dimension];
+                if (child.style[dimension]) {
+                    const size = child.style[dimension];
+                    cell.style[dimension] = size.endsWith('%')
+                        ? `${this.getBoundingClientRect()[dimension] * parseFloat(size) / 100}px` : size;
+                }
                 // The region owns its resized dimension; the slotted content fills it.
                 child.style[dimension] = '100%';
                 const bar = document.createElement('div');

@@ -31,7 +31,7 @@ import {RecipeDefaults} from './recipe-defaults.js';
 import { SourceBag, wrapSource, VALUE } from './source-bag.js';
 import { getCollection, injectCollectionCss } from './collections.js';
 import {resolveInlineExpressions} from './logic/expression.js';
-import {DATA_ELEMENT_FIELDS, LogicRuntime} from './logic/runtime.js';
+import {DATA_ELEMENT_FIELDS, RPC_ELEMENT_FIELDS, LogicRuntime} from './logic/runtime.js';
 
 /** Structural segment that carries the payload source (tree-not-forest). */
 export const SOURCE_ROOT = '_root_';
@@ -51,11 +51,13 @@ const BASE_GRAMMAR = {
         dataSetter: { sub_tags: '', _meta: { data_element: 'setter' } },
         dataFormula: { sub_tags: '', _meta: { data_element: 'formula' } },
         dataController: { sub_tags: '', _meta: { data_element: 'controller' } },
+        dataRpc: { sub_tags: '', _meta: { data_element: 'rpc' } },
+        remoteSource: { sub_tags: '', _meta: { data_element: 'source' } },
     },
 };
 
 /** Schema fields of a data-element, stripped from the func bindings. */
-export {DATA_ELEMENT_FIELDS};
+export {DATA_ELEMENT_FIELDS, RPC_ELEMENT_FIELDS};
 
 export class BuilderBase {
     constructor(name = null) {
@@ -425,10 +427,13 @@ export class BuilderBase {
         const [, resolved] = this.runtimeValues(node);
         const out = {};
         const ownFields = node.nodeTag === 'dataFormula'
-            ? new Set(['destination', 'formula', 'func', '_on_start'])
-            : new Set(['destination', 'func', '_on_start']);
+            ? new Set(['destination', 'formula', 'func', '_on_start', '_delay'])
+            : ['dataRpc', 'remoteSource'].includes(node.nodeTag)
+                ? new Set(RPC_ELEMENT_FIELDS)
+                : new Set(['destination', 'func', '_on_start', '_delay']);
         for (const [k, v] of Object.entries(resolved)) {
-            if (!ownFields.has(k)) {
+            if (!ownFields.has(k)
+                    && !(['dataRpc', 'remoteSource'].includes(node.nodeTag) && k.startsWith('_'))) {
                 out[k] = v;
             }
         }
@@ -569,6 +574,7 @@ export class BuilderBase {
     }
 
     _copyImportedSource(source, destination, legacy = !(source instanceof SourceBag)) {
+        const copied = [];
         for (const original of source.getNodes()) {
             const tag = original.nodeTag;
             if (!tag || !this.schema[tag]) {
@@ -585,6 +591,7 @@ export class BuilderBase {
             const attrs = {...original.getAttr()};
             attrs._meta = {...this.schema[tag]._meta, ...attrs._meta};
             const node = destination.setItem(original.label, value, attrs);
+            copied.push(node);
             node.nodeTag = tag;
             node.xmlTag = original.xmlTag;
             node._builder = this;
@@ -592,6 +599,34 @@ export class BuilderBase {
                 this._copyImportedSource(originalValue, value, legacy);
             }
         }
+        return copied;
+    }
+
+    /** Validate then replace only the branch owned by a remoteSource provider. */
+    replaceRemoteSource(provider, source) {
+        const decoded = source instanceof Bag ? source : Bag.fromTytx(source);
+        const staged = new SourceBag(null, this, this.handler);
+        this._copyImportedSource(decoded, staged);
+        const destination = provider.parentBag;
+        const previous = provider._remoteNodes || [];
+        const previousSet = new Set(previous);
+        const occupied = new Set(destination.getNodes()
+            .filter(node => node !== provider && !previousSet.has(node))
+            .map(node => node.label));
+        for (const node of staged.getNodes()) {
+            if (occupied.has(node.label)) {
+                throw new Error(`remote Source label collides with existing content: ${node.label}`);
+            }
+        }
+        let installed;
+        this.handler.application.live(() => {
+            for (const node of previous) {
+                if (destination.getNode(node.label) === node) destination.popNode(node.label);
+            }
+            installed = this._copyImportedSource(staged, destination, false);
+            provider._remoteNodes = installed;
+        });
+        return installed;
     }
 
     /** setup → resolve collections → main → (if reactive) arm reactivity. */
@@ -621,6 +656,7 @@ export class BuilderBase {
     dispose() {
         if (this._disposed) return;
         this._disposed = true;
+        for (const node of this._logic._walk(this.source)) node.cancelDelayedCalls?.();
         this._sourceroot.unsubscribe('builder_source', {any: true});
     }
 

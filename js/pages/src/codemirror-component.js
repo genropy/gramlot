@@ -44,9 +44,10 @@ registerComponentCollection('labEditors', {
                 this._widgetLabel.connect();
                 try {
                     const deps = '?deps=@codemirror/state@6.7.4,@codemirror/view@6.43.11';
-                    const [{EditorView, basicSetup}, {EditorState}, language] = await Promise.all([
+                    const [{EditorView, basicSetup}, {EditorState}, {oneDark}, language] = await Promise.all([
                         import('https://esm.sh/codemirror@6.0.2' + deps),
                         import('https://esm.sh/@codemirror/state@6.7.4'),
+                        import('https://esm.sh/@codemirror/theme-one-dark@6.1.3' + deps),
                         this.getAttribute('language') === 'python'
                             ? import('https://esm.sh/@codemirror/lang-python@6.2.1' + deps)
                             : this.getAttribute('language') === 'css'
@@ -59,7 +60,7 @@ registerComponentCollection('labEditors', {
                     const readonly = this.hasAttribute('readonly');
                     this.fallback.remove();
                     this.editor = new EditorView({parent: this._content, doc: this._value,
-                        extensions: [basicSetup, (language.python || language.css || language.xml || language.javascript)(),
+                        extensions: [basicSetup, oneDark, (language.python || language.css || language.xml || language.javascript)(),
                             EditorState.readOnly.of(readonly), EditorView.editable.of(!readonly),
                             EditorView.lineWrapping,
                             EditorView.contentAttributes.of({tabindex: '0', 'aria-label': this.getAttribute('aria-label') || 'Code'}),

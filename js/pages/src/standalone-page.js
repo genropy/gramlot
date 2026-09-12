@@ -16,5 +16,5 @@ export async function mountPythonPage(host, {url, name='page', inspector=true} =
     return new Application(host,builder,{inspector});
 }
 const host=document.querySelector('[data-gramlot-source]');
-if(host)mountPythonPage(host,{url:host.dataset.gramlotSource,name:host.dataset.gramlotName||'page'})
+if(host)mountPythonPage(host,{url:host.dataset.gramlotSource,name:host.dataset.gramlotName||'page', inspector:host.dataset.gramlotExample === 'true' ? {launcher:false} : true})
     .catch(error=>{host.textContent=error.message;host.setAttribute('role','alert');});

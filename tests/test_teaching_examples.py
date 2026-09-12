@@ -147,7 +147,9 @@ def test_preview_build_uses_the_executed_sources(tmp_path):
     assert "Complete Python file" not in page
     assert page.count('class="recipe-editor"') == 8
     assert page.count('readonly aria-label="Python code (read only)"') == 4
-    assert page.count('data-action="run"') == 4
+    assert page.count('data-action="run"') == 0
+    assert page.count('class="code-language"') == 8
+    assert page.count('class="inspector-tool"') == 8
     assert (output / "assets" / "lab.js").is_file()
     runtime = next((output / "runtime").iterdir())
     assert (runtime / "dom" / "collections" / "forms.js").is_file()

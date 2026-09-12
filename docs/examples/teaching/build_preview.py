@@ -235,7 +235,7 @@ def build(output: Path) -> None:
                     continue
                 source = (example_folder / f"recipe.{extension}").read_text()
                 write(output, f"{example_base}/recipe.{extension}", source)
-                write(output, f"{example_base}/{language}.html", frame(example["title"], language, runtime_base, lesson.get("inspector", False), lesson.get("support"), lesson.get("editor_collection", False)))
+                write(output, f"{example_base}/{language}.html", frame(example["title"], language, runtime_base, True, lesson.get("support"), lesson.get("editor_collection", False)))
                 compact = "examples" in lesson and not (
                     language == "javascript" and source.lstrip().startswith("import ")
                 )
@@ -244,7 +244,7 @@ def build(output: Path) -> None:
                 if language == "javascript":
                     code = (f'<textarea class="recipe-editor" aria-label="JavaScript code" spellcheck="false">'
                             f'{escape(displayed)}</textarea>'
-                            '<div class="lab-controls"><button type="button" data-action="run">Run</button>'
+                            '<div class="lab-controls">'
                             '<button type="button" data-action="reset">Reset</button>'
                             '<span class="lab-status" role="status" aria-live="polite"></span></div>')
                 else:
@@ -256,13 +256,13 @@ def build(output: Path) -> None:
                            'title="Drag to resize; use arrow keys when focused"></div>')
                 panels.append(
                     f'<section class="panel lab-row" data-lesson="{slug}" data-language="{language}" data-source-mode="{mode}">'
-                    f'<h3>{label}</h3><div class="example-code resizable">'
+                    f'<h3>{escape(example["title"])}</h3><div class="example-code resizable">'
                     f'<div class="example-pane"><iframe title="{escape(example["title"])} — {label}" '
                     f'src="/{example_base}/{language}.html"></iframe>'
                     + ('<div class="example-tools"><button type="button" class="inspector-tool" '
                        'aria-label="Open inspector" title="Inspector"><span aria-hidden="true">🔍</span> Open inspector</button></div>'
-                       if lesson.get("inspector") else '') + '</div>'
-                    f'{divider}<div class="code-pane">{code}</div></div></section>'
+                       ) + '</div>'
+                    f'{divider}<div class="code-pane"><div class="code-language">{label}</div>{code}</div></div></section>'
                 )
             intro = (f'<h2>{escape(example["title"])}</h2>'
                      f'<p>{escape(example.get("description", ""))}</p>') if "examples" in lesson else ""
@@ -284,7 +284,7 @@ def build(output: Path) -> None:
                 f'<a href="{asset_url(lesson["support"])}">View the injected data helper</a>.</p>'
                 if lesson.get("support") else '')
              if languages == ["python"] else
-             f'<p>{"Python above, JavaScript below. " if "python" in languages else ""}Example on the left, code on the right. Edit JavaScript and press Run; Reset restores the original example and its Data.</p>') +
+             f'<p>{"Python above, JavaScript below. " if "python" in languages else ""}Example on the left, code on the right. JavaScript runs when focus leaves the editor; Reset restores the original example and its Data.</p>') +
             f'{"".join(sections)}<script type="module" src="{asset_url("lab.js")}"></script>'
             f'<script type="module" src="{asset_url("preview-inspector.js")}"></script>'
         )
@@ -305,7 +305,7 @@ def build(output: Path) -> None:
         'labels and formlet. Continue with inputs, validation, Data and messages as you need them.</p>'
         '<p><a href="/lessons/01-text/">Start with text →</a></p></section>'
         '<section><h2>Read and experiment</h2><p>Python source is read-only. '
-        'JavaScript examples offer Run and Reset for local experiments. '
+        'JavaScript runs on editor focus-out; Reset restores the original example. '
         'Where available, Open inspector lets you explore Data and Source.</p></section>'
     )
     write(output, "index.html", document("Introduction", body, lessons))

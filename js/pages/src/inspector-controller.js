@@ -16,17 +16,17 @@ export class InspectorController {
         this.button = host.ownerDocument.createElement('button');
         this.button.type = 'button';
         this.button.className = 'gramlot-inspector-launcher';
-        this.button.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18M12 8h6M12 12h6M12 16h4"/></svg>';
+        this.button.textContent = '🔍 Open inspector';
         this.button.title = 'Inspector · Ctrl+Shift+D';
         this.button.setAttribute('aria-label', 'Open inspector');
         this.button.setAttribute('aria-keyshortcuts', 'Control+Shift+D');
-        this.button.style.cssText = 'font:16px system-ui;color:inherit;background:transparent;border:1px solid currentColor;border-radius:5px;padding:4px 8px;cursor:pointer;margin:8px;';
+        this.button.style.cssText = 'font:300 11px system-ui;color:#9ba3af;background:transparent;border:0;padding:3px 0;cursor:pointer;margin:3px 0;';
         this.launch = () => this.toggle().catch(error => {
             this.button.title = `Inspector: ${error.message}`;
             host.dispatchEvent(new CustomEvent('gramlot-inspector-error', {detail: {error}, bubbles: true, composed: true}));
         });
         this.button.addEventListener('click', this.launch);
-        host.append(this.button);
+        if (application.options.inspector?.launcher !== false) host.append(this.button);
         this.owners = documentControllers.get(host.ownerDocument) || new Set();
         documentControllers.set(host.ownerDocument, this.owners);
         this.owners.add(this);
@@ -55,7 +55,11 @@ export class InspectorController {
                 if (this.disposed) return null;
                 const element = createInspector(this.application, this.presentation);
                 this.element = element;
-                this.application.target.root.append(element);
+                const root = this.application.target.root;
+                const selector = this.application.options.inspector?.target;
+                const destination = selector ? root.querySelector(selector) : root;
+                if (!destination) throw new Error(`Inspector destination not found: ${selector}`);
+                destination.append(element);
                 try { await element.initialize(); }
                 catch (error) { element.remove(); this.element = null; throw error; }
                 return this.disposed ? null : element;

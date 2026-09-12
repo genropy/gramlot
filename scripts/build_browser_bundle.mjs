@@ -22,6 +22,7 @@ const aliases = new Map([
     ['gramlot-dom', join(dom, 'index.js')],
     ['gramlot-dom/date-parser', join(dom, 'date-parser/index.js')],
     ['gramlot-builder', join(pages, 'builder.js')],
+    ['gramlot-editors', join(pages, 'codemirror-component.js')],
     ['genro-bag-js', join(bag, 'index.js')],
     ['#uuid', join(bag, 'browser-uuid.js')],
     ['genro-tytx', join(tytx, 'index.js')],

@@ -31,6 +31,7 @@ PACKAGE_ASSET_DIRECTORIES = {
 IMPORT_PATHS = {
     'gramlot-dom': 'dom/index.js',
     'gramlot-builder': 'pages/builder.js',
+    'gramlot-editors': 'pages/codemirror-component.js',
     '/_assets/dom/': 'dom/',
     'genro-bag-js': 'bag/index.js',
     '#uuid': 'bag/browser-uuid.js',

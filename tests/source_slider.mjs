@@ -65,6 +65,8 @@ try {
     for (const random of [0.999, 0, 0.05]) {
         Math.random = () => random;
         const previousContacts = app.data.getItem('example.contacts');
+        // Separate user actions, outside the 200ms immediate-button guard.
+        await new Promise(resolve => setTimeout(resolve, 210));
         host.querySelector('button[data-command-node]').click();
         const count = 1 + Math.floor(random * 10);
         assert.equal(cards().length, count);

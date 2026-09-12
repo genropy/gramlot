@@ -13,8 +13,6 @@ class Page(WebPage):
         root.data('send', 0)
         root.data('cancel', 0)
         root.data('authorization', '')
-        root.data('sourceVisible', False)
-        root.data('sourceFile', 'page.py')
         root.data('responseRows', Bag())
         struct = GridStruct()
         struct.view().rows()
@@ -22,18 +20,14 @@ class Page(WebPage):
 
         root.openApiResolver('schema', url='=loadUrl', reload='^reload', status='schemaState')
         root.openApiClient()
-        root.urlResolver('sourceCode', url='^sourceFile', responseType='text', status='sourceState')
-        root.dataFormula('sourceWidth', "visible ? '44%' : '0px'", visible='^sourceVisible', _on_start=True)
-        root.dataFormula('sourceDisplay', "visible ? 'block' : 'none'", visible='^sourceVisible', _on_start=True)
         root.dataFormula('resultDisplay',
                          "state === 'loading' || state === 'error' || status != null ? 'block' : 'none'",
                          state='^requestState.state', status='^response.status', _on_start=True)
 
-        layout = root.borderContainer(height='100vh', class_='explorer')
+        layout = root.borderContainer(height='100%', class_='explorer')
         header = layout.contentPane(region='top', height='48px', class_='app-bar')
         header.strong('gramlot_api')
         header.span('Python OpenAPI explorer', class_='muted')
-        header.button('Source', action="this.SET('sourceVisible', !this.GET('sourceVisible'));")
 
         navigation = layout.contentPane(region='left', width='245px', splitter=True,
                                         class_='navigation')
@@ -47,15 +41,6 @@ this.SET('reload', this.GET('reload') + 1);
         navigation.div('^schemaState.error', class_='error')
         navigation.passwordbox(value='^authorization', lbl='Authorization header')
         navigation.storeTree(store='^navigation', selectedPath='^selection', labelAttribute='caption')
-
-        source = layout.contentPane(region='right', width='^sourceWidth', splitter=True,
-                                    display='^sourceDisplay', min_width='0', overflow='auto')
-        source.div('page.py · Python source', class_='muted')
-        source.button('Close', action="this.SET('sourceVisible', false);")
-        source.div('^sourceState.error', class_='error')
-        source.codeMirror(value='^sourceCode', language='python', readonly=True,
-                          lbl='Python source',
-                          style='--code-editor-height:calc(100vh - 140px);--code-editor-font-size:13px;')
 
         content = layout.contentPane(region='center', class_='content', overflow='auto')
         content.openApiForm(class_='operation')

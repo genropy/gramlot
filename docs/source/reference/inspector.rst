@@ -2,7 +2,7 @@ Inspector
 =========
 
 Pages rendered by ``GramlotBuilder`` provide an inspector by default. Click the
-small inspector icon or press **Ctrl+Shift+D**, including while editing a field.
+subtle Open inspector control or press **Ctrl+Shift+D**, including while editing a field.
 The component, recipe and property editors are created only on first opening.
 Closing the palette retains its selection; disposing the application removes
 its launcher, shortcut, component and Bag subscriptions.
@@ -122,3 +122,17 @@ lifetime, and declared dtype continues to determine nullable primary editors.
 
 Only a newly added attribute offers a type choice. That choice disappears after
 a successful focus-out commit. Existing values do not expose a type dropdown.
+
+Example presentation
+--------------------
+
+FastAPI demonstration pages set ``example_view = True`` on ``WebPage``.
+The adapter supplies a shared Gramlot layout: live recipe beside its Python
+source in dark read-only CodeMirror, with a draggable divider. The magnifier
+and subtle Open inspector control sit immediately below the live border.
+The displayed source is captured when loading the page and is exactly the text
+compiled by the server. The example layout does not show a floating launcher.
+
+Hosts may use ``inspector: {presentation: 'embedded', launcher: false,
+target: '#example-inspector'}``. The target must exist before opening the
+inspector. The rejected pictogram must not be reintroduced.

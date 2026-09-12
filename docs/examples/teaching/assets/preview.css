@@ -11,10 +11,12 @@ main>section{margin-block:36px}main>section>p{line-height:1.5;max-width:1000px}.
 
 .recipe-editor[hidden]{display:none}
 .lab-row[data-lesson="11-source-slider"] iframe{height:660px}
-.example-code.resizable{grid-template-columns:minmax(0,calc(var(--example-width,50%) - 6px)) 12px minmax(0,1fr)}
+.example-code.resizable{grid-template-columns:minmax(0,calc(var(--example-width,50%) - 3px)) 6px minmax(0,1fr)}
 .lab-divider{cursor:col-resize;touch-action:none;background:#edf1f7;position:relative;outline-offset:-2px}
-.lab-divider::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:4px;height:48px;border-radius:4px;background:#9caec8}
-.lab-divider:hover,.lab-divider:focus-visible{background:#dce7fa;outline:2px solid #1643c5}
+.lab-divider::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:1px;height:28px;background:#c2c9d3}
+.lab-divider:hover::after,.lab-divider:focus-visible::after{background:#72849d}
+.lab-divider:focus-visible{outline:1px solid #9caec8}
+.lab-divider::before{content:"";position:absolute;inset:0 -3px;z-index:1}
 .example-code.resizing{user-select:none;cursor:col-resize}.example-code.resizing iframe{pointer-events:none}
 @media(max-width:700px){.example-code.resizable{grid-template-columns:1fr}.lab-divider{display:none}}
 
@@ -35,3 +37,20 @@ header{min-height:68px;background:#f5f7fb;padding:18px 28px}
 @media(max-width:1000px){.app-shell{grid-template-columns:210px minmax(0,1fr)}.example-code{grid-template-columns:1fr}.code-pane{border-left:0;border-top:1px solid #dce3ee}}
 @media(max-width:650px){.app-shell{grid-template-columns:1fr}.sidebar{position:static;height:auto;max-height:240px;border-right:0;border-bottom:1px solid #dce3ee;padding:12px 16px}.app-shell main{padding:24px 16px}header{padding:14px 16px}}
 [data-install-app]{font:inherit;font-size:13px;color:#1643c5;background:white;border:1px solid #cbd5e5;border-radius:5px;padding:7px 13px;cursor:pointer;margin-left:auto}[data-install-app][hidden]{display:none}
+
+/* Every example uses the same live / splitter / source presentation. */
+.panel.lab-row { border:0; border-radius:0; background:transparent; overflow:visible; }
+.panel.lab-row h3 { background:transparent; border:0; padding:0 0 10px; font-size:15px; }
+.example-pane { padding:0; }
+.panel.lab-row iframe { border:1px solid #dce3ee; border-radius:5px; background:white; }
+.example-tools { padding:3px 0 0; }
+.inspector-tool { opacity:1; color:#9ba3af; font:11px/1.4 system-ui,sans-serif; font-weight:300; padding:2px 0; }
+.code-pane { border:1px solid #343b48; border-radius:5px; background:#282c34; color:#abb2bf; overflow:hidden; }
+.code-language { padding:6px 12px; font:11px/1.4 system-ui,sans-serif; color:#abb2bf; border-bottom:1px solid #343b48; }
+.code-pane .cm-editor,.recipe-editor { font:12px/1.5 ui-monospace,monospace; background:#282c34; color:#abb2bf; }
+.lab-controls { border-color:#343b48; padding:5px 10px; }
+.lab-status { color:#abb2bf; font-size:11px; }
+.lab-controls button { font-size:11px; padding:3px 8px; background:#282c34; color:#abb2bf; border-color:#505969; }
+.lab-divider { background:transparent; }
+.example-code.resizable { grid-template-columns:minmax(0,calc(var(--example-width,50%) - 3px)) 6px minmax(0,1fr); }
+.lab-divider { display:block; }

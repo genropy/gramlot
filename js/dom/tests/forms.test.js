@@ -356,6 +356,8 @@ test('form commands use source scope through slotted containers', async () => {
     await settle();
     assert.deepEqual(results, ['blocked']);
     app.mutate(widget('name').id, 'Bob');
+    // This is a new user action after the legacy immediate-click guard.
+    await new Promise(resolve => setTimeout(resolve, 210));
     host.querySelector('button').click();
     await settle();
     assert.deepEqual(results, ['blocked', 'saved']);

@@ -15,7 +15,7 @@ gramlot manual --directory build/teaching-preview
 
 Open the URL printed by the final command. Each lesson shows Python above
 JavaScript, with the live example on the left and its code on the right.
-Narrow screens stack the example above the code. The Python frame executes the generated TYTX
+The live/code order is retained on narrow screens. The Python frame executes the generated TYTX
 from `recipe.py`; the JavaScript frame imports and executes `recipe.js`.
 
 Keep each example focused on one concept. Explanations belong in the manifest,
@@ -30,7 +30,7 @@ empty; entering values triggers the logic. There are 13 Python/JavaScript pairs
 across the ten lessons.
 
 Python code is displayed once in CodeMirror with Python highlighting and read-only
-state. JavaScript code is editable in CodeMirror. Run rebuilds only that JavaScript
+state. JavaScript code is editable in CodeMirror. Leaving the JavaScript editor rebuilds that
 example; Reset restores its original code and fresh Data. Edits are local to
 the browser and are lost on reload. Compilation errors are shown without removing
 the previous example; a subsequent Run or Reset can recover. CodeMirror uses
@@ -94,3 +94,13 @@ selection, not cell editing, filtering or server pagination.
 
 Checks: `tests/browser/tutorial-chapters.spec.js` covers both languages, display,
 validation feedback/recovery, tree selection, grid selection and nested navigation.
+
+## Uniform example presentation
+
+Every tutorial and gallery case has its example name above a bordered live panel
+on the left, a draggable splitter, and a dark CodeMirror editor on the right
+using a 12px code font. The language label belongs above the editor. A subtle
+magnifier and “Open inspector” control sit immediately below the live border.
+All cases expose inspection. Python is read-only; JavaScript executes whenever
+focus leaves its editor, including the basic textarea fallback. No Run step is
+required. Reset remains available.

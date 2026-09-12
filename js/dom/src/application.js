@@ -29,6 +29,8 @@ import { TopicService } from './services/topics.js';
 import { RecipeRuntime } from './services/recipe-runtime.js';
 import {ResolverService} from './resolvers/service.js';
 import {OpenApiClientService} from './services/openapi-client.js';
+import {ServerCallService} from './services/server-call.js';
+import {InteractionFeedback} from './services/interaction-feedback.js';
 
 export class Application {
     /**
@@ -42,6 +44,8 @@ export class Application {
         this.events = new TopicService(this);
         this._recipeRuntime = new RecipeRuntime(this);
         this.resolvers = new ResolverService(this);
+        this.server = new ServerCallService(this, options.rpc);
+        this.feedback = new InteractionFeedback(this);
         this.openapi = new OpenApiClientService();
         this.handler = new BuilderHandler(this);
         this.vld = new Validator(this);
@@ -83,6 +87,8 @@ export class Application {
         this.dev?.dispose();
         this.events.dispose();
         this.resolvers.dispose();
+        this.server.dispose();
+        this.feedback.dispose();
         this._forms.dispose();
         this.handler.dispose();
         for (const node of [...this.target.root.childNodes]) {
@@ -98,6 +104,24 @@ export class Application {
 
     subscribe(topic, callback, options) { return this.events.subscribe(topic, callback, options); }
     publish(topic, payload) { return this.events.publish(topic, payload); }
+    serverCall(method, params = {}, asyncCallback = null, mode = null,
+               httpMethod = null, options = {}) {
+        if (asyncCallback !== null && typeof asyncCallback !== 'function') {
+            throw new TypeError('serverCall callback must be a function or null');
+        }
+        if (mode !== null) {
+            throw new Error('serverCall result modes are not supported by this TYTX experiment');
+        }
+        if (httpMethod !== null && httpMethod !== 'POST') {
+            throw new Error('serverCall supports only POST in this TYTX experiment');
+        }
+        const promise = this.server.call(method, params, options);
+        if (!asyncCallback) return promise;
+        return promise.then(
+            result => { asyncCallback.call(this, result, null); return result; },
+            error => { asyncCallback.call(this, null, error); throw error; },
+        );
+    }
     _runRecipe(node, code, extra) { if (this._disposed) return; return this._recipeRuntime.run(node, code, extra); }
 
     get data() {
@@ -253,12 +277,39 @@ export class Application {
             const node = this.builder.nodeByTargetId(button.getAttribute('data-command-node'));
             if (!node || node.nodeTag !== 'button') return;
             const [, attrs] = this.builder.runtimeValues(node);
-            if (attrs.disabled || attrs.hidden) return;
-            if (!attrs.action && !attrs.publish) return;
+            if (attrs.disabled || attrs.hidden || this.feedback.locks.size) return;
+            if (!attrs.action && !attrs.publish && !attrs.fire
+                    && !Object.keys(attrs).some(key => key.startsWith('fire_'))) return;
             event.preventDefault();
             event.stopPropagation();
-            if (attrs.action) this._runRecipe(node, attrs.action, {event});
-            else this.publish(attrs.publish, true);
+            const execute = count => {
+                const [, current] = this.builder.runtimeValues(node);
+                if (current.disabled || current.hidden || this.feedback.locks.size) return;
+                const modifiers = [event.shiftKey && 'Shift', event.ctrlKey && 'Ctrl',
+                    event.altKey && 'Alt', event.metaKey && 'Meta'].filter(Boolean).join(',');
+                const modifier = modifiers.replaceAll(',', '');
+                if (current.action) this._runRecipe(node, current.action, {event, _counter: count, modifiers});
+                else if (current.fire) node.fireEvent(current.fire, modifier || true,
+                    {attributes: {modifier, _counter: count}});
+                else if (current.publish) this.publish(current.publish, true);
+                else for (const [key, path] of Object.entries(current)) {
+                    if (key.startsWith('fire_')) node.fireEvent(path, key.slice(5),
+                        {attributes: {modifier, _counter: count}});
+                }
+            };
+            if (attrs._delay) {
+                node._pendingClickCount = (node._pendingClickCount || 0) + 1;
+                node.delayedCall(() => {
+                    const count = node._pendingClickCount;
+                    node._pendingClickCount = 0;
+                    execute(count);
+                }, attrs._delay, 'button');
+            } else {
+                if (node._clickBlocked) return;
+                node._clickBlocked = true;
+                node.delayedCall(() => { node._clickBlocked = false; }, 200, 'buttonGuard');
+                execute(undefined);
+            }
         });
         this._listen('gnr-topic', event => {
             event.stopPropagation();

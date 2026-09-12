@@ -47,7 +47,6 @@ test('PoC uses Gramlot controllers, Bags, form bindings and resolver execution',
  assert.deepEqual(JSON.parse(request.options.body),{productId:1,quantity:2});
  assert.equal(app.data.getItem('api.response.body.total'),98);
  assert.match(app.data.getItem('api.responseText'),/98/);
- app.live(()=>app.data.setItem('api.sourceVisible',true));assert.equal(app.data.getItem('api.sourceWidth'),'44%');
 });
 test('application contains no imperative UI or HTTP bypasses',async()=>{
  const code=await readFile(new URL('page.py',folder),'utf8');
