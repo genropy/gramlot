@@ -1,5 +1,13 @@
 # Gramlot project memory
 
+**Current direction — 2026-09-12:** main preserves the consolidated existing line;
+develop carries the 0.2.0 beta design. Review dataRpc/serverCall and remote before
+freezing component grammars. Design precedes an experimental worktree. See the
+[component/grammar design](../development/gramlot-0.2.0-component-grammar-design.md),
+[RPC audit](../development/datarpc-servercall-legacy-audit-2026-09-12.md) and
+[branch policy](../development/branch-policy.md). Later decisions in these records
+supersede earlier priorities and migration-only branch instructions below.
+
 **Python-first authoring:** application authors work in Python with only small
 local JS fragments when needed. The OpenAPI PoC now uses page.py, openApiClient
 and openApiForm declarations; reusable browser behavior lives in the framework.
