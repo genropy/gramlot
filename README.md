@@ -47,6 +47,9 @@ For custom servers, use `GramlotApplication` or `mount_gramlot` from
 - [Progressive Python/JavaScript teaching preview](docs/examples/teaching/README.md)
 - [Building Gramlot components](docs/source/guide/components.rst)
 
+The current source version is **0.1.2**, not yet published. The next development
+target is 0.2.0 beta.
+
 [Gramlot 0.1.0a1 is available on PyPI](https://pypi.org/project/gramlot/0.1.0a1/). See
 [build and release instructions](docs/release.md).
 

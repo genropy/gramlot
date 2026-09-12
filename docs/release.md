@@ -1,5 +1,17 @@
 # Gramlot release status
 
+## Current source version: 0.1.2
+
+The owner assigned version **0.1.2** to the consolidated current line on
+2026-09-12. Python and internal JavaScript package metadata use this version;
+browser manifests derive it when rebuilt. This is a source version assignment,
+not a published release. No 0.1.2 tag or publication has been performed.
+Gramlot remains pre-alpha; 0.2.0 beta is the next development target.
+Previously built 0.1.0a1 artifacts are historical candidates and must not be
+renamed or presented as 0.1.2. Rebuild and verify before any release.
+
+## Published release: 0.1.0a1
+
 **0.1.0a1**, first alpha, published on PyPI on 2026-09-09.
 
 The tag-triggered workflow passed CI and uploaded the wheel and source archive.
