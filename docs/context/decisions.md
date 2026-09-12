@@ -538,3 +538,150 @@ The owner accepted the proposed starting format: a CI-built versioned browser ZI
 and identical prebuilt payload in the Python wheel, with CDN delivery optional
 later. Local implementation is authorized. This does not publish a new framework
 version by itself. See [distribution contract](../development/browser-distribution-proposal.md).
+
+## Data endpoints and remote Source — owner decision, 2026-09-12
+
+Use two explicit method decorators: `@endpoint` for services returning Data and
+`@source` for methods constructing Source. `dataRpc` consumes endpoint results;
+container `remote` consumes Source. These markers belong to Gramlot independently
+of the optional server adapter. Exact import paths and additional options remain
+to be specified.
+
+`main(self, root)` is implicitly a Source method: authors do not need to decorate
+it. This is the sole naming convention approved here. Additional remotely callable
+methods require explicit `@source` or `@endpoint`; ordinary helpers are not exposed.
+Internally main must use the same Source contract as other @source methods, with
+the root container as its initial destination.
+
+The initial recipe is conceptually the first remote content. The client shell and
+services can start before it arrives. Embedding the initial recipe versus requesting
+it separately, and JSON versus MessagePack delivery, remain implementation choices
+to evaluate; no unconditional second-request requirement was approved. WebSocket
+startup was discussed as a benefit of the architecture, not implemented support.
+
+This supersedes the experiment's `@metadata(prefix='rpc', public=True)` spelling
+as the target API. The experimental worktree has not yet been migrated: approval
+of this contract does not claim decorators or remote content are implemented.
+
+## Inherited endpoint/source roles and stateless pages — owner decision, 2026-09-12
+
+Page classes and library mixins may declare @endpoint and @source methods. The
+base WebPage may likewise supply standard endpoints and Source methods. Ordinary
+Python MRO selects the effective implementation; cooperative super() remains
+available. Do not introduce a parallel collision-resolution scheme.
+
+Owner correction later in the conversation: an unchanged inherited method keeps
+its decorator, but a new overriding def must be decorated again to remain exposed.
+An undecorated override hides the inherited exposure. main remains implicitly
+Source. This supersedes the earlier note that overrides inherited an ancestor's
+role without redecorating. Use the effective Python MRO method, including ordinary
+library mixins; do not search past an undecorated override for a marker.
+
+Double decoration and explicit role changes remain design questions. The RPC
+experiment already hides undecorated overrides but does not yet discover arbitrary
+library mixins or implement the new decorator names.
+
+The owner also requires Page to be stateless. Any per-page state belongs in a
+separate store/context, potentially identified by page_id. Reusing an instance is
+an implementation choice, not permission to store request/user state on it.
+page_id generation, context lookup and lifecycle are still to be designed.
+
+## Ready browser, shared store and standalone clarification — 2026-09-12
+
+The browser application and configured services should be ready before the initial
+main Source arrives; content readiness and application readiness are distinct.
+This does not claim WebSocket implementation or mandate a separate recipe request.
+
+Keep mutable shared state outside stateless Python Page objects, in a store that
+contains a dictionary of Bags. A thread acquires exclusive ownership for its entire
+read or write operation and releases it at completion; other callers wait. Protect
+all access, not merely dictionary lookup. Guaranteed exception-safe release and
+non-escaping shared references are implementation requirements of this model.
+Lock API, store scope, async integration and multiprocess support remain to design.
+
+The blanket prohibition on server-dependent standalone pages is superseded:
+standalone HTML may consume configured external services, potentially a Gramlot
+server. It cannot execute Python endpoints without a server hosting them. The
+hosted-service direction is parked; missing capabilities must not be hidden.
+
+See the [design and implementation plan](../development/page-services-design-2026-09-12.md)
+for the proposed phases, actual PoC limitations and collected review questions.
+
+## RPC ownership, delay and busy feedback — owner correction, 2026-09-12
+
+The owner rejects a recipe-level _concurrency option. Use Promise-based request
+handles while retaining useful legacy behavior and SourceNode ownership. A dataRpc
+SourceNode may have one active invocation: another activation is refused before
+transport with busy sound feedback, without queuing or automatic replay. Other
+SourceNodes remain independent. Completion/error releases the node. This supersedes
+the PoC's parallel/latest Data RPC policies; Source replacement is a separate issue.
+
+_delay coalesces triggers before execution using a replaceable SourceNode timer;
+parameters are read at execution. The legacy delay unit is milliseconds. A running
+RPC is not replaced by a timer or a newer response. Authors may use _lockScreen to
+block interaction until completion. Browser audio policy can suppress the sound,
+but must not alter the refusal behavior.
+
+Legacy Button/LightButton share action handling: a nonzero _delay collects clicks
+and passes _counter, event and modifiers to one action; without delay execution is
+immediate with a 200ms repeat-click guard. fire/fire_* carry the count in event Data
+attributes, while publish sends true. Preserve these useful distinctions instead
+of treating every gesture as an unowned imperative callback.
+
+The authorized alignment remains local in codex/datarpc-poc. See the
+[alignment record](../development/rpc-source-node-alignment-2026-09-12.md)
+for implementation, verification and limitations. No integration/publication follows
+implicitly from these decisions.
+
+### Example layout and inspector control (owner correction, 2026-09-12)
+
+Demonstrations must show the running Gramlot panel beside the actual executed
+Python source in CodeMirror, using the shared example layout. Do not reintroduce
+the rejected outlined inspector pictogram or its detached placement. Provide
+inspection within the example layout. The triangle RPC worktree implements this
+presentation locally; it is not yet integrated or released.
+
+
+### Uniform example presentation, final owner correction (2026-09-12)
+
+All example presentations must use the example name as the heading, a bordered
+live pane on the left, a draggable splitter and CodeMirror on the right. Put the
+language above the editor, not in place of the example name. Prefer dark code
+with a slightly smaller font (implemented as 12px). The magnifier and very light
+“Open inspector” text belong immediately below the live pane's border. Python
+is read-only. JavaScript is editable and runs when focus leaves the editor;
+there must be no mandatory Run step. This supersedes the earlier triangle layout
+with an always-open inspector below the code. No presentation exceptions are
+approved. The current tutorial/gallery generator and shared Python example panel
+implement this locally; no release or consumer migration is implied.
+
+
+### Data RPC consolidation accepted as the next step (2026-09-12)
+
+The owner considers the dataRpc experiment ready for consolidation and asks to
+record the decisions. See [consolidated Data RPC contract](../development/data-rpc-consolidated-contract-2026-09-12.md). Consolidation records the
+contract and verifies the existing experiment; it does not imply publication or
+automatically start the remaining backlog. JSON-to-Bag conversion, Page instance
+reuse and page identity remain explicit open questions.
+
+### RPC result metadata: legacy finding to preserve (2026-09-12)
+
+The owner explicitly requests retaining the verified distinction between:
+(1) result-node attributes supplied by `return result, resultattrs` or a BagNode,
+including timings automatically added by standard services such as getSelection;
+(2) general request diagnostics carried in X-Gnr* HTTP headers; and
+(3) envelope siblings such as dataChanges and resource requirements.
+The generic legacy RPC proxy does not inject servertime into every result.
+This records a compatibility finding, not approval of a new Gramlot metadata API.
+See [the consolidated RPC contract](../development/data-rpc-consolidated-contract-2026-09-12.md#automatic-metadata-three-distinct-channels-in-legacy)
+for producers, consumers, units and limitations of the source verification.
+
+
+### Data RPC belongs in 0.1.2 (owner scope change, 2026-09-12)
+
+The owner explicitly moves the implemented Data RPC foundation into the planned
+0.1.2 release. It is no longer reserved for 0.2.0 beta. The worktree implementation
+is integrated locally in the canonical develop checkout without committing or
+moving main. Preserve the latest shared example UI and all unrelated dirty work.
+The legacy resultattrs protocol remains an explicit gap; this scope decision does
+not by itself implement it or authorize publication. See docs/release.md.

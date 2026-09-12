@@ -1,5 +1,18 @@
 # Open work retained from Pages
 
+## Page services foundation for 0.2.0 — experiment authorized, 2026-09-12
+
+Review the [page services design and plan](../development/page-services-design-2026-09-12.md)
+for the contract and execution scope. The owner has now assigned Sol to implement
+P1–P5 and their verification in the existing worktree; grammar expansion is excluded.
+The RPC experiment is local and uncommitted in
+sibling gramlot-datarpc-poc; preserve it. The agent completed P1–P5 locally and the coordinator has implemented the newer owner
+contract: SourceNode-owned busy refusal, no _concurrency, _delay, _lockScreen and
+button action counts. Review the [alignment record](../development/rpc-source-node-alignment-2026-09-12.md)
+before integration. Store scope remains single-process; page_id and JSON-to-Bag
+conversion remain open. Hosted standalone services are deferred. This priority
+precedes freezing the component grammar; it does not activate the broader backlog.
+
 ## Context menus and symbolic-date help — deferred by owner, 2026-09-11
 
 The symbolic-date syntax menu belongs to the general menu design. The owner
@@ -326,3 +339,45 @@ The floating inspector defect found during packaging is corrected: recipe
 compilation now checks SourceBag typing, and reconciliation preserves externally
 attached stores. Browser checks verified populated Data/Source trees, editing and
 close/reopen in both source and bundled modes. See the checkpoint for evidence.
+
+
+## Data RPC consolidation checkpoint — 2026-09-12
+
+Use [consolidated Data RPC contract](../development/data-rpc-consolidated-contract-2026-09-12.md) before resuming server work.
+The next bounded action is integration review of the existing page-services/RPC
+worktree, preserving its local presentation changes. Do not reopen superseded
+_concurrency proposals. Remaining API questions are listed in that contract.
+
+RPC result-contract correction: legacy `mode='bag'` transports a rich envelope,
+including `(value, resultAttrs)` / BagNode results and separate client Data changes.
+Explicitly design result-node metadata before calling the value-only experiment
+complete. See the final section of the consolidated Data RPC contract. This is
+separate from JSON-to-Bag conversion and does not imply restoring XML transport.
+
+When specifying RPC result metadata, preserve the recorded distinction between
+resultattrs, request diagnostic headers and envelope side channels. Decide their
+Gramlot representation explicitly; do not silently add all diagnostics to Data
+node attributes or assume TYTX auto-typing implements the legacy result protocol.
+
+## Database-coherent selectors — legacy investigation
+
+See [legacy dbSelect contract](../development/dbselect-legacy-contract-2026-09-12.md).
+The owner asks to recover its strong database coherence: relation-aware authoring,
+identity resolution versus search, row versus result attributes, invalid current
+values, selected_* propagation and table-change cache invalidation. This is evidence
+for design, not authorization to couple Gramlot core to a database implementation.
+
+
+## 0.1.2 RPC integration — superseding worktree-only status
+
+The owner includes Data RPC in 0.1.2. Runtime, tests and usage documentation are
+now integrated into the canonical develop checkout as uncommitted changes. The
+worktree remains preserved. Next is review/commit/branch integration at the release
+gate, not repeating the file integration. Resultattrs and other open contracts are
+still listed explicitly; no tag, main update or publication has occurred.
+
+
+Commit checkpoint: RPC and examples are recorded in develop commit ef23584.
+The owner authorizes commit and branch push, explicitly without release. Earlier
+instructions to prepare the implementation commit are now satisfied. main and
+version tags remain unchanged; release policy and resultattrs work remain open.

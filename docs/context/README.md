@@ -1,5 +1,17 @@
 # Gramlot project memory
 
+**Release scope update:** the owner includes the Data RPC foundation in **0.1.2**.
+Implementation commit `ef23584` is on develop; the owner authorized commit and
+branch push only. main and release tags have not changed. See [release status](../release.md).
+
+Side discussion retained for future work: [live pandas workspace with Gramlot](../development/live-pandas-workspace-2026-09-12.md).
+It records a user-owned DataFrame hosted by Genro ASGI, visual data acquisition and
+analysis, and WebSocket updates. This is a future consumer-application idea, not
+an active implementation task or a new Gramlot server dependency.
+
+Current RPC consolidation: [consolidated Data RPC contract](../development/data-rpc-consolidated-contract-2026-09-12.md). This is the current entry point for
+approved behavior, local implementation, fresh checks and remaining decisions.
+
 **Current direction — 2026-09-12:** main preserves the consolidated existing line;
 develop carries the 0.2.0 beta design. Review dataRpc/serverCall and remote before
 freezing component grammars. Design precedes an experimental worktree. See the
@@ -7,6 +19,14 @@ freezing component grammars. Design precedes an experimental worktree. See the
 [RPC audit](../development/datarpc-servercall-legacy-audit-2026-09-12.md) and
 [branch policy](../development/branch-policy.md). Later decisions in these records
 supersede earlier priorities and migration-only branch instructions below.
+
+Latest continuation: [live pages, RPC, remote Source and shared-state plan](../development/page-services-design-2026-09-12.md).
+It records the final override/redecoration rule, ready-browser lifecycle, exclusive
+store ownership, revised standalone boundary and the uncommitted RPC experiment.
+The owner subsequently authorized a Sol experiment for page services (P1–P5),
+with verification and without component grammar expansion or publication. The agent
+completed that slice locally; the later [RPC interaction alignment](../development/rpc-source-node-alignment-2026-09-12.md)
+replaces _concurrency with SourceNode-owned busy refusal and restores delay/action semantics.
 
 **Python-first authoring:** application authors work in Python with only small
 local JS fragments when needed. The OpenAPI PoC now uses page.py, openApiClient

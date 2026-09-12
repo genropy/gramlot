@@ -204,7 +204,9 @@ executes them; every widget must not implement its own HTTP stack.
 Dependencies are transitive through inheritance and composition. A host must
 provide the selected services, not merely an HTTP server or FastAPI installation.
 Known requirements can be checked at construction/export; activation must also
-check dynamic dependencies. Standalone pages cannot use server-dependent components.
+check dynamic dependencies. Later owner clarification permits standalone pages
+to use configured external services; the original blanket prohibition is superseded.
+See the [page services plan](page-services-design-2026-09-12.md).
 
 The next compatibility investigation is container remote: it reuses communication
 but returns/manages Source, which adds ownership, required collections, scope and

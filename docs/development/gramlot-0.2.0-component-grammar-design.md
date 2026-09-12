@@ -13,8 +13,9 @@ Builders modification or worktree creation is authorized by this document.
 Owner correction, 2026-09-12, after review of the first design: examine dataRpc
 and remote before proceeding with the component manifesto. Usable server
 communication is a foundation of the target framework, and components that
-require a server are not usable in standalone pages. This requirement takes
-precedence over the earlier experimental sequence below. Phase B remains pending.
+require a server must have their required services available. The later standalone
+clarification permits configured external services; the blanket prohibition is
+superseded. This prerequisite takes precedence over the earlier sequence below.
 
 First compatibility baseline: [legacy dataRpc and serverCall audit](datarpc-servercall-legacy-audit-2026-09-12.md).
 It also traces callable method serialization, previously left unresolved.
@@ -46,9 +47,8 @@ Standalone pages must reject selected components with unsatisfied server
 requirements during construction/export where known, and before activation for
 late-loaded Source. Do not silently substitute mock services or remove behavior.
 Serving a page through HTTP does not establish that the required application
-services exist. Separately clarify the existing use of the word standalone for
-browser-only examples that call external HTTP APIs; this vocabulary question does
-not relax the owner's prohibition on server-dependent standalone components.
+services exist. Standalone packaging does not prohibit configured remote services;
+a hosted Gramlot service for standalone applications is parked for later design.
 
 Open questions for this prerequisite: service reference/exposure syntax; typed
 arguments/results/errors; read versus mutation concurrency; remote Source ownership
@@ -67,8 +67,11 @@ Evidence: [server-services audit](data-services-design-audit.md),
 The owner selected a main/develop cycle. Existing work was consolidated locally
 on main at c5a5b37; develop starts there and retains this design and the RPC audit.
 See [branch policy](branch-policy.md) and [verification checkpoint](consolidation-checkpoint-2026-09-12.md).
-No experimental worktree has been created. The first investigation remains server
-contracts, before component-manifest choices are finalized.
+A later authorized RPC experiment now exists in sibling gramlot-datarpc-poc on
+codex/datarpc-poc, with uncommitted code. main subsequently advanced to 07bf835
+(source version 0.1.2), merged into develop at dbf6eec. See the
+[page services plan](page-services-design-2026-09-12.md) for current evidence.
+Component-manifest choices remain unfinalized.
 
 The agreed first RPC PoC compares triangle area computed by local dataFormula
 with the same calculation performed by a Python method through dataRpc. Both use
@@ -81,6 +84,28 @@ decodes it and assigns the typed value to Data. Numbers, including Decimal when
 returned, are valid results alongside text and Bag. JSON/dict/list conversion to
 Bag remains an explicit unresolved boundary. A numeric triangle result does not
 require resolving that conversion before experimentation.
+
+## Approved method roles — 2026-09-12
+
+The owner selected `@endpoint` for Data-producing methods and `@source` for
+Source-building methods. `main(self, root)` is implicitly @source; additional
+remotely callable methods need an explicit decorator. Initial main content and
+container remote share the Source contract. The existing experimental metadata
+marker has not yet been migrated. See the
+[decision register](../context/decisions.md#data-endpoints-and-remote-source--owner-decision-2026-09-12).
+
+## Approved inheritance and state clarification — 2026-09-12
+
+Library mixins and the base page may supply standard @endpoint/@source methods.
+Normal Python MRO selects implementations and super() composes them. Unchanged
+inherited methods keep their markers; a new override must be decorated again.
+An undecorated override is unexposed, except for implicit Source main. This is the
+owner's final correction, superseding the earlier inherited-role-on-override note.
+A Page is stateless; shared state belongs in a separate dictionary-of-Bags store,
+held exclusively throughout each read/write operation. Exact scope, API and async
+integration remain open. The browser application should be ready before main
+content arrives. See the [page services design and plan](page-services-design-2026-09-12.md)
+for contracts, review questions and the preserved RPC experiment's actual limits.
 
 ## 1. Objective and owner decisions
 
