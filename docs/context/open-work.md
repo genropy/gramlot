@@ -1,3 +1,8 @@
+> Latest release checkpoint (2026-09-12): GitHub v0.1.3 is published from
+> 8c12313. Earlier statements below about unchanged main/tags and no database
+> implementation are historical checkpoints; see [release status](../release.md)
+> and [current context](README.md). Site/Rosetta production deployment is pending.
+
 # Open work retained from Pages
 
 ## After 0.1.3 consolidation: customer dialog

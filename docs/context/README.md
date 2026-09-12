@@ -1,5 +1,13 @@
 # Gramlot project memory
 
+**Published checkpoint — 2026-09-12:** GitHub prerelease `v0.1.3` is published
+from `8c12313`, including the dbSelect and common navigation consolidation.
+Both remote main and develop reached that commit. No PyPI/npm/CDN publication
+was performed. Earlier no-release statements below describe previous checkpoints.
+See [release status](../release.md). Site and Rosetta deployment remains separate
+and pending: their local FastAPI containers use the released wheel; production
+workflow/environment changes require explicit confirmation after approval review.
+
 **dbSelect experiment:** server-backed search and identity lookup are now
 exercised in the separate customer dbSelect example at `/database/customer-select/`. See [scope and verified limits](../development/dbselect-prototype-2026-09-12.md). Included in the owner-requested consolidation commit; no release.
 

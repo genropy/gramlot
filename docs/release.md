@@ -1,5 +1,18 @@
 # Gramlot release status
 
+## Published GitHub prerelease: 0.1.3
+
+Published on 2026-09-12 from tag `v0.1.3`, commit `8c12313`.
+[GitHub assets](https://github.com/genropy/gramlot/releases/tag/v0.1.3) include
+wheel, sdist, browser ZIP and checksums. The release workflow completed all CI
+gates. The release is explicitly pre-alpha; no PyPI, npm or CDN upload was made.
+The previous PyPI release remains 0.1.0a1.
+
+Local full Python verification: 152 passed. Browser ZIP/wheel parity: 46
+identical files. Consumer site/Rosetta migration and deployment are separate.
+
+The source-version checkpoints below describe earlier authorization stages.
+
 ## Current source version: 0.1.3
 
 The owner assigned **0.1.3** on 2026-09-12 and authorized commit and push to
