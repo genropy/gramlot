@@ -118,18 +118,13 @@ def test_preview_build_uses_the_executed_sources(tmp_path):
         page = (output / "lessons" / slug / "index.html").read_text()
         for example in lesson.get("examples", [{"path": "."}]):
             example_path = Path(slug) / example["path"]
-            for extension in ("py", "js"):
+            for extension in ("py",):
                 if {"py": "python", "js": "javascript"}[extension] not in lesson.get("languages", ["python", "javascript"]):
                     continue
                 recipe = (EXAMPLES / example_path / f"recipe.{extension}").read_text()
                 assert (output / "lessons" / example_path / f"recipe.{extension}").read_text() == recipe
-                if "examples" in lesson:
-                    body = module.recipe_body(recipe, extension)
-                    assert 1 <= len(body.splitlines()) <= 4
-                    assert page.count(escape(body)) == 1
-                    assert escape(recipe) not in page
-                else:
-                    assert escape(recipe) in page
+                assert escape(recipe) in page
+                assert 'data-language="javascript"' not in page
             assert (output / "lessons" / example_path / "recipe.tytx").is_file() == (
                 "python" in lesson.get("languages", ["python", "javascript"]))
     slider_page = (output / "lessons" / "11-source-slider" / "index.html").read_text()
@@ -145,11 +140,11 @@ def test_preview_build_uses_the_executed_sources(tmp_path):
     assert 'function populate' in (output / "assets" / "contact-data.js").read_text()
     page = (output / "lessons" / "10-local-logic" / "index.html").read_text()
     assert "Complete Python file" not in page
-    assert page.count('class="recipe-editor"') == 8
+    assert page.count('class="recipe-editor"') == 4
     assert page.count('readonly aria-label="Python code (read only)"') == 4
     assert page.count('data-action="run"') == 0
-    assert page.count('class="code-language"') == 8
-    assert page.count('class="inspector-tool"') == 8
+    assert page.count('class="code-language"') == 4
+    assert page.count('class="inspector-tool"') == 4
     assert (output / "assets" / "lab.js").is_file()
     runtime = next((output / "runtime").iterdir())
     assert (runtime / "dom" / "collections" / "forms.js").is_file()
@@ -194,6 +189,10 @@ def test_gallery_covers_the_component_catalogue_and_mounts_cases(tmp_path):
     catalogue = json.loads((output / "gallery/catalogue.json").read_text())
     for collection in catalogue["collections"]:
         for component in collection["components"]:
+            if component["name"] == "dbSelect":
+                # Requires the server-backed customer test, not a standalone frame.
+                assert (ROOT / "tests/browser/dbselect.spec.js").is_file()
+                continue
             page = output / "gallery" / collection["name"] / component["name"] / "index.html"
             content = page.read_text()
             assert 'aria-current="page"' in content

@@ -214,11 +214,17 @@ def build(output: Path) -> None:
     gallery_spec.loader.exec_module(gallery)
     catalogue = json.loads((PROJECT_ROOT / "js/dom/src/components/builtin-components.json").read_text())
     gallery_lessons = gallery.prepare(output, catalogue)
+    navigation_entries = [dict(title='Component gallery', url='/gallery/', group='Components')]
+    for item in lessons + gallery_lessons:
+        navigation_entries.append(dict(title=item['title'],
+            url='/' + item.get('_base', 'lessons/' + item['slug']) + '/',
+            group=('Components / ' if item.get('_gallery') else 'Tutorial / ') + item['group']))
+    write(output, 'navigation.json', json.dumps(navigation_entries))
     for index, lesson in enumerate(lessons + gallery_lessons, 1):
         slug = lesson["slug"]
         folder = Path(lesson.get("_folder", HERE / slug))
         base = lesson.get("_base", f"lessons/{slug}")
-        languages = lesson.get("languages", ["python", "javascript"])
+        languages = ["python"]  # JavaScript editing belongs in the playground.
         examples = lesson.get("examples", [{"path": ".", "title": lesson["title"]}])
         sections = []
         for example in examples:
@@ -236,9 +242,7 @@ def build(output: Path) -> None:
                 source = (example_folder / f"recipe.{extension}").read_text()
                 write(output, f"{example_base}/recipe.{extension}", source)
                 write(output, f"{example_base}/{language}.html", frame(example["title"], language, runtime_base, True, lesson.get("support"), lesson.get("editor_collection", False)))
-                compact = "examples" in lesson and not (
-                    language == "javascript" and source.lstrip().startswith("import ")
-                )
+                compact = False  # Display the entire executed module, including methods and decorators.
                 displayed = recipe_body(source, extension) if compact else source
                 mode = "body" if compact else "module"
                 if language == "javascript":
@@ -264,8 +268,7 @@ def build(output: Path) -> None:
                        ) + '</div>'
                     f'{divider}<div class="code-pane"><div class="code-language">{label}</div>{code}</div></div></section>'
                 )
-            intro = (f'<h2>{escape(example["title"])}</h2>'
-                     f'<p>{escape(example.get("description", ""))}</p>') if "examples" in lesson else ""
+            intro = f'<p>{escape(example.get("description", ""))}</p>' if "examples" in lesson else ""
             sections.append(f'<section>{intro}<div class="examples">{"".join(panels)}</div></section>')
         reference = lesson.get("reference")
         reference_link = (

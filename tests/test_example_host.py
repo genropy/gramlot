@@ -16,9 +16,18 @@ def test_common_host_serves_examples_and_fixture_contract(tmp_path):
     spec.loader.exec_module(module)
     (tmp_path / 'runtime/version/dom').mkdir(parents=True)
     (tmp_path / 'runtime/version/dom/example.js').write_text('export const example = true;')
-    (tmp_path / 'index.html').write_text('Tutorial fixture')
+    (tmp_path / 'index.html').write_text('<html><head></head><body>Tutorial fixture</body></html>')
     with TestClient(module.create_app(tmp_path)) as client:
-        assert client.get('/').text == 'Tutorial fixture'
+        assert 'Tutorial fixture' in client.get('/').text
+        assert 'example-navigation' in client.get('/').text
+        for url in ('/page/triangle/', '/hello/hello/', '/openapi/'):
+            assert 'id="example-navigation"' in client.get(url).text
+        assert 'id="example-navigation"' not in client.get('/example-navigation/').text
+        response = client.get('/example-navigation/recipe', params={'current':'/page/triangle/'})
+        assert response.status_code == 200
+        assert 'Triangle RPC' in response.text
+        assert 'DB not enabled' in response.text
+        assert 'aria-current' in response.text
         assert client.get('/runtime/dom/example.js').status_code == 200
         assert client.get('/page/triangle/').status_code == 200
         assert client.get('/hello/hello/').status_code == 200

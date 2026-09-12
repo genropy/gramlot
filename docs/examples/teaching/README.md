@@ -11,29 +11,20 @@ Build prepared runtime assets and the preview from the repository root:
 .venv/bin/python docs/examples/serve.py
 ```
 
-Open http://127.0.0.1:8051/. The common FastAPI host builds the assets and serves all examples. Each lesson shows Python above
-JavaScript, with the live example on the left and its code on the right.
-The live/code order is retained on narrow screens. The Python frame executes the generated TYTX
-from `recipe.py`; the JavaScript frame imports and executes `recipe.js`.
+Open http://127.0.0.1:8051/. The common FastAPI host serves all examples.
+Each example shows its bordered live panel on the left and its complete Python
+source in read-only CodeMirror on the right, separated by a thin splitter.
+The Python frame executes TYTX generated from the same `recipe.py` displayed in
+full: imports, class, setup and all methods are retained. FastAPI page examples
+likewise show the entire page module, including `@endpoint` and `@source` methods.
+
+JavaScript variants are no longer repeated beneath the Python examples.
+Interactive JavaScript authoring belongs in the playground. Existing JavaScript
+recipe files remain available in the repository.
 
 Keep each example focused on one concept. Explanations belong in the manifest,
 outside the executable recipe. Do not add headings, counters, controller effects,
 layout or initialization merely to decorate another concept's example.
-
-Lesson 10 contains four independent examples with three or four recipe statements
-each: reactive formula, passive read, inline expression and controller. The preview
-extracts the actual `main`/`build` body and displays it once. No executable setup
-is omitted from the displayed body. Fields start
-empty; entering values triggers the logic. There are 13 Python/JavaScript pairs
-across the ten lessons.
-
-Python code is displayed once in CodeMirror with Python highlighting and read-only
-state. JavaScript code is editable in CodeMirror. Leaving the JavaScript editor rebuilds that
-example; Reset restores its original code and fresh Data. Edits are local to
-the browser and are lost on reload. Compilation errors are shown without removing
-the previous example; a subsequent Run or Reset can recover. CodeMirror uses
-the same pinned CDN modules as the existing playground, with an explicit basic
-textarea fallback if the CDN is unavailable.
 
 The header's Show null values preference enables null background decoration and
 is saved in the browser; it defaults off. Toggling it updates all example frames

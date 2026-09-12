@@ -465,6 +465,9 @@ def prepare(output, catalogue):
     for collection in catalogue['collections']:
         for component in collection['components']:
             name = component['name']
+            if name == 'dbSelect':
+                # Server-only example is hosted at /database/states/, not in a standalone frame.
+                continue
             if name not in CASES:
                 raise ValueError(f'Missing gallery cases for {name}')
             base = f"gallery/{collection['name']}/{name}"

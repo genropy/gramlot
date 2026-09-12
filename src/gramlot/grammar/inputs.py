@@ -15,6 +15,9 @@ class InputDeclarations:
     @element(sub_tags='', _meta={'webcomponent': True, 'render_tag': 'gnr-filteringselect'})
     def filteringSelect(self, **kwargs): ...
 
+    @element(sub_tags='', _meta={'webcomponent': True, 'render_tag': 'gnr-dbselect'})
+    def dbSelect(self, **kwargs): ...
+
     @element(sub_tags='', _meta={'webcomponent': True, 'render_tag': 'gnr-combobox'})
     def comboBox(self, **kwargs): ...
 

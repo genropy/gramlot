@@ -1,0 +1,20 @@
+import {test,expect} from '@playwright/test';
+test('customer lookup in separate page',async({page})=>{
+ test.skip(!process.env.GRAMLOT_STATES_URL, 'Requires the optional Genropy database host');
+ const base=new URL(process.env.GRAMLOT_STATES_URL).origin;
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base+'/database/customer-select/');
+ const select=page.locator('gnr-dbselect');
+ await select.getByRole('button',{name:'Show options'}).click();
+ const option=select.getByRole('option').first();await expect(option).toBeVisible();
+ const caption=await option.textContent();await option.click();
+ await expect(select.locator('input')).toHaveValue(caption);
+ await expect(page.locator('.example-live')).toContainText('Name: '+caption);
+ await expect(page.locator('.example-live')).toContainText('Customer ID:');
+ await select.locator('input').fill(caption.slice(0,4));
+ await expect(select.getByRole('option',{name:caption,exact:true})).toBeVisible();
+ expect(errors).toEqual([]);
+ await page.goto(base+'/database/states/');
+ await expect(page.locator('gnr-grid')).toHaveCount(3);
+ await expect(page.locator('gnr-dbselect')).toHaveCount(0);
+});

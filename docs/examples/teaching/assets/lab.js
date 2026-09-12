@@ -95,6 +95,9 @@ async function installEditor(row, textarea) {
         host.className = 'recipe-editor-codemirror';
         textarea.insertAdjacentElement('afterend', host);
         const editor = new EditorView({
+            // The editor lives in light DOM even when its host is slotted into a
+            // borderContainer. Mount styles in the document, not that shadow root.
+            root: document,
             parent: host,
             doc: textarea.value,
             extensions: [

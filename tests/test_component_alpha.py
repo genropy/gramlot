@@ -23,7 +23,8 @@ def test_every_catalogued_recipe_accepts_runtime_attributes():
     builder = GramlotBuilder()
     for collection in catalog['collections']:
         for component in collection['components']:
-            node = getattr(builder.root, component['name'])(value='^record.value', extension_flag=True)
+            required = {'rpcmethod': 'lookup'} if component['name'] == 'dbSelect' else {}
+            node = getattr(builder.root, component['name'])(value='^record.value', extension_flag=True, **required)
             assert node.node.node_tag == component['name']
             assert node.node.attr['value'] == '^record.value'
             assert node.node.attr['extension_flag'] is True

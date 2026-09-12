@@ -5,14 +5,14 @@
 def example_panel(root, source_text: str, title: str):
     """Return a bordered live pane beside its exact read-only Python source."""
     root.styleSheet('''
-        .example-shell { padding:16px; box-sizing:border-box; font:13px system-ui,sans-serif; }
-        .example-heading { font:600 15px system-ui,sans-serif; margin:0 0 10px; }
-        .example-live-column { padding-right:10px; box-sizing:border-box; }
-        .example-live { border:1px solid #dce3ee; border-radius:5px; padding:16px;
+        .example-shell { padding:10px; box-sizing:border-box; font:13px system-ui,sans-serif; }
+        .example-heading { font:500 14px system-ui,sans-serif; margin:0 0 6px; }
+        .example-live-column { padding-right:4px; box-sizing:border-box; }
+        .example-live { border:1px solid #dce3ee; border-radius:5px; padding:10px;
             box-sizing:border-box; background:white; overflow:auto; }
         .example-code { background:#282c34; color:#abb2bf; border:1px solid #343b48;
             border-radius:5px; box-sizing:border-box; overflow:auto; }
-        .example-code-label { padding:6px 12px; font:11px/1.4 system-ui,sans-serif; border-bottom:1px solid #343b48; }
+        .example-code-label { padding:4px 10px; font:11px/1.4 system-ui,sans-serif; border-bottom:1px solid #343b48; }
         .example-code gnr-codemirror { --code-editor-height:calc(100vh - 125px); --code-editor-font-size:12px; border:0; }
         .example-inspector-toggle { font:300 11px/1.4 system-ui,sans-serif; color:#9ba3af;
             background:transparent; border:0; padding:3px 0; margin:0; cursor:pointer; }

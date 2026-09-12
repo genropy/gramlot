@@ -61,6 +61,10 @@ export class HtmlRenderer extends RendererBase {
             runtimeAttrs = attrs;
         }
         const el = document.createElement(tag);
+        if (tag === 'gnr-dbselect') {
+            node.handler.application.server.requireCapability();
+            el.sourceNode = node;
+        }
         if (tag === 'gnr-grid') {
             el.sourceNode = node;
             const {store, columns = [], structpath, identifier = null, selectedKey = null,

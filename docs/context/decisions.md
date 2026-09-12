@@ -736,3 +736,22 @@ DB-API 2 is the useful underlying reference, but adapters must handle their actu
 row representations explicitly. Avoid lossy fetchAsJson string serialization before
 TYTX. Exact field names for rows, identity and metadata remain to be designed;
 this does not authorize converting every arbitrary RPC JSON object into a Bag.
+
+## Example navigation icons — owner correction, 2026-09-12
+
+The unified example tree must retain the existing lightweight navigation icons;
+black native details disclosure triangles are not acceptable. Reuse
+`docs/examples/teaching/assets/navigation-tree.css` for folder/book/file/grid
+icons, with compact density overrides. Suppress native markers rather than
+reintroducing them when rebuilding or unifying the navigation shell.
+
+### Examples show complete Python modules; JavaScript belongs in the playground
+
+Owner decision, 2026-09-12: do not repeat JavaScript variants underneath Python
+examples. Tutorial and gallery panels display the complete executed Python file,
+including imports, class declarations, setup, methods and decorators. FastAPI
+example pages retain their existing full-module source view, including endpoints.
+JavaScript experimentation belongs in the playground; repository JavaScript
+recipes are preserved. This supersedes the earlier paired Python/JavaScript
+presentation and compact method-body display. Local verification compared all
+94 Python panels across 55 generated pages with their executed recipe files.

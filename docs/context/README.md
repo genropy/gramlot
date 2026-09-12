@@ -1,5 +1,13 @@
 # Gramlot project memory
 
+**dbSelect experiment:** server-backed search and identity lookup are now
+exercised in the separate customer dbSelect example at `/database/customer-select/`. See [scope and verified limits](../development/dbselect-prototype-2026-09-12.md). Included in the owner-requested consolidation commit; no release.
+
+**Example navigation consolidation (local, after 0.1.3):** all top-level examples
+share one Python-authored Gramlot navigation tree under the FastAPI host on 8051,
+including the optional states/localities/customers application. The 8052 preview
+was stopped. See [the host guide](../examples/README.md). Included in the owner-requested consolidation commit; no release.
+
 **Latest consolidation: 0.1.3.** The owner authorizes committing and pushing the
 completed stores, Genropy contrib and three-grid example to develop, without
 release/tag. Customer double-click/dialog work is paused before implementation.

@@ -17,6 +17,7 @@ const catalogue = JSON.parse(readFileSync(join(root, 'catalogue.json'), 'utf8'))
 let count = 0;
 for (const collection of catalogue.collections) {
     for (const component of collection.components) {
+        if (component.name === 'dbSelect') continue; // Covered against the server in browser/dbselect.spec.js.
         const folder = join(root, collection.name, component.name);
         const cases = readdirSync(folder).filter(name => /^\d+$/.test(name));
         if (component.name === 'grid') cases.push(...readdirSync(join(folder, 'attributes'))

@@ -1,6 +1,8 @@
 # Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 """Run all repository examples through the optional FastAPI adapter."""
 import argparse
+import importlib.util
+from urllib.parse import urlencode
 import os
 from pathlib import Path
 import subprocess
@@ -37,7 +39,21 @@ def create_app(preview: Path | None = None, *, genropy_application=None) -> Fast
         raise ValueError('Expected one generated runtime version; rebuild the examples.')
     app = FastAPI(title='Gramlot examples')
     mount_gramlot(app, HERE / 'triangle-rpc', prefix='/page', title='Triangle RPC')
-    mount_gramlot(app, HERE / 'hello', prefix='/hello', title='Hello pages')
+    navigation_host = mount_gramlot(app, HERE / 'hello', prefix='/hello', title='Hello pages')
+    spec = importlib.util.spec_from_file_location('gramlot_example_navigation', HERE / 'navigation.py')
+    navigation = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(navigation)
+    entries = navigation.catalogue(preview, database=genropy_application is not None)
+
+    @app.get('/example-navigation/')
+    def navigation_document(current: str = '/'):
+        return navigation_host.html_document('/example-navigation/recipe?' + urlencode({'current':current}), inspector=False)
+
+    @app.get('/example-navigation/recipe')
+    def navigation_recipe(current: str = '/'):
+        return navigation_host.recipe_response(navigation.recipe(entries, current))
+
+    app.add_middleware(navigation.ExampleNavigationShell, imports=navigation_host.runtime.import_map())
 
     if genropy_application is not None:
         from gramlot.contrib.fastapi_genropy import mount_genropy

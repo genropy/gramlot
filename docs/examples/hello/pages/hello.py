@@ -6,5 +6,7 @@ from gramlot.page import WebPage
 class Page(WebPage):
     """Display a greeting to introduce a Python-authored Gramlot page."""
 
+    example_view = True
+
     def main(self, root):
         root.h1("Hello World")

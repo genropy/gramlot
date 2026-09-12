@@ -14,6 +14,7 @@
  * elements are defined lazily (in defineComponents), so importing this
  * module needs no DOM.
  */
+import {defineDbSelect} from './db-select.js';
 import {getComponentBases} from '../components/bases.js';
 import {defineDateCalendar} from './date-calendar.js';
 import {NumberEditor} from './number-editor.js';
@@ -502,6 +503,7 @@ function defineComponents() {
     customElements.define('gnr-textbox', GnrTextBox);
     customElements.define('gnr-textboxarea', GnrTextBoxArea);
     customElements.define('gnr-filteringselect', GnrFilteringSelect);
+    customElements.define('gnr-dbselect', defineDbSelect(GnrFilteringSelect));
     customElements.define('gnr-combobox', GnrComboBox);
     customElements.define('gnr-passwordbox', GnrPasswordbox);
     customElements.define('gnr-numbertextbox', GnrNumberTextBox);

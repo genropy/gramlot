@@ -40,6 +40,18 @@ export const BUILTIN_COMPONENTS = [
         ]
       },
       {
+        "name": "dbSelect",
+        "tag": "gnr-dbselect",
+        "subTags": "",
+        "pythonGroup": "InputDeclarations",
+        "capabilities": [
+          "control",
+          "decoration",
+          "null",
+          "field-state"
+        ]
+      },
+      {
         "name": "comboBox",
         "tag": "gnr-combobox",
         "subTags": "",

@@ -54,3 +54,14 @@ header{min-height:68px;background:#f5f7fb;padding:18px 28px}
 .lab-divider { background:transparent; }
 .example-code.resizable { grid-template-columns:minmax(0,calc(var(--example-width,50%) - 3px)) 6px minmax(0,1fr); }
 .lab-divider { display:block; }
+
+/* Compact documentation chrome; leave live widget sizes to their recipes. */
+.app-shell main h1 { font-size:24px; line-height:1.2; margin:8px 0 12px; }
+.app-shell main h2 { font-size:17px; line-height:1.3; margin:10px 0 6px; }
+.app-shell main .eyebrow { font-size:10px; margin:0 0 6px; }
+.app-shell main .lead { font-size:14px; line-height:1.45; margin:8px 0 12px; }
+.app-shell main > section { margin-block:18px; }
+.app-shell main > section > p { font-size:13px; margin:6px 0 10px; }
+.examples { gap:12px; }
+.panel.lab-row h3 { padding:0 0 6px; font-size:14px; font-weight:500; }
+.code-language { padding:4px 10px; }

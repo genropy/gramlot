@@ -35,7 +35,7 @@ that run is not evidence against the aligned configuration.
 See [store design and implementation checkpoint](../../development/collection-store-design-2026-09-12.md).
 
 The opt-in browser regression is `tests/browser/states-grid.spec.js`; set
-`GRAMLOT_STATES_URL=http://127.0.0.1:8052/database/states/` when running Playwright
+`GRAMLOT_STATES_URL=http://127.0.0.1:8051/database/states/` when running Playwright
 against a prepared local instance. It does not start or populate a database.
 
 ## State → localities
