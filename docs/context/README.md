@@ -1,5 +1,11 @@
 # Gramlot project memory
 
+**Site PostgreSQL/Genropy checkpoint:** site `v0.1.5` is deployed with the complete
+fictional invoice database (18 application tables, 17,511 rows). Database pages
+use `GenropyPage` and `GnrApp` against dedicated PostgreSQL. This supersedes the
+initial SQLite demo. Framework and Rosetta remain `v0.1.3`; their releases are
+separate from the site. See [release status](../release.md) for verified scope.
+
 **Published checkpoint — 2026-09-12:** GitHub prerelease `v0.1.3` is published
 from `8c12313`, including the dbSelect and common navigation consolidation.
 Both remote main and develop reached that commit. No PyPI/npm/CDN publication

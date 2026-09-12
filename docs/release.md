@@ -13,7 +13,38 @@ identical files. Consumer site/Rosetta migration and deployment are separate.
 
 The source-version checkpoints below describe earlier authorization stages.
 
-## Consumer production deployment: 2026-09-12
+## Site 0.1.5: complete PostgreSQL demo through Genropy
+
+The separate site tag `v0.1.5` (commit `5054e94`) was deployed successfully:
+[release CI](https://github.com/genropy/gramlot-site/actions/runs/34718597461).
+Framework remains `v0.1.3`; Rosetta remains `v0.1.3` with the public verification
+limits recorded below. This site checkpoint supersedes the earlier SQLite demo.
+
+The owner confirmed the invoice data is fictional and requested the complete
+application database, PostgreSQL and installed Genropy. A native dump of all
+18 physical `invc` tables was transferred over SSH and restored into a dedicated
+PostgreSQL 17 service. The snapshot contains 17,511 rows, including 3,200 customers,
+800 localities, 1,695 products, 256 invoices and 806 invoice rows. Notes, yearly
+prices and remaining lookup tables are included. Administrative data is excluded
+except referenced identity keys required by the staff relation. The model's
+`product_group` table does not exist in the source database and was not fabricated.
+The original database is untouched; this is a snapshot, not live replication.
+
+The site installs Genropy from public revision
+`418b4454a6e08445817e858a1b5d2a2c91c2dbf5`, with matching models and a checksummed
+wheel. FastAPI mounts `GnrApp` through `gramlot.contrib.fastapi_genropy`;
+both database pages inherit `GenropyPage` and query through
+`self.db.table(...).query(...).fetch()`. Application database access is SELECT-only.
+The raw dump remains on the database host, outside GitHub and the site image.
+CI uses separate minimal fixtures.
+
+Production verification through `GnrApp` passed all 18 table counts and foreign-key
+checks. Both public browser scenarios passed: [linked state grids](https://www.gramlot.org/database/states/)
+and [customer lookup](https://www.gramlot.org/database/customer-select/), including
+state switching, reload and complete Python source display. Customer lookup
+returns up to ten suggestions per search; that is not the database size.
+
+## Earlier consumer production deployment: 2026-09-12
 
 The owner explicitly authorized workflow/environment changes and production.
 Both consumers now verify ordinary main pushes without publishing; validated
@@ -27,9 +58,9 @@ environments accept v* tags only, with no untagged manual deployment bypass.
   [successful CI/deploy](https://github.com/genropy/gramlot-rosetta/actions/runs/34714618801).
   Image digest: `sha256:6fe64122d9c4ce3dcc29f6e4c13f2d514ca6faa8975f16cdf6fe7abf9a6da375`.
 
-Both public health endpoints report the same released wheel SHA256:
+At this checkpoint, both public health endpoints reported the same released wheel SHA256:
 `893b9a75a10437f239739b70f635a602dac24864e68b0c1de4deea2cc80dfae2`.
-Both hosts use FastAPI. The public customer dbSelect demo uses synthetic SQLite
+Both hosts use FastAPI. The initial public customer dbSelect demo used synthetic SQLite
 fixtures; no local legacy customer data was copied to production. Production
 images remain private; host deployment retains the previous digest for rollback.
 Framework, site and Rosetta tags are distinct releases; none was moved.
