@@ -65,7 +65,12 @@ export class HtmlRenderer extends RendererBase {
             el.sourceNode = node;
             const {store, columns = [], structpath, identifier = null, selectedKey = null,
                 rowHeight = 26, frozenColumns = 0, datamode = 'bag', ...attrs} = runtimeAttrs;
-            el.configureStore(store, {identifier, datamode});
+            if (typeof store === 'string') {
+                if (node.getAttr('identifier') != null || node.getAttr('datamode') != null) {
+                    throw new Error('Named grid stores own identifier and datamode');
+                }
+                el.useCollectionStore(node.handler.application.stores.get(store));
+            } else el.configureStore(store, {identifier, datamode});
             el.locale = displayLocale(node, runtimeAttrs, el.ownerDocument);
             if (node.getAttr('structpath')) el.structBag = structpath;
             else el.columns = columns;

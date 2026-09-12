@@ -85,3 +85,43 @@ Dependencies
 The ``fastapi`` extra adds FastAPI and Uvicorn.
 The shared frontend is distributed in the Gramlot wheel alongside runtime
 assets. Rebuilding the framework wheel is separate from authoring Python pages.
+
+Optional GenroPy database host
+------------------------------
+
+``gramlot.contrib.fastapi_genropy`` adds an explicit adapter above FastAPI. Pass
+an already initialized ``GnrApp`` to keep application construction under host
+control:
+
+.. code-block:: python
+
+   from gnr.app.gnrapp import GnrApp
+   from gramlot.contrib.fastapi_genropy import create_genropy_application
+
+   gnr_app = GnrApp('test_invoice_pg')
+   app = create_genropy_application('.', genropy_application=gnr_app)
+
+A page inherits ``GenropyPage`` and uses the ordinary endpoint decorator:
+
+.. code-block:: python
+
+   from gramlot.contrib.fastapi_genropy import GenropyPage
+   from gramlot.page import endpoint
+
+   class Page(GenropyPage):
+       @endpoint
+       def customers(self):
+           return self.db.table('invc.customer').query().fetchAsBag()
+
+       def main(self, root):
+           root.button('Load', action='FIRE .load;')
+
+``self.db`` is lazy and restricted to synchronous services. The adapter runs DB
+context setup, the method, legacy Bag conversion and cleanup on the same worker.
+It closes the worker's connections in ``finally`` and never commits implicitly;
+page code must call ``self.db.commit()`` explicitly when a write should commit.
+Return legacy Bags only after their values are materialized. Legacy resolvers,
+selections, query objects and the legacy ``(value, resultAttrs)`` tuple protocol
+are rejected. Importing the adapter does not import GenroPy. When no application
+is supplied, ``create_genropy_application`` lazily imports GenroPy and constructs
+``GnrApp(instance_name)``, whose default instance name is ``test_invoice_pg``.

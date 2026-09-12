@@ -29,3 +29,16 @@ ES modules for development. An invalid or incomplete present browser manifest
 fails explicitly rather than silently switching runtime versions. The browser
 ZIP and the corresponding Python wheel are intended to contain the same payload;
 see [browser distribution](development/browser-distribution-proposal.md).
+
+
+## Common example environment
+
+All repository examples now use one FastAPI host:
+
+```sh
+.venv/bin/python docs/examples/serve.py
+```
+
+See [example routes and instructions](examples/README.md). The static tutorial
+and gallery remain browser recipes, and Python endpoints use the same optional
+adapter. No GenroPy or Genro ASGI installation is required.

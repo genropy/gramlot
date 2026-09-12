@@ -62,7 +62,7 @@ function defineComponents() {
             this._frame.addEventListener('scroll', () => this._renderRows());
         }
 
-        get storeBag() { return this._storeBag || null; }
+        get storeBag() { return this._store?.getData() || this._storeBag || null; }
         get structBag() { return this._structBag || null; }
         structbag() { return this.structBag; }
         set structBag(value) {
@@ -91,9 +91,31 @@ function defineComponents() {
         get datamode() { return this._datamode || 'bag'; }
         set datamode(value) { this.configureStore(this._storeBag, {identifier:this.identifier, datamode:value}); }
         collectionStore() { return this._store || null; }
+        useCollectionStore(store) {
+            if (store === this._sharedStore) return;
+            this.changeManager?.dispose();
+            this._unsubscribe?.();
+            if (this._store && !this._sharedStore) this._store.dispose();
+            this._sharedStore = store;
+            this._store = store;
+            this._storeBag = store?.getData() || null;
+            this._identifier = store?.identifier || null;
+            this._datamode = store?.datamode || 'bag';
+            this._unsubscribe = this.isConnected && store ? store.subscribe(() => this._storeChanged()) : null;
+            if (this.isConnected) {
+                this.changeManager = new GridChangeManager(this);
+                this.changeManager.configure(this.structBag ? gridColumnDefinitionsFromStruct(this.structBag) : this._columnDefinitions);
+                this._storeChanged();
+            }
+        }
         configureStore(bag, {identifier = null, datamode = 'bag'} = {}) {
+            if (this._sharedStore) this.useCollectionStore(null);
             if (!['bag','attr'].includes(datamode)) throw new TypeError('datamode must be bag or attr');
             if (this._store) this._store.configure(bag, {identifier, datamode});
+            else if (this.isConnected) {
+                this._store = new BagGridStore(bag, {identifier, datamode});
+                this._unsubscribe = this._store.subscribe(() => this._storeChanged());
+            }
             this._storeBag = bag; this._identifier = identifier; this._datamode = datamode;
         }
         _syncHorizontal(columns = this._columns) {
@@ -171,6 +193,7 @@ function defineComponents() {
                 this._store = new BagGridStore(this._storeBag, {identifier:this._identifier, datamode:this.datamode});
                 this._unsubscribe = this._store.subscribe(() => this._storeChanged());
             }
+            if (!this._unsubscribe) this._unsubscribe = this._store.subscribe(() => this._storeChanged());
             this.changeManager = new GridChangeManager(this);
             if (this.structBag) this._structureChanged();
             else this.changeManager.configure(this._columnDefinitions);
@@ -181,9 +204,11 @@ function defineComponents() {
                 this._resizeObserver.observe(this._frame);
             }
         }
-        disconnectedCallback() { this._clearStructureSubscriptions(); this._cancelResize?.(); this._resizeObserver?.disconnect(); this.changeManager?.dispose(); this.changeManager = null; this._unsubscribe?.(); this._unsubscribe = null; this._store?.dispose(); this._store = null; }
+        disconnectedCallback() { this._clearStructureSubscriptions(); this._cancelResize?.(); this._resizeObserver?.disconnect(); this.changeManager?.dispose(); this.changeManager = null; this._unsubscribe?.(); this._unsubscribe = null; if (!this._sharedStore) this._store?.dispose(); this._store = this._sharedStore || null; }
 
         _storeChanged() {
+            this._storeBag = this._store?.getData() || null;
+            if (!this._store) return;
             if (this._formulaMutationDepth) { this._formulaRenderPending = true; return; }
             if (this._store.error) { this._renderError(this._store.error); return; }
             if (this._selectedKey != null && !this._store.row(this._selectedKey)) this._choose(null, 'reconcile');

@@ -52,6 +52,8 @@ const BASE_GRAMMAR = {
         dataFormula: { sub_tags: '', _meta: { data_element: 'formula' } },
         dataController: { sub_tags: '', _meta: { data_element: 'controller' } },
         dataRpc: { sub_tags: '', _meta: { data_element: 'rpc' } },
+        rpcStore: { sub_tags: '', _meta: { data_element: 'rpc' } },
+        bagStore: { sub_tags: '', _meta: { data_element: 'store' } },
         remoteSource: { sub_tags: '', _meta: { data_element: 'source' } },
     },
 };
@@ -428,12 +430,12 @@ export class BuilderBase {
         const out = {};
         const ownFields = node.nodeTag === 'dataFormula'
             ? new Set(['destination', 'formula', 'func', '_on_start', '_delay'])
-            : ['dataRpc', 'remoteSource'].includes(node.nodeTag)
+            : ['dataRpc', 'rpcStore', 'remoteSource'].includes(node.nodeTag)
                 ? new Set(RPC_ELEMENT_FIELDS)
                 : new Set(['destination', 'func', '_on_start', '_delay']);
         for (const [k, v] of Object.entries(resolved)) {
             if (!ownFields.has(k)
-                    && !(['dataRpc', 'remoteSource'].includes(node.nodeTag) && k.startsWith('_'))) {
+                    && !(['dataRpc', 'rpcStore', 'remoteSource'].includes(node.nodeTag) && k.startsWith('_'))) {
                 out[k] = v;
             }
         }

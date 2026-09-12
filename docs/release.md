@@ -1,19 +1,25 @@
 # Gramlot release status
 
-Latest checkpoint: implementation commit `ef23584` on develop contains the
-integrated RPC foundation and example presentation. The owner authorized committing
-and pushing develop, explicitly without release. Historical uncommitted checkpoints
-below describe the preceding verification. No tag or publication is authorized.
+## Current source version: 0.1.3
 
-## Current source version: 0.1.2
+The owner assigned **0.1.3** on 2026-09-12 and authorized commit and push to
+`develop`, without a tag or publication. Python and internal JavaScript metadata
+are aligned; browser manifests derive the version when rebuilt. Gramlot remains
+pre-alpha; 0.2.0 beta remains the next development target.
 
-The owner assigned version **0.1.2** to the consolidated current line on
-2026-09-12. Python and internal JavaScript package metadata use this version;
-browser manifests derive it when rebuilt. This is a source version assignment,
-not a published release. No 0.1.2 tag or publication has been performed.
-Gramlot remains pre-alpha; 0.2.0 beta is the next development target.
-Previously built 0.1.0a1 artifacts are historical candidates and must not be
-renamed or presented as 0.1.2. Rebuild and verify before any release.
+This checkpoint includes the shared resident/RPC stores, optional
+`gramlot.contrib.fastapi_genropy`, the common FastAPI example host and the live
+states → localities/customers example. The customer double-click dialog was
+requested but paused before implementation when the owner chose consolidation.
+The previous Data RPC foundation is already recorded in ef23584/bef2f15.
+
+The states and customer queries were verified against local PostgreSQL, with
+browser checks for state-driven detail loading. Broader collection features and
+the general RPC resultattrs protocol remain open. Source version assignment and
+branch push do not constitute a release. Previously built artifacts retain their
+original versions; no earlier artifact is renamed.
+
+The sections below retain earlier 0.1.2 verification and publication history.
 
 ## 0.1.2 scope update — 2026-09-12
 
@@ -116,3 +122,18 @@ not CI completion or publication. The final release gate is still required.
 Documentation validation before commit: Sphinx HTML build passed with warnings
 as errors (`-W --keep-going`). The remote preflight found no develop branch;
 branch push creates it without changing main or sending tags.
+
+## 0.1.3 consolidation checks — 2026-09-12
+
+- Runtime regression: 370 JavaScript tests passed.
+- Python regression before the final customer example extension: 147 passed,
+  four skipped, three dependency deprecation warnings. Nine focused contrib/example
+  tests passed again after that extension, including RPC method registration,
+  empty selections and parameterized detail queries.
+- Live PostgreSQL/Chromium: states, localities and customer grids; NSW/VIC detail
+  filtering, state selection retained on reload, uniform live/source presentation.
+- Source version 0.1.3: wheel and sdist built successfully with existing local
+  build dependencies (`python -m build --no-isolation`); Sphinx warnings-as-errors
+  build passed. These local artifacts are not published releases.
+- Customer modal form is deliberately excluded: investigation only, no partial
+  dialog implementation. No changes to consumer repositories.

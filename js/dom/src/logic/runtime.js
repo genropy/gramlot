@@ -7,8 +7,8 @@ export const DATA_ELEMENT_FIELDS = new Set([
     'destination', 'formula', 'func', '_on_start', '_delay',
 ]);
 export const RPC_ELEMENT_FIELDS = new Set([
-    'destination', 'method', '_on_start', '_onCalling', '_onResult', '_onError',
-    '_timeout', '_delay', '_lockScreen',
+    'destination', 'method', 'rpcmethod', '_on_start', '_onCalling', '_onResult', '_onError',
+    '_timeout', '_delay', '_lockScreen', 'storeCode', 'storepath', '_identifier',
 ]);
 
 export class LogicRuntime {
@@ -58,8 +58,13 @@ export class LogicRuntime {
             }
         }
         for (const node of fresh) this.builder._defaults.initializeNode(node);
+        for (const node of fresh) {
+            if (['rpcStore', 'bagStore'].includes(node.nodeTag)) {
+                this.builder.handler.application.stores.register(node);
+            }
+        }
         const providers = fresh.filter(node =>
-            ['dataFormula', 'dataController', 'dataRpc', 'remoteSource'].includes(node.nodeTag));
+            ['dataFormula', 'dataController', 'dataRpc', 'rpcStore', 'remoteSource'].includes(node.nodeTag));
         for (const node of fresh) {
             if (node.nodeTag !== 'dataSetter' && !providers.includes(node)) {
                 this.installed.add(node);
@@ -67,7 +72,7 @@ export class LogicRuntime {
         }
         // Register ^ dependencies even when startup is opt-in.
         for (const node of providers) {
-            if (['dataRpc', 'remoteSource'].includes(node.nodeTag)) {
+            if (['dataRpc', 'rpcStore', 'remoteSource'].includes(node.nodeTag)) {
                 const service = node.handler?.application?.server;
                 if (!service) throw new Error(`${node.nodeTag} requires an Application RPC service`);
                 service.prepareProvider(node, node.nodeTag === 'remoteSource' ? 'source' : 'data');
@@ -109,7 +114,7 @@ export class LogicRuntime {
                 this.compute(node);
                 this.installed.add(node);
             }
-            if (['dataRpc', 'remoteSource'].includes(node.nodeTag)) {
+            if (['dataRpc', 'rpcStore', 'remoteSource'].includes(node.nodeTag)) {
                 this.compute(node);
                 this.installed.add(node);
             }
@@ -153,7 +158,7 @@ export class LogicRuntime {
     compute(node, trigger = null, extra = {}) {
         if (this.builder._disposed) return;
         // Reject while occupied at the trigger boundary, never queue for later.
-        if (node.nodeTag === 'dataRpc' && node.rpcPending) {
+        if (['dataRpc', 'rpcStore'].includes(node.nodeTag) && node.rpcPending) {
             node.handler?.application?.feedback.busy(node);
             return Promise.resolve({status: 'busy'});
         }
@@ -203,8 +208,8 @@ export class LogicRuntime {
             } finally {
                 this.executing.delete(node);
             }
-        } else if (node.nodeTag === 'dataRpc') {
-            if (typeof attr.method !== 'string' || !attr.method) {
+        } else if (['dataRpc', 'rpcStore'].includes(node.nodeTag)) {
+            if (typeof (attr.method || attr.rpcmethod) !== 'string' || !(attr.method || attr.rpcmethod)) {
                 throw new Error('dataRpc requires method');
             }
             return node.handler?.application?.server.invokeProvider(
@@ -221,7 +226,8 @@ export class LogicRuntime {
     }
 
     disposeNode(node) {
-        if (['dataRpc', 'remoteSource'].includes(node.nodeTag)) {
+        if (['rpcStore', 'bagStore'].includes(node.nodeTag)) node.handler?.application?.stores.unregister(node);
+        if (['dataRpc', 'rpcStore', 'remoteSource'].includes(node.nodeTag)) {
             node.handler?.application?.server.cancel(node);
         }
         this.builder.handler?._unregisterPointer(node);

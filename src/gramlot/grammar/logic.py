@@ -9,6 +9,12 @@ class LogicElementDeclarations:
     @element(sub_tags='', _meta={'data_element': 'rpc'})
     def dataRpc(self, **kwargs): ...
 
+    @element(sub_tags='', _meta={'data_element': 'rpc'})
+    def rpcStore(self, **kwargs): ...
+
+    @element(sub_tags='', _meta={'data_element': 'store'})
+    def bagStore(self, **kwargs): ...
+
     @element(sub_tags='', _meta={'data_element': 'source'})
     def remoteSource(self, **kwargs): ...
 
@@ -82,6 +88,27 @@ class LogicDeclarations:
         if destination is not None:
             attrs['destination'] = destination
         return self._declaration('dataRpc', **attrs)
+
+    def rpcStore(self, rpcmethod, *, storeCode, storepath, _identifier, **params):
+        """Declare a named RPC collection; typed rows become a browser Bag."""
+        if '_concurrency' in params:
+            raise TypeError('_concurrency is not supported')
+        if '_onStart' in params:
+            params['_on_start'] = params.pop('_onStart')
+        for name, value in dict(storeCode=storeCode, storepath=storepath,
+                                _identifier=_identifier).items():
+            if not isinstance(value, str) or not value:
+                raise TypeError(f'{name} must be a nonempty string')
+        return self._declaration('rpcStore', method=self._page_method_reference(rpcmethod, 'data'),
+                                 storeCode=storeCode, storepath=storepath,
+                                 _identifier=_identifier, **params)
+
+    def bagStore(self, *, storeCode, storepath, _identifier=None, datamode='bag'):
+        """Declare a shared collection over an existing Data Bag."""
+        if not storeCode or not storepath:
+            raise TypeError('bagStore requires storeCode and storepath')
+        return self._declaration('bagStore', storeCode=storeCode, storepath=storepath,
+                                 _identifier=_identifier, datamode=datamode)
 
     def remote(self, method, **params):
         """Configure this existing contentPane with server-built Source.

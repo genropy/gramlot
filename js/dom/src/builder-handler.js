@@ -200,6 +200,7 @@ export class BuilderHandler {
         this.application?.feedback?.releaseOwner(node);
         this.application?.resolvers?.cancel(node);
         this.application?.server?.cancel(node);
+        this.application?.stores?.unregister(node);
         // A removed provider may already be queued by an earlier write in the
         // same live batch. Teardown must remove that pending execution too.
         this._pendingFormulas.delete(node);

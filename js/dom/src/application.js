@@ -30,6 +30,7 @@ import { RecipeRuntime } from './services/recipe-runtime.js';
 import {ResolverService} from './resolvers/service.js';
 import {OpenApiClientService} from './services/openapi-client.js';
 import {ServerCallService} from './services/server-call.js';
+import {CollectionStores} from './stores/collection-stores.js';
 import {InteractionFeedback} from './services/interaction-feedback.js';
 
 export class Application {
@@ -46,6 +47,7 @@ export class Application {
         this.resolvers = new ResolverService(this);
         this.server = new ServerCallService(this, options.rpc);
         this.feedback = new InteractionFeedback(this);
+        this.stores = new CollectionStores(this);
         this.openapi = new OpenApiClientService();
         this.handler = new BuilderHandler(this);
         this.vld = new Validator(this);
@@ -88,6 +90,7 @@ export class Application {
         this.events.dispose();
         this.resolvers.dispose();
         this.server.dispose();
+        this.stores.dispose();
         this.feedback.dispose();
         this._forms.dispose();
         this.handler.dispose();

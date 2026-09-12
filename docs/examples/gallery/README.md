@@ -5,8 +5,7 @@ progressive tutorial. It shares the preview shell, runtime packaging, Python
 recipe loader, code panel and inspector. Build both with:
 
 ```sh
-.venv/bin/python scripts/prepare_assets.py
-.venv/bin/python docs/examples/teaching/build_preview.py --output build/teaching-preview
+.venv/bin/python docs/examples/serve.py
 ```
 
 Navigation comes from `js/dom/src/components/builtin-components.json`: collection,
@@ -63,3 +62,5 @@ has its own installation at `/`. Installation opens a standalone window; the
 preview server must still be running. Service workers intentionally do not cache
 recipes or runtime assets during development. If the server is unavailable, a
 recovery page explains how to reconnect.
+
+The shared FastAPI host serves this gallery at http://127.0.0.1:8051/gallery/.

@@ -1,5 +1,32 @@
 # Open work retained from Pages
 
+## After 0.1.3 consolidation: customer dialog
+
+The owner requested opening a customer form in a dialog on row double-click, then
+paused that work to commit/push source version 0.1.3. Investigation found no modal
+dialog component or grid row-activation event implemented. No code for either was
+added. Resume only when selected; reading versus editing/saving remains to settle.
+The completed example has states, localities and customers linked by state.
+
+## After the grid: legacy RelationTreeResolver — owner reminder, 2026-09-12
+
+Once the current grid work is finished, inspect `RelationTreeResolver` in
+`/Users/gporcari/Sviluppo/Genropy/genropy/gnrpy/gnr/sql/gnrsqlmodel/resolvers.py`.
+The owner deferred this until after the grid. Following the completed first
+states-grid experiment and the instruction to proceed, the source investigation
+is now recorded in [the relation-tree audit](../development/relation-tree-resolver-legacy-2026-09-12.md).
+No explorer implementation has started. Review the separate model, metadata and
+browser expansion contracts before selecting a new slice.
+
+## Collection-store design review — 2026-09-12
+
+Review [the first store proposal](../development/collection-store-design-2026-09-12.md):
+legacy-compatible declarations, shared ownership, typed selection results and a
+bounded states-grid experiment. The owner approved a bounded experiment, now locally implemented and checked
+against the real states database. Review its API and limits before expanding to
+filters, editing or virtual collections. No full migration or release inclusion
+is implied. See the implementation checkpoint at the end of the design.
+
 ## Page services foundation for 0.2.0 — experiment authorized, 2026-09-12
 
 Review the [page services design and plan](../development/page-services-design-2026-09-12.md)
@@ -381,3 +408,11 @@ Commit checkpoint: RPC and examples are recorded in develop commit ef23584.
 The owner authorizes commit and branch push, explicitly without release. Earlier
 instructions to prepare the implementation commit are now satisfied. main and
 version tags remain unchanged; release policy and resultattrs work remain open.
+
+## First database integration: GnrApp under FastAPI
+
+The owner proposes GnrApp('test_invoice_pg').db for the first specialized page.
+See [the source investigation](../development/gnrapp-db-fastapi-investigation-2026-09-12.md).
+Preserve same-worker context/query/cleanup, explicit transaction ownership and
+conversion from legacy Bag to Gramlot Bag. Legacy page notifications are not
+provided by plain GnrApp. No live DB connection or implementation was performed.

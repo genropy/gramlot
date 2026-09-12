@@ -15,23 +15,17 @@ See [the API and Data contract](../../guides/openapi-client.md).
 ## Run
 
 ```sh
-.venv/bin/python scripts/prepare_assets.py
-.venv/bin/python docs/examples/teaching/build_preview.py --output build/teaching-preview
-node docs/examples/gramlot-api-poc/server.mjs
+.venv/bin/python docs/examples/serve.py
 ```
 
-The server compiles page.py to page.tytx at startup using `.venv/bin/python`;
-`GRAMLOT_PYTHON` can override the interpreter. Default port: 64324 (`PORT` overrides
-it; zero picks a free port). After editing Python, recompile and reload:
+Open http://127.0.0.1:8051/openapi/. The common FastAPI server compiles page.py
+at startup, serves the shared prepared browser runtime, and provides synthetic
+products/quotation API fixtures. After changes, restart without --no-build.
 
-```sh
-.venv/bin/python docs/examples/gramlot-api-poc/build.py
-```
-
-`index.html` only supplies an import map and mount point to the generic Gramlot
-standalone Python-page loader. It contains no application event handlers.
-The Node server serves assets and local products/quotation API fixtures. All
-external API calls use browser resolvers and obey browser CORS.
+`index.html` supplies the import map and mount point to the generic Gramlot
+Python-page loader. The application contains no DOM or request bypasses. Browser
+resolvers execute external API calls, subject to browser CORS. The fixture schema
+explicitly uses the host root for its API paths.
 
 ## Verification and boundaries
 

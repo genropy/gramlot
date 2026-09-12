@@ -8,12 +8,10 @@ supplemental input example and does not change the five-step sequence.
 Build prepared runtime assets and the preview from the repository root:
 
 ```sh
-python scripts/prepare_assets.py
-python docs/examples/teaching/build_preview.py
-gramlot manual --directory build/teaching-preview
+.venv/bin/python docs/examples/serve.py
 ```
 
-Open the URL printed by the final command. Each lesson shows Python above
+Open http://127.0.0.1:8051/. The common FastAPI host builds the assets and serves all examples. Each lesson shows Python above
 JavaScript, with the live example on the left and its code on the right.
 The live/code order is retained on narrow screens. The Python frame executes the generated TYTX
 from `recipe.py`; the JavaScript frame imports and executes `recipe.js`.

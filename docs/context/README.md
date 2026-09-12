@@ -1,5 +1,23 @@
 # Gramlot project memory
 
+**Latest consolidation: 0.1.3.** The owner authorizes committing and pushing the
+completed stores, Genropy contrib and three-grid example to develop, without
+release/tag. Customer double-click/dialog work is paused before implementation.
+See [release status](../release.md). Earlier 0.1.2 snapshots below are historical.
+
+After the first states-grid experiment: [legacy relation-tree/explorer audit](../development/relation-tree-resolver-legacy-2026-09-12.md).
+Verified model traversal, metadata enrichment and lazy Page RPC are distinct;
+a Gramlot metadata provider remains a proposal.
+
+Collection stores: [legacy continuity and proposed RPC design](../development/collection-store-design-2026-09-12.md).
+The owner wants legacy APIs where possible and continuity of philosophy. The first shared/RPC store slice is now implemented locally and verified with
+eight real Australian states/territories through the optional FastAPI–GenroPy host.
+The full store migration remains future work; see the design checkpoint.
+
+**Example hosting:** use the common [FastAPI example host](../examples/README.md)
+for tutorial, gallery, builder, Hello, RPC and OpenAPI. GenroPy is a design
+reference, not a runtime requirement.
+
 **Release scope update:** the owner includes the Data RPC foundation in **0.1.2**.
 Implementation commit `ef23584` is on develop; the owner authorized commit and
 branch push only. main and release tags have not changed. See [release status](../release.md).

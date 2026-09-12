@@ -162,12 +162,13 @@ export class ServerCallService {
                     if (proceed === false) return {status: 'cancelled'};
                 }
                 if (obsolete()) return {status: 'obsolete'};
-                const result = await this.call(attr.method, kwargs, {
+                const result = await this.call(attr.method || attr.rpcmethod, kwargs, {
                     owner: node, timeout: attr._timeout, role: 'data',
                 });
                 if (obsolete()) return {status: 'obsolete'};
                 let old;
                 this.application.live(() => {
+                    if (node.nodeTag === 'rpcStore') this.application.stores.accept(node, result);
                     if (attr.destination) {
                         const path = node.absDatapath(attr.destination);
                         old = this.application.data.getItem(path);
@@ -180,6 +181,7 @@ export class ServerCallService {
                 return {status: 'ready', result};
             } catch (error) {
                 if (obsolete()) return {status: 'obsolete'};
+                if (node.nodeTag === 'rpcStore') node.store.loadError = error;
                 if (attr._onError) this.application._recipeRuntime.run(
                     node, attr._onError, {error, kwargs},
                 );
@@ -207,7 +209,7 @@ export class ServerCallService {
         }
         this.cancel(node);
         const generation = this.ownerGenerations.get(node) || 0;
-        const call = this.call(attr.method, kwargs, {
+        const call = this.call(attr.method || attr.rpcmethod, kwargs, {
             owner: node, timeout: attr._timeout, role: 'source',
         });
         node._rpcPromise = (async () => {

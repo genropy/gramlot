@@ -247,3 +247,36 @@ example), and **Grid — 5,000 rows · attributes** at `/gallery/grid/grid/attri
 The large example stores fields on row-node attributes without nested record Bags.
 See [collection store assessment](../development/collection-stores-2026-09-11.md)
 for the implemented store API subset and limits.
+
+## Named collection stores (local experiment)
+
+A grid can borrow a Source-owned store instead of owning a direct Bag adapter:
+
+```python
+root.rpcStore(self.load_rows, storeCode='rows', storepath='rows',
+              _identifier='id', _onStart=True)
+root.grid(store='rows', structpath='struct')
+```
+
+The endpoint returns `{'rows': [record, ...], 'identifier': 'id', 'metadata': {...}}`
+through ordinary TYTX RPC. The explicit RPC-store consumer validates keys and
+constructs attribute-backed Bag rows. Arbitrary JSON dataRpc results are unchanged.
+`GenropyPage.selection_result(fetched_rows, identifier='id')` supplies this shape
+for legacy named query rows. See the [executable states page](../examples/states-grid/pages/states.py).
+
+Use `root.bagStore(storeCode='rows', storepath='rows', _identifier='id',
+datamode='attr')` for a resident collection. Multiple grids may borrow one store;
+the declaring SourceNode owns its lifetime. Store codes and owned Data paths must
+be unique within the application. Identifier/datamode belong on the declaration,
+not a grid borrowing that store. Direct `store='^rows'` retains its original API.
+
+`grid.collectionStore()` exposes the shared BagRows methods and `metadata`.
+For an RPC store, `loadData()` invokes its ordinary provider. Busy triggers are
+refused, `_delay` coalesces before execution, and Source removal cancels ownership
+so late responses cannot write Data. Invalid results leave previous rows intact
+and expose `loadError`; use `_onError` for application presentation. Selection is
+per grid and survives reload by key. This slice has no paging or persistence.
+
+Verification checkpoint: real PostgreSQL selection and Chromium reload/selection
+checks passed on 2026-09-12. Automated store tests cover typed values, invalid keys,
+shared consumers, disposal, resident replacement, delay and standalone rejection.

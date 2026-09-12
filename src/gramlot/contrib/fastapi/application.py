@@ -223,7 +223,7 @@ class PageCollection:
         registered = self.page_methods[name].get(method)
         if registered is None or registered.role != role:
             raise LookupError(f'{role} service {method!r} is not registered')
-        page = page_class()
+        page = self.create_page(page_class)
         bound_method = registered.function.__get__(page, page_class)
         signature = self._resolved_signature(bound_method)
         supplied = dict(params)
@@ -231,6 +231,7 @@ class PageCollection:
             page_name=name, method_name=method, role=role,
             store=self.store, request=request,
         )
+        self.prepare_page(page, context)
         for parameter in signature.parameters.values():
             if parameter.annotation is InvocationContext:
                 if parameter.name in supplied:
@@ -253,8 +254,11 @@ class PageCollection:
             raise ServiceParameterError(str(error)) from error
         if inspect.iscoroutinefunction(bound_method):
             result = await bound_method(*arguments.args, **arguments.kwargs)
+            result = self.materialize_result(page, result)
         else:
-            result = await run_in_threadpool(bound_method, *arguments.args, **arguments.kwargs)
+            result = await run_in_threadpool(
+                self.invoke_sync, page, bound_method, arguments.args, arguments.kwargs,
+            )
             if inspect.isawaitable(result):
                 result = await result
         if role == 'source':
@@ -262,6 +266,24 @@ class PageCollection:
                 raise TypeError(f'Source method {method} must build into root and return None')
             return builder.source
         self._validate_rpc_value('return', result, signature.return_annotation)
+        return result
+
+    def create_page(self, page_class):
+        """Create one fresh page. Contrib adapters may attach host services."""
+        return page_class()
+
+    def prepare_page(self, page, context) -> None:
+        """Attach invocation metadata before dispatch."""
+
+    def invoke_sync(self, page, method, args, kwargs):
+        """Run and materialize a synchronous invocation in one worker."""
+        result = method(*args, **kwargs)
+        if inspect.isawaitable(result):
+            return result
+        return self.materialize_result(page, result)
+
+    def materialize_result(self, page, result):
+        """Materialize a result before its invocation boundary is released."""
         return result
 
     def require_page(self, name: str):

@@ -1,5 +1,14 @@
 # Recorded decisions and corrections
 
+## Collection-store continuity — owner direction, 2026-09-12
+
+Recover the power of legacy collection stores, preserving APIs where possible
+and at least their philosophy: declarative authoring, backend-independent
+consumers and SourceNode-owned reactive services. The owner asks to see a concrete
+proposal. [The first design](../development/collection-store-design-2026-09-12.md)
+separates verified legacy behavior, existing Gramlot adapters and proposed APIs.
+Its payload shape, helper names and migration order are not approved contracts.
+
 ## Python application authors, JavaScript framework behavior — 2026-09-11
 
 The owner clarified that Gramlot targets Python programmers. Applications and
@@ -685,3 +694,45 @@ is integrated locally in the canonical develop checkout without committing or
 moving main. Preserve the latest shared example UI and all unrelated dirty work.
 The legacy resultattrs protocol remains an explicit gap; this scope decision does
 not by itself implement it or authorize publication. See docs/release.md.
+
+### One example hosting environment: FastAPI (2026-09-12)
+
+The owner chooses FastAPI for all current examples to demonstrate that GenroPy is
+an inspiration, not a dependency. Use docs/examples/serve.py as the common entry
+point for tutorial, gallery, visual builder, Hello, triangle RPC and OpenAPI.
+Static recipes stay static; server-backed capabilities use the Gramlot adapter.
+The former OpenAPI Node fixture server is replaced by FastAPI routes. This does
+not make FastAPI mandatory in Gramlot core or add GenroPy/Genro ASGI dependencies.
+
+### Optional FastAPI–GenroPy contrib (2026-09-12)
+
+The owner approves `gramlot.contrib.fastapi_genropy` as the integration namespace
+for GnrApp-backed pages under FastAPI. No Genro ASGI requirement or mandatory
+GenroPy dependency is added to core. Synchronous endpoint methods use the existing
+FastAPI worker dispatch without a new decorator flag. The contrib must keep lazy
+DB-context initialization, result materialization and finally cleanup on the same
+worker, with explicit transaction commits. The namespace is reserved; working
+adapter code and a live database test remain pending. A Django contrib is a later,
+separate possibility, not an active implementation task.
+
+The owner names the specialized page class `GenropyPage`. It belongs to
+`gramlot.contrib.fastapi_genropy`, exposes the invocation-aware `db` property,
+and retains ordinary Gramlot endpoint/source declarations. This approves the
+class name; it does not mark the pending adapter implementation as complete.
+
+### Database selection results: typed rows, browser Bag construction (2026-09-12)
+
+The owner chooses a JSON-shaped selection contract transported with TYTX; a
+MessagePack transport is also a possible direction, not an implemented RPC mode.
+The database-specific adapter normalizes the objects returned by its fetch API
+into portable rows and selection metadata. Gramlot JavaScript builds the Data Bag
+from the decoded selection contract. Do not route this selection through legacy
+fetchAsBag or require a legacy Bag to cross the transport boundary.
+
+For GenroPy, use query(...).fetch() and normalize its row objects in the adapter,
+preserving types and row order. The inspected implementation calls cursor.fetchall()
+(and post-processes rows on its single-cursor path), not cursor.executemany().
+DB-API 2 is the useful underlying reference, but adapters must handle their actual
+row representations explicitly. Avoid lossy fetchAsJson string serialization before
+TYTX. Exact field names for rows, identity and metadata remain to be designed;
+this does not authorize converting every arbitrary RPC JSON object into a Bag.

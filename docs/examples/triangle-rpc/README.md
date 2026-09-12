@@ -3,10 +3,10 @@
 Run the example with the optional FastAPI adapter:
 
 ```console
-gramlot fastapi serve docs/examples/triangle-rpc
+.venv/bin/python docs/examples/serve.py
 ```
 
-Then open `/page/triangle/`. The Python page declares all UI, state, bindings,
+Then open `http://127.0.0.1:8051/page/triangle/`. The Python page declares all UI, state, bindings,
 local logic and the remote calls through Gramlot. There is no application DOM,
 event or fetch code. `base` and `height` feed both the literal local expression
 `base * height / 2` and the `@endpoint` `triangle_area()` Python method. Its

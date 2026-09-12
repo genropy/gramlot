@@ -96,7 +96,8 @@ export class DomTarget extends TargetWrapper {
             // Typed collection properties never travel through HTML attributes.
             // Keep the mounted viewport and its owned subscription intact.
             el.sourceNode = next.sourceNode;
-            el.configureStore(next.storeBag, {identifier:next.identifier, datamode:next.datamode});
+            if (next._sharedStore) el.useCollectionStore(next._sharedStore);
+            else el.configureStore(next.storeBag, {identifier:next.identifier, datamode:next.datamode});
             el.locale = next.locale;
             el.structBag = next.structBag;
             el.columns = next.columns;
