@@ -13,6 +13,34 @@ identical files. Consumer site/Rosetta migration and deployment are separate.
 
 The source-version checkpoints below describe earlier authorization stages.
 
+## Consumer production deployment: 2026-09-12
+
+The owner explicitly authorized workflow/environment changes and production.
+Both consumers now verify ordinary main pushes without publishing; validated
+version tags reachable from main trigger publication and deployment. Production
+environments accept v* tags only, with no untagged manual deployment bypass.
+
+- Site application tag v0.1.3: commit `4121590`,
+  [successful CI/deploy](https://github.com/genropy/gramlot-site/actions/runs/34714614611).
+  Image digest: `sha256:f79dbc08e592bb247c003066cbccc89981e322bd64f11183ebcc54a7f6818d55`.
+- Rosetta application tag v0.1.3: commit `93cd1da`,
+  [successful CI/deploy](https://github.com/genropy/gramlot-rosetta/actions/runs/34714618801).
+  Image digest: `sha256:6fe64122d9c4ce3dcc29f6e4c13f2d514ca6faa8975f16cdf6fe7abf9a6da375`.
+
+Both public health endpoints report the same released wheel SHA256:
+`893b9a75a10437f239739b70f635a602dac24864e68b0c1de4deea2cc80dfae2`.
+Both hosts use FastAPI. The public customer dbSelect demo uses synthetic SQLite
+fixtures; no local legacy customer data was copied to production. Production
+images remain private; host deployment retains the previous digest for rollback.
+Framework, site and Rosetta tags are distinct releases; none was moved.
+
+Post-deployment verification: public site homepage, Python tutorial and synthetic
+customer dbSelect browser scenario passed. Public Rosetta passed 48/50 browser
+checks; the inspector splitter drag and builder Source-tree hover checks failed.
+A focused three-repeat run passed 3/6, confirming intermittent behavior rather
+than a clean public pass. Both had passed local and tag CI runs. These two
+pointer/layout interactions remain open; do not report all public tests green.
+
 ## Current source version: 0.1.3
 
 The owner assigned **0.1.3** on 2026-09-12 and authorized commit and push to

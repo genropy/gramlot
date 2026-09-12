@@ -1,7 +1,7 @@
 > Latest release checkpoint (2026-09-12): GitHub v0.1.3 is published from
 > 8c12313. Earlier statements below about unchanged main/tags and no database
 > implementation are historical checkpoints; see [release status](../release.md)
-> and [current context](README.md). Site/Rosetta production deployment is pending.
+> and [current context](README.md). Site/Rosetta production deployment completed under their separate v0.1.3 tags.
 
 # Open work retained from Pages
 
@@ -421,3 +421,12 @@ See [the source investigation](../development/gnrapp-db-fastapi-investigation-20
 Preserve same-worker context/query/cleanup, explicit transaction ownership and
 conversion from legacy Bag to Gramlot Bag. Legacy page notifications are not
 provided by plain GnrApp. No live DB connection or implementation was performed.
+
+## Public Rosetta pointer interactions after v0.1.3 deployment
+
+Local and release CI passed 50/50 browser tests, but public verification passed
+48/50. Inspector internal splitter drag and builder Source-tree hover actions
+are intermittent (focused repeat: 3/6 passed). Investigate layout readiness and
+pointer targeting before attributing the cause to application or test code.
+Production health, lesson interactions and the site customer dbSelect passed.
+See [release checkpoint](../release.md) for deployed tags, CI runs and digests.
