@@ -56,6 +56,10 @@ jobs:
         with:
           name: python-distributions
           path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: browser-distributions
+          path: browser-dist
       - name: Publish release and attach distributions
         env:
           GH_TOKEN: ${{ github.token }}
@@ -67,9 +71,9 @@ jobs:
             *) prerelease=false ;;
           esac
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" dist/* --clobber
+            gh release upload "$RELEASE_TAG" dist/* browser-dist/* --clobber
             gh release edit "$RELEASE_TAG" --draft=false --prerelease="$prerelease"
           else
-            gh release create "$RELEASE_TAG" dist/* --title "$RELEASE_TAG" \
+            gh release create "$RELEASE_TAG" dist/* browser-dist/* --title "$RELEASE_TAG" \
               --generate-notes --prerelease="$prerelease" --verify-tag
           fi

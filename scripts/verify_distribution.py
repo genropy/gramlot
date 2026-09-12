@@ -21,6 +21,16 @@ def main():
     manifest = json.loads((resources / 'manifest.json').read_text())
     for name, expected in manifest['assets'].items():
         assert sha256((resources / name).read_bytes()).hexdigest() == expected, name
+    browser = resources / 'browser'
+    browser_manifest = json.loads((browser / 'manifest.json').read_text())
+    assert browser_manifest['schemaVersion'] == 1
+    assert browser_manifest['frameworkVersion'] == version('gramlot')
+    for item in browser_manifest['files']:
+        path = browser / item['path']
+        assert path.stat().st_size == item['size'], item['path']
+        assert sha256(path.read_bytes()).hexdigest() == item['sha256'], item['path']
+    assert all((browser / path).is_file()
+               for path in browser_manifest['entryPoints'].values())
     for forbidden in ('application.py', 'worker.py', 'server_configuration.py', 'page_document.py'):
         assert not (package / forbidden).exists(), forbidden
     for forbidden in ('rpc.js', 'application.js', 'bootstrap.js'):
@@ -30,7 +40,7 @@ def main():
     for transport in ('json', 'msgpack'):
         source = from_tytx(to_tytx(builder.source, transport), transport)
         assert source['div_0.h1_0'] == 'Hello World'
-    print(f'Gramlot {version("gramlot")}: host-independent wheel, typed recipes and assets OK')
+    print(f'Gramlot {version("gramlot")}: host-independent wheel, typed recipes and browser distribution OK')
 
 
 if __name__ == '__main__':

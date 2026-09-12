@@ -15,3 +15,17 @@ python -m pip install -r docs/requirements.txt
 python -m sphinx -W --keep-going -b html docs/source docs/_build/html
 gramlot manual --directory docs/_build/html --port 8037
 ```
+
+## Prebuilt browser runtime
+
+When an installed distribution contains `resources/browser/manifest.json`, the
+adapter serves that prebuilt runtime automatically. Pages share its versioned
+`_runtime/<buildId>/` URLs, with immutable caching and gzip for static resources.
+No Node installation or runtime compilation is needed on the application server.
+HTML and recipe responses are not given immutable caching by this adapter.
+
+A source checkout without a browser distribution continues to serve the original
+ES modules for development. An invalid or incomplete present browser manifest
+fails explicitly rather than silently switching runtime versions. The browser
+ZIP and the corresponding Python wheel are intended to contain the same payload;
+see [browser distribution](development/browser-distribution-proposal.md).

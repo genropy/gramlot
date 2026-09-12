@@ -24,9 +24,13 @@ class CustomBuildHook(BuildHookInterface):
                   for p in folder.rglob('*') if p.is_file()}
         inputs.update(str(p.relative_to(root))
                       for p in (root / 'src/gramlot/grammar').rglob('*.py') if p.is_file())
+        inputs.update(str(p.relative_to(root))
+                      for p in (root / 'src/gramlot/contrib/fastapi/frontend').rglob('*')
+                      if p.is_file())
         inputs.update({'js/dom/package.json', 'js/dom/package-lock.json',
                        'src/gramlot/inspector.py', 'src/gramlot/builder.py',
-                       'src/gramlot/transport.py'})
+                       'src/gramlot/transport.py', 'scripts/build_browser_bundle.mjs',
+                       'scripts/build_browser_distribution.py'})
         if inputs != set(manifest['sources']):
             raise RuntimeError('JavaScript source inventory changed; rerun scripts/prepare_assets.py')
         actual = {str(p.relative_to(resources)) for p in resources.rglob('*') if p.is_file()}

@@ -38,6 +38,7 @@
     "genro-tytx": "git+https://github.com/genropy/genro-tytx.git#6b9bf3a486014d92812caa3b06674083e646c5cd"
   },
   "devDependencies": {
+    "esbuild": "0.28.2",
     "jsdom": "27.0.1"
   },
   "private": true

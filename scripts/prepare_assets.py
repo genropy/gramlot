@@ -32,11 +32,42 @@ class AssetPreparation:
         from gramlot.builder import GramlotBuilder
         from gramlot.inspector import build_inspector
         from gramlot.transport import to_tytx
+        from genro_builders.builder import SourceBag
+        from genro_tytx import from_tytx
+
+        def verify_source_types(original, decoded, path="root"):
+            """Fail before publishing if the encoder erases a structural branch type."""
+            if isinstance(original, SourceBag) and not isinstance(decoded, SourceBag):
+                raise SystemExit(
+                    f"Recipe compiler lost SourceBag typing at {path}; "
+                    "install the project dependencies from pyproject.toml"
+                )
+            if not isinstance(original, SourceBag):
+                return
+            for node in original:
+                value = node.value
+                if isinstance(value, SourceBag):
+                    verify_source_types(value, decoded.get_item(node.label), f"{path}.{node.label}")
+
+        def source_branch_count(source):
+            return 1 + sum(
+                source_branch_count(node.value)
+                for node in source
+                if isinstance(node.value, SourceBag)
+            )
+
         for presentation, filename in (("floating", "inspector.tytx"),
                                        ("embedded", "inspector-embedded.tytx")):
             inspector = GramlotBuilder()
             build_inspector(inspector.root, presentation=presentation)
-            (target / "pages" / filename).write_text(to_tytx(inspector.source, "json"))
+            encoded = to_tytx(inspector.source, "json")
+            if encoded.count("::XS") != source_branch_count(inspector.source):
+                raise SystemExit(
+                    f"Recipe compiler lost SourceBag markers in {filename}; "
+                    "install the project dependencies from pyproject.toml"
+                )
+            verify_source_types(inspector.source, from_tytx(encoded, transport="json"))
+            (target / "pages" / filename).write_text(encoded)
         for package in ("genro-bag-js", "genro-tytx", "@msgpack/msgpack", "decimal.js"):
             source = modules / package
             destination = target / "licenses" / package
@@ -53,9 +84,13 @@ class AssetPreparation:
         paths = [p for folder in (root / "js/dom/src", root / "js/pages/src")
                  for p in folder.rglob('*') if p.is_file()]
         paths += [p for p in (root / "src/gramlot/grammar").rglob("*.py") if p.is_file()]
+        paths += [p for p in (root / "src/gramlot/contrib/fastapi/frontend").rglob('*')
+                  if p.is_file()]
         paths += [root / "js/dom/package.json", root / "js/dom/package-lock.json",
                   root / "src/gramlot/inspector.py", root / "src/gramlot/builder.py",
-                  root / "src/gramlot/transport.py"]
+                  root / "src/gramlot/transport.py",
+                  root / "scripts/build_browser_bundle.mjs",
+                  root / "scripts/build_browser_distribution.py"]
         manifest = {
             "sources": {str(p.relative_to(root)): sha256(p.read_bytes()).hexdigest() for p in sorted(paths)},
             "assets": {str(p.relative_to(target)): sha256(p.read_bytes()).hexdigest()

@@ -40,6 +40,7 @@ For custom servers, use `GramlotApplication` or `mount_gramlot` from
 [Read the English manual](https://gramlot.readthedocs.io/en/latest/).
 
 - [Getting started](docs/source/guide/first-page.rst)
+- [JavaScript only: browser ZIP and static hosting](docs/guides/javascript-only.md)
 - [FastAPI integration](docs/source/guide/fastapi.rst)
 - [Pages and reserved metadata](docs/source/reference/pages.rst)
 - [Documentation development](docs/development/building-docs.rst)
@@ -54,6 +55,7 @@ For custom servers, use `GramlotApplication` or `mount_gramlot` from
 ```sh
 npm --prefix js/dom ci --ignore-scripts
 python scripts/prepare_assets.py
+python scripts/build_browser_distribution.py
 python scripts/prepare_test_client.py
 python -m pip install '.[test,fastapi]' httpx
 GRAMLOT_CLIENT_MODULES="$PWD/build/test-client" python -m pytest -q
@@ -61,4 +63,7 @@ npm --prefix js/dom test
 ```
 
 Documentation builds independently from runtime packages. See `docs/requirements.txt`.
+The browser build writes the same manifest-driven payload to the Python wheel and
+to `build/browser-distributions/gramlot-browser-<version>-<build-id>.zip`.
+Consumers deploy that payload directly; installing Gramlot never invokes Node.
 Gramlot is licensed under Apache 2.0.

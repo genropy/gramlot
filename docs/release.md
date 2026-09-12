@@ -31,14 +31,21 @@ The FastAPI extra is optional; core installation does not load a server framewor
 ```sh
 npm --prefix js/dom ci --ignore-scripts
 python scripts/prepare_assets.py
+python scripts/build_browser_distribution.py
 python -m pip install build twine
 python -m build
 python -m twine check --strict dist/*
 ```
 
-The build hook checks every browser asset against the prepared manifest. The
-installed wheel requires no Node tooling. The alpha filename has been rebuilt
-during development: identify local candidates by hash, not version alone.
+The browser build emits a content-addressed ZIP and embeds the identical payload
+under `gramlot/resources/browser/` in the wheel. Its manifest inventories public
+ES-module entries, lazy inspector resources, licenses, hashes, sizes and media
+types. `scripts/verify_browser_distribution.py` checks ZIP/wheel byte parity.
+The build hook checks every browser asset against the prepared manifest, and the
+installed wheel requires no Node tooling. Browser ZIPs and checksums are uploaded
+as a separate CI artifact, so Twine and PyPI only receive Python distributions.
+The alpha filename has been rebuilt during development: identify local candidates
+by hash or browser build ID, not version alone.
 
 ## Automation and service setup
 
