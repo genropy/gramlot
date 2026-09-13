@@ -84,7 +84,7 @@ class AssetPreparation:
         paths = [p for folder in (root / "js/dom/src", root / "js/pages/src")
                  for p in folder.rglob('*') if p.is_file()]
         paths += [p for p in (root / "src/gramlot/grammar").rglob("*.py") if p.is_file()]
-        paths += [p for p in (root / "src/gramlot/contrib/fastapi/frontend").rglob('*')
+        paths += [p for p in (root / "src/gramlot/contrib/_shared/frontend").rglob('*')
                   if p.is_file()]
         paths += [root / "js/dom/package.json", root / "js/dom/package-lock.json",
                   root / "src/gramlot/inspector.py", root / "src/gramlot/builder.py",

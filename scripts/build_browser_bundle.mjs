@@ -16,7 +16,7 @@ const pages = join(resources, 'pages');
 const bag = join(resources, 'genro-bag-js/src');
 const tytx = join(resources, 'genro-tytx/js/src');
 const msgpack = join(resources, 'genro-tytx/js/node_modules/@msgpack/msgpack/dist.esm');
-const frontend = resolve(resources, '../contrib/fastapi/frontend');
+const frontend = resolve(resources, '../contrib/_shared/frontend');
 
 const aliases = new Map([
     ['gramlot-dom', join(dom, 'index.js')],

@@ -25,7 +25,7 @@ class CustomBuildHook(BuildHookInterface):
         inputs.update(str(p.relative_to(root))
                       for p in (root / 'src/gramlot/grammar').rglob('*.py') if p.is_file())
         inputs.update(str(p.relative_to(root))
-                      for p in (root / 'src/gramlot/contrib/fastapi/frontend').rglob('*')
+                      for p in (root / 'src/gramlot/contrib/_shared/frontend').rglob('*')
                       if p.is_file())
         inputs.update({'js/dom/package.json', 'js/dom/package-lock.json',
                        'src/gramlot/inspector.py', 'src/gramlot/builder.py',

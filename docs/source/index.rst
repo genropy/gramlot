@@ -17,7 +17,8 @@ Integrations
 ``gramlot fastapi serve [directory]``, or add them to an existing FastAPI app.
 See :doc:`guide/fastapi`.
 
-**More integrations coming soon.**
+**Django integration** is available in the current development tree. Add Gramlot
+pages to an existing Django project; see :doc:`guide/django`.
 
 .. toctree::
    :maxdepth: 2
@@ -27,6 +28,7 @@ See :doc:`guide/fastapi`.
    guide/first-page
    guide/components
    guide/fastapi
+   guide/django
 
 .. toctree::
    :maxdepth: 2

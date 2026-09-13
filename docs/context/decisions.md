@@ -755,3 +755,13 @@ JavaScript experimentation belongs in the playground; repository JavaScript
 recipes are preserved. This supersedes the earlier paired Python/JavaScript
 presentation and compact method-body display. Local verification compared all
 94 Python panels across 55 generated pages with their executed recipe files.
+
+
+### Optional Django contrib — owner decision, 2026-09-13
+
+The owner requests `gramlot.contrib.django` with what is needed for Django hosting,
+then authorizes copying the supplied local Bakerydemo application as a consumer.
+This supersedes the earlier deferred-Django note. The adapter remains optional;
+core imports and installations stay server-independent. The current implementation
+and local verification are recorded in [the Django checkpoint](../development/django-adapter-2026-09-13.md).
+The copied host is local test material, not a Genro ASGI dependency or publication.

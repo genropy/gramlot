@@ -213,3 +213,12 @@ test('horizontal scrollbar starts after frozen columns and synchronizes the view
     assert.equal(element._frame.scrollLeft, 0);
     element.remove();
 });
+
+test('row activation exposes the record key for double-click and Enter', () => {
+    const grid = mount();
+    const keys = [];
+    grid.addEventListener('grid-activated-row', event => keys.push(event.detail.key));
+    grid.shadowRoot.querySelector('.row').dispatchEvent(new window.MouseEvent('dblclick', {bubbles:true}));
+    grid.shadowRoot.querySelector('.row').dispatchEvent(new window.KeyboardEvent('keydown', {key:'Enter', bubbles:true}));
+    assert.deepEqual(keys, [grid._store.rowAt(0).key, grid._store.rowAt(0).key]);
+});

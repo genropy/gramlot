@@ -158,3 +158,38 @@ test('onCalling false cancels before transport and direct calls honor pre-aborte
         error => error.kind === 'cancelled');
     app.dispose();
 });
+
+test('host RPC headers are sent for Source and Data, only to the same origin', async t => {
+    const dom = setupDom();
+    dom.reconfigure({url: 'https://example.test/ui/'});
+    const requests = [];
+    t.mock.method(globalThis, 'fetch', async (url, options) => {
+        requests.push({url, headers: options.headers});
+        return response({ok: true, result: null});
+    });
+    const app = new Application(document.createElement('div'), null, {
+        rpc: {url: '/ui/demo/rpc', headers: {'X-CSRFToken': 'masked-token'}},
+    });
+    await app.server.call('main', {}, {role: 'source'});
+    await app.server.call('save');
+    assert.deepEqual(requests.map(request => request.url), [
+        '/ui/demo/rpc/source/main', '/ui/demo/rpc/data/save',
+    ]);
+    assert.ok(requests.every(request => request.headers['X-CSRFToken'] === 'masked-token'));
+    assert.throws(() => new Application(document.createElement('div'), null, {
+        rpc: {url: 'https://other.test/rpc', headers: {'X-CSRFToken': 'masked-token'}},
+    }), /same-origin/);
+    app.dispose();
+});
+
+test('Django middleware HTML rejections preserve HTTP error status', async t => {
+    t.mock.method(globalThis, 'fetch', async () => new Response('<h1>Forbidden</h1>', {status: 403}));
+    class Page extends HtmlBuilder { main(root) { root.p('hello'); } }
+    const app = mount(Page, {rpc: '/page/demo/rpc'});
+    await assert.rejects(app.server.call('save'), error => {
+        assert.equal(error.kind, 'http');
+        assert.equal(error.status, 403);
+        return true;
+    });
+    app.dispose();
+});

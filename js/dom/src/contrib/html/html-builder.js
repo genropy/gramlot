@@ -84,6 +84,9 @@ export class HtmlRenderer extends RendererBase {
             el.addEventListener('grid-selected-row', event => {
                 if (node.builder?.handler?.application) node.publish('onSelectedRow', event.detail);
             });
+            el.addEventListener('grid-activated-row', event => {
+                if (node.builder?.handler?.application) node.publish('onRowActivated', event.detail);
+            });
             el.addEventListener('grid-column-resize', event => {
                 const handler = node.builder.handler;
                 if (!handler) return;

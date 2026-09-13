@@ -18,7 +18,16 @@ export class ServerCallError extends Error {
 export class ServerCallService {
     constructor(application, endpoint = null) {
         this.application = application;
-        this.endpoint = typeof endpoint === 'string' && endpoint ? endpoint.replace(/\/$/, '') : null;
+        const config = endpoint && typeof endpoint === 'object' ? endpoint : {url: endpoint};
+        this.endpoint = typeof config.url === 'string' && config.url ? config.url.replace(/\/$/, '') : null;
+        this.headers = {...(config.headers || {})};
+        if (this.endpoint && Object.keys(this.headers).length) {
+            const location = application?.target?.root?.ownerDocument?.location
+                || globalThis.location || globalThis.document?.location;
+            if (!location || new URL(this.endpoint, location.href).origin !== location.origin) {
+                throw new Error('Gramlot RPC host headers require a same-origin endpoint');
+            }
+        }
         this.requests = new Map();
         this.allRequests = new Set();
         this.ownerGenerations = new WeakMap();
@@ -98,7 +107,7 @@ export class ServerCallService {
             const response = await fetch(
                 `${this.endpoint}/${role}/${encodeURIComponent(method)}`, {
                 method: 'POST',
-                headers: {'Content-Type': TYTX_MEDIA_TYPE, Accept: TYTX_MEDIA_TYPE},
+                headers: {...this.headers, 'Content-Type': TYTX_MEDIA_TYPE, Accept: TYTX_MEDIA_TYPE},
                 body: toTytx(params, 'json'),
                 signal: controller.signal,
                 },
@@ -108,6 +117,11 @@ export class ServerCallService {
             try {
                 envelope = fromTytx(body, 'json');
             } catch (error) {
+                if (!response.ok) {
+                    throw new ServerCallError(`RPC HTTP ${response.status}`, {
+                        kind: 'http', status: response.status,
+                    });
+                }
                 throw new ServerCallError(`Invalid TYTX RPC response: ${error.message}`, {
                     kind: 'protocol', status: response.status,
                 });

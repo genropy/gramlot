@@ -324,7 +324,9 @@ function defineComponents() {
                 this.focusCell = {rowKey:row.key, columnId:event.target.closest('.cell')?.dataset.columnId || this._columns[0].id};
                 this._choose(row.key, 'pointer');
             });
+            element.addEventListener('dblclick', () => this._activate(row.key));
             element.addEventListener('keydown', event => {
+                if (event.key === 'Enter') { event.preventDefault(); this._activate(row.key); return; }
                 if (!['ArrowDown','ArrowUp'].includes(event.key)) return;
                 event.preventDefault();
                 const selectedIndex = this._store.keys().indexOf(this._selectedKey);
@@ -352,6 +354,12 @@ function defineComponents() {
             }
             this._pinCells(element);
             return element;
+        }
+        _activate(key) {
+            this._choose(key, 'activation');
+            this.dispatchEvent(new CustomEvent('grid-activated-row', {
+                bubbles:true, composed:true, detail:{key},
+            }));
         }
         _choose(key, source) {
             if (key === this._selectedKey) return;

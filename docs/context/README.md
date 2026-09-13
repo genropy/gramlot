@@ -5,6 +5,13 @@ share the identity/caption contract, with a package/table/field cascade example.
 Callback supports synchronous and Promise results without requiring a server.
 See [contract and limits](../guides/select-providers.md). No publication.
 
+**Optional Django adapter — 2026-09-13:** `gramlot.contrib.django` is implemented
+locally with Source/Data RPC, Django request/permissions/CSRF, explicit ORM
+selections and shared host-independent internals. The owner-supplied Bakerydemo
+copy renders 11 published breads on Django 6.0/Wagtail 8 through an installed
+local wheel. See [scope and verification](../development/django-adapter-2026-09-13.md)
+and [the guide](../django.md). No publication in this task.
+
 **Local relation-tree RPC experiment — 2026-09-13:** legacy relation branches are
 adapted into normal Bag RPC descriptors and expanded lazily by `storeTree`.
 The customer example and nested FastAPI/browser path are verified; no deployment.
