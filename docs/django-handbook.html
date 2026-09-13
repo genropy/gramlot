@@ -1,0 +1,380 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Gramlot · Django handbook</title><style>
+:root{color-scheme:light;--ink:#22344a;--muted:#65758b;--blue:#155dcc;--line:#dce4ef}*{box-sizing:border-box}body{margin:0;background:#f2f5fa;color:var(--ink);font:16px/1.7 system-ui,sans-serif}header{background:#152b47;color:white;padding:40px max(24px,calc((100vw - 1100px)/2)) 32px}header small{letter-spacing:.13em;text-transform:uppercase;color:#a5c7ff}header h1{font-size:36px;margin:5px 0}header p{margin:0;color:#d0def0;max-width:850px}.bar{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);z-index:2}.bar-inner{max-width:1150px;margin:auto;padding:10px 20px;display:flex;gap:12px;align-items:center}.tabs{display:flex;gap:5px;overflow:auto;flex:1}button{font:inherit;cursor:pointer;border:1px solid transparent;border-radius:7px;padding:9px 14px;white-space:nowrap;background:transparent;color:var(--ink)}button[aria-selected=true]{background:#e9f1ff;color:#124ea5;font-weight:650}button:hover{background:#edf2f8}button:focus-visible,a:focus-visible{outline:3px solid #e59b22;outline-offset:3px}.print{border-color:var(--line);font-size:13px}main{max-width:1100px;margin:28px auto 60px;padding:0 20px}section{background:white;border:1px solid var(--line);border-radius:12px;padding:34px 44px;box-shadow:0 6px 24px #1b365009}section[hidden]{display:none}.source{font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:24px;overflow-wrap:anywhere}h1,h2,h3{line-height:1.3;letter-spacing:-.02em}section h1{font-size:30px}h2{font-size:23px;margin-top:38px}h3{font-size:19px;margin-top:28px}a{color:var(--blue);text-underline-offset:3px}pre{background:#14283f;color:#dfebf7;padding:20px;border-radius:9px;overflow:auto;font-size:13px;line-height:1.6}code{font: .88em ui-monospace,SFMono-Regular,Consolas,monospace}p code,li code{background:#edf2f8;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;display:block;overflow:auto}td,th{border:1px solid var(--line);padding:10px;text-align:left}blockquote{border-left:4px solid #8eb5f2;padding-left:18px;color:var(--muted)}footer{max-width:1060px;margin:0 auto 28px;color:var(--muted);font-size:12px;padding:0 20px}@media(max-width:650px){header{padding:25px 20px}header h1{font-size:29px}section{padding:22px 20px}.bar-inner{padding:8px}.print{display:none}main{padding:0 10px}.tabs button{font-size:13px}}@media print{body{background:white;font-size:11pt}header{background:white;color:black;padding:0 0 20px}header p,header small{color:#444}.bar,.source{display:none}main{margin:0;padding:0;max-width:none}section,section[hidden]{display:block;border:0;box-shadow:none;padding:0;break-before:page}section:first-child{break-before:auto}pre{white-space:pre-wrap;background:#eee;color:black}footer{display:none}h2,h3{break-after:avoid}}
+</style></head><body><header><small>Gramlot / Integrations</small><h1>Django handbook</h1><p>Hosting, permissions, ORM data, model exploration and the Bakery administration PoC — collected in one offline document.</p></header><nav class="bar" aria-label="Handbook sections"><div class="bar-inner"><div class="tabs" role="tablist" aria-label="Documentation"><button role="tab" id="tab-guide" aria-controls="guide" aria-selected="true" tabindex="0">Django guide</button><button role="tab" id="tab-example" aria-controls="example" aria-selected="false" tabindex="-1">Django example</button><button role="tab" id="tab-bakery" aria-controls="bakery" aria-selected="false" tabindex="-1">Bakery & SQL</button><button role="tab" id="tab-status" aria-controls="status" aria-selected="false" tabindex="-1">Implementation & limits</button><button role="tab" id="tab-overlay" aria-controls="overlay" aria-selected="false" tabindex="-1">Source overlay</button></div><button class="print" id="print">Print all sections</button></div></nav><main><section id="guide" role="tabpanel" aria-labelledby="tab-guide" tabindex="0"><div class="source">Source: docs/django.md</div><h1>Django adapter</h1>
+<p><code>gramlot.contrib.django</code> hosts Python-authored Gramlot pages inside an existing
+Django project. It provides Source and Data RPC, the packaged browser runtime,
+request access, optional page permissions and an explicit ORM selection helper.
+Django and FastAPI remain optional; this adapter does not import FastAPI or GenroPy.</p>
+<p>This is local development work after 0.1.3, not a published release. Install the
+locally built wheel with its <code>django</code> extra until a release includes the adapter.
+The supported dependency range is Django 5.2 and 6.0, subject to each Django
+version's Python requirements.</p>
+<h2>Add pages to a project</h2>
+<p>Create <code>pages/hello.py</code> under your application's chosen directory:</p>
+<pre><code class="language-python">from gramlot.contrib.django import DjangoPage
+from gramlot.page import endpoint
+
+class Page(DjangoPage):
+    def main(self, root):
+        root.h1('Hello from Django')
+        root.dataRpc('greeting', self.greeting, _onStart=True)
+        root.p('^greeting')
+
+    @endpoint
+    def greeting(self):
+        user = self.request.user
+        return f'Hello {user.username}' if user.is_authenticated else 'Hello visitor'
+</code></pre>
+<p>Include the collection in your normal URLconf:</p>
+<pre><code class="language-python">from django.conf import settings
+from django.urls import include, path
+from gramlot.contrib.django import DjangoPageCollection
+
+pages = DjangoPageCollection(settings.BASE_DIR, prefix='/ui', title='My application')
+urlpatterns = [path('ui/', include((pages.urls, 'gramlot'), namespace='gramlot'))]
+</code></pre>
+<p>Open <code>/ui/hello/</code>. The <code>prefix</code> must match the full public mounting path, including
+any outer <code>include()</code> paths. Nested paths such as <code>/tools/ui</code> are supported;
+reverse-proxy script-prefix discovery is not automatic. Put these routes before
+CMS catch-all routes. Multiple collections can use distinct prefixes/namespaces.</p>
+<p>The collection discovers flat Python files under <code>pages/</code>, ignores underscore
+files and directories, and requires a locally defined <code>Page(WebPage)</code> subclass.
+It creates a fresh page and Source for every invocation. Ordinary <code>WebPage</code> also
+works; <code>DjangoPage</code> adds <code>self.request</code> and <code>selection_result</code>. An annotated
+<code>InvocationContext</code> parameter remains available with either base class.</p>
+<p>No custom <code>manage.py</code> replacement, server bootstrap, Django REST Framework,
+GenroPy, or <code>INSTALLED_APPS</code> entry for Gramlot is required. Keep Django's normal
+middleware, URLconf and management commands.</p>
+<h2>Use the host website template</h2>
+<p>Pass <code>template_name='products/explorer.html'</code> to <code>DjangoPageCollection</code> to use a
+normal Django template, including inheritance and request context processors.
+The template can extend the site's existing header/footer shell. Put the new
+application UI in the Python Page's Source.</p>
+<p>The adapter supplies <code>gramlot_title</code>, <code>gramlot_imports</code>, <code>gramlot_startup</code> and
+<code>gramlot_entry</code>. Include the following in the host template:</p>
+<pre><code class="language-html">&lt;script type=&quot;importmap&quot;&gt;{{ gramlot_imports|safe }}&lt;/script&gt;
+&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;
+&lt;p id=&quot;error&quot; role=&quot;status&quot; hidden&gt;&lt;/p&gt;
+&lt;script type=&quot;application/json&quot; id=&quot;startup&quot;&gt;{{ gramlot_startup|safe }}&lt;/script&gt;
+&lt;script type=&quot;module&quot; src=&quot;{{ gramlot_entry }}&quot;&gt;&lt;/script&gt;
+</code></pre>
+<p>The two JSON values are escaped by the adapter for script-element embedding;
+keep them intact. Place the import map before scripts that import Gramlot modules.
+CSRF and access checks are identical to the default shell. This contract embeds
+one Gramlot application per document.</p>
+<h2>Authentication, permissions and CSRF</h2>
+<p>Use Django's session and authentication middleware. You can require login and
+permissions for an entire collection:</p>
+<pre><code class="language-python">pages = DjangoPageCollection(
+    settings.BASE_DIR, prefix='/ui', login_required=True,
+    permission_required='sales.view_customer',
+)
+</code></pre>
+<p>Or declare <code>login_required</code> and <code>permission_required</code> on a page. Collection and
+page requirements both apply to HTML, recipe GETs and every Source/Data RPC.
+Unauthorized pages are omitted from the navigation recipe. Anonymous requests
+receive 401; authenticated users lacking permission receive 403. The adapter
+does not redirect RPCs to login HTML. Authentication UI belongs to the Django
+host; return to/reload the Gramlot page after signing in or out.</p>
+<p>Defaults are public. <code>@endpoint</code> exposes a callable; it does not authorize record
+access. Check write permissions inside write methods and filter querysets for
+the current user. <code>example_view=True</code> deliberately shows Python source, so use it
+only for examples whose implementation is intended to be visible.</p>
+<p>CSRF protection stays enabled on POSTs. The host embeds a masked token in startup
+configuration and the shared Gramlot client sends the configured header for both
+Source and Data RPC. This supports custom CSRF header/cookie names, HttpOnly
+cookies and <code>CSRF_USE_SESSIONS</code>. Pages are not publicly cached. Token-bearing RPC
+configuration only allows the same origin. No application JavaScript or
+<code>csrf_exempt</code> is needed. Native middleware rejections retain their HTTP status
+in client errors, even when their bodies are HTML.</p>
+<h2>ORM results and transactions</h2>
+<p>Project selected fields explicitly:</p>
+<pre><code class="language-python">@endpoint
+def customers(self):
+    queryset = Customer.objects.filter(active=True).order_by('id')
+    return self.selection_result(queryset, fields=['id', 'name', 'balance'])
+</code></pre>
+<p>Alternatively pass <code>queryset.values('id', 'name')</code>, or mappings from another data
+provider. <code>selection_result</code> is also exported as a function. It returns the shared
+<code>{rows, identifier, metadata}</code> contract; the browser constructs the Data Bag.
+Decimal/date values retain their types through TYTX. Model instances and arbitrary
+lazy objects are not automatically serialized. Identifiers must be unique,
+nonempty string or finite numeric values; explicitly map UUID identities to
+strings when needed.</p>
+<p>Filtering, ordering, pagination, total counts and field authorization belong to
+the application. <code>metadata.totalrows</code> defaults to the materialized row count;
+pass explicit metadata when returning a page from a larger selection.</p>
+<p>Views are synchronous under both WSGI and ASGI. Synchronous page services and
+queryset materialization run on the request thread via Django's thread-sensitive
+async bridge. Async services are supported, but synchronous ORM work must stay
+inside synchronous methods or an appropriate Django async bridge. Use
+<code>transaction.atomic()</code> around writes; the adapter also preserves
+<code>ATOMIC_REQUESTS</code> rollback when RPC exceptions become error responses. It never
+adds implicit commits. With <code>DEBUG=False</code>, unexpected exception details are
+logged server-side and replaced with a generic response.</p>
+<h2>Assets and limits</h2>
+<p>The collection serves the shared packaged runtime under <code>PREFIX/_runtime/</code>.
+Installed bundles have content-versioned URLs and immutable caching; source
+checkout assets use no-cache. File traversal and symlink escapes are rejected.
+No npm build or <code>collectstatic</code> is required in the consuming application. For
+high-volume delivery, a front server may serve that same packaged asset subtree.
+A restrictive custom CSP needs host-specific integration; nonce handling is not
+implemented by this adapter.</p>
+<p><code>ExclusiveBagStore</code> remains local to one collection/process and is not a Django
+session store or shared multi-worker backend. This integration does not add
+WebSockets, automatic ModelForms, admin generation,
+Wagtail revision editing, or a universal ORM abstraction.</p>
+<h2>Examples and verification</h2>
+<p>The maintained <a href="#example">Django customer example</a> uses a grid,
+a permission-checked update and a transaction, authored entirely through Gramlot.
+The owner-supplied local Bakerydemo copy is separately exercised with Django 6.0
+and Wagtail 8; see the <a href="#status">implementation checkpoint</a>.</p>
+<h2>Staff-only model schema tree (PoC)</h2>
+<p><code>DjangoPage.model_tree</code> exposes lazy model metadata to active staff users only.
+It is disabled by default (<code>model_roots = ()</code>). Set <code>model_roots</code> to explicit
+lowercase Django labels, or <code>('*',)</code> to include all installed models.</p>
+<pre><code class="language-python">class Page(DjangoPage):
+    login_required = True
+    model_roots = ('*',)
+
+    def main(self, root):
+        root.dataRpc('schema', self.model_tree, _on_start=True)
+        root.storeTree(store='^schema', selectedPath='^selected',
+                       typeAttribute='dtype', relationAttribute='relation_direction')
+</code></pre>
+<p>The root lists apps; expanding an app lists models, and expanding a model lists
+fields with data types and lazy related-model branches. Foreign keys, reverse
+relations and many-to-many relations are included. Each expansion uses the same
+permission-checked endpoint. Metadata traversal makes no record queries.
+Wrap the collection URL callbacks with <code>admin.site.admin_view</code> to protect the
+HTML entry and integrate the native admin login, as the local Bakery PoC does.</p>
+<p>This is a schema explorer, not a record editor or ModelAdmin replacement.
+Auto-created intermediary models and hidden fields are excluded; generic targets,
+Python properties and internal StreamField block schemas are not expanded.
+Relation paths are limited to 24 levels, including cyclic model graphs.</p>
+<h2>Generated table editor (local PoC)</h2>
+<p>Subclass <code>gramlot.contrib.django.tables.DjangoTablesPage</code> and declare explicit
+<code>table_fields = {'myapp.country': ['title', 'sort_order']}</code>. The page provides
+model selection, search (up to 100 rows), and New/Save/Cancel in a record dialog.
+Double-click or Enter activates a grid row. Server-side ModelForms validate
+allowlisted fields; each operation checks active staff status and Django model
+permissions. The first projection uses text inputs for scalar fields only.
+Relations, deletion and custom widget mapping are not implemented in this slice.</p>
+</section><section id="example" role="tabpanel" aria-labelledby="tab-example" tabindex="0" hidden><div class="source">Source: docs/examples/django/README.md</div><h1>Django customer example</h1>
+<p>A normal Django project hosting a Python Gramlot page with an ORM-backed grid and
+a permission-checked, transactional city update. Application UI, state and RPC
+use Gramlot declarations; Django's own admin supplies the host login screen.</p>
+<p>Install the local Gramlot wheel with the <code>django</code> extra (the adapter is not yet
+in a published release), then run from this directory:</p>
+<pre><code class="language-sh">python manage.py migrate
+python manage.py shell -c &quot;from gramlot_demo.models import Customer; Customer.objects.get_or_create(name='Ada', defaults={'city': 'Rome'})&quot;
+python manage.py createsuperuser
+python manage.py runserver 127.0.0.1:8064
+</code></pre>
+<p>Visit <code>/admin/</code> and sign in with your local superuser. Then open
+<code>http://127.0.0.1:8064/ui/customers/</code>, select Ada, enter a new city and click <strong>Save
+city</strong>. The grid reloads from the database. Anonymous users can read the grid;
+saving requires <code>gramlot_demo.change_customer</code>. A superuser has that permission.</p>
+<p>The SQLite file stays beside this example and is ignored by Git. To isolate a
+run, set <code>GRAMLOT_DJANGO_DB</code> to another local SQLite path. The settings are for
+local demonstration, not a deployment configuration.</p>
+<p>See <a href="#guide">the adapter guide</a> for existing-project integration,
+authentication, CSRF, typed selections and lifecycle limits.</p>
+<h2>Complete Bakery PoC</h2>
+<p>The adapted Bakerydemo source, media and compressed SQLite SQL dump are in
+<a href="#bakery">bakerydemo</a>. The earlier <code>bakery_overlay</code> directory is
+retained as the source-only integration snapshot.</p>
+</section><section id="bakery" role="tabpanel" aria-labelledby="tab-bakery" tabindex="0" hidden><div class="source">Source: docs/examples/django/bakerydemo/GRAMLOT.md</div><h1>Adapted Bakerydemo for Gramlot</h1>
+<p>Complete local Bakerydemo source snapshot, including media and the Gramlot
+public explorer, SPA dashboard, schema browser and table editor. Upstream
+licensing is retained in LICENSE. This is a Django 6 / Wagtail 8 development PoC.</p>
+<p>Install this directory's requirements and a Gramlot build with its Django extra.
+Restore the compressed SQLite SQL dump from this directory:</p>
+<pre><code class="language-sh">unzip -p bakerydemo.sql.zip bakerydemo.sql | sqlite3 bakerydemodb
+python manage.py runserver 127.0.0.1:8063 --settings=bakerydemo.settings.gramlot
+</code></pre>
+<p>Restore into a new, empty database file. Open <code>/spa_admin/</code> for the dashboard
+and <code>/products/explore/</code> for the public product explorer. The supplied upstream
+demo account is admin / changeme. This is a local demo, not production settings.</p>
+<p>The dump was made from a consistent SQLite backup and restored into a fresh
+database to check integrity, foreign keys and all table row counts. Active
+Django sessions were cleared in the backup only. Local <code>.env</code>,
+<code>settings/local.py</code>, environment/cache files and the live database are excluded.
+The source database was not modified.</p>
+</section><section id="status" role="tabpanel" aria-labelledby="tab-status" tabindex="0" hidden><div class="source">Source: docs/development/django-adapter-2026-09-13.md</div><h1>Optional Django adapter — 2026-09-13</h1>
+<h2>Owner scope and implementation</h2>
+<p>The owner requested <code>gramlot.contrib.django</code> with the required host integration,
+then supplied the local Bakerydemo checkout as a real consumer to copy and use.
+This supersedes the earlier decision register's deferred-Django status.</p>
+<p>Implemented locally, without commit/push/release in this task:</p>
+<ul>
+<li><code>DjangoPageCollection</code>: native Django URLconf composition, flat <code>pages/</code>
+discovery, fresh pages per invocation, Data/Source TYTX routes and request context.</li>
+<li><code>DjangoPage</code>: invocation-scoped Django request and explicit ORM selection helper.</li>
+<li>Collection/page login and permissions on HTML, recipe and RPC routes; host
+middleware/session compatibility and framework-level masked CSRF headers.</li>
+<li>Thread-sensitive synchronous execution and materialization, explicit application
+transactions and preserved rollback for encoded RPC errors under <code>ATOMIC_REQUESTS</code>.</li>
+<li>Shared internal discovery/invocation, browser asset metadata and startup HTML,
+extracted from FastAPI. Existing FastAPI and GenroPy host hooks remain intact.</li>
+<li>Optional <code>django</code> extra, Python customer example, guide and CI coverage.</li>
+</ul>
+<p>No Django/FastAPI/GenroPy dependency enters core. No Genro ASGI code is imported.
+The GenroPy contrib still specifically hosts GnrApp under FastAPI; this work does
+not claim that it is now an independently composable Django database provider.</p>
+<h2>Real consumer: copied Bakerydemo</h2>
+<p>Source supplied by the owner:
+<code>../genro-asgi/temp/django_lab/bakerydemo</code>.
+Local copy: <code>temp/django_lab/bakerydemo</code> in the canonical Gramlot repository.
+Copied 452 files, 26,692,590 bytes; every copied source file matched its original
+SHA-256 after verification. The copy excludes Git administration, environments,
+node_modules and Python caches. It contains its own copied SQLite database;
+no symlinks point back to the original.</p>
+<p>Only new integration files were added to the copy:</p>
+<ul>
+<li><code>bakerydemo/settings/gramlot.py</code>: local settings forcing the copied SQLite DB.</li>
+<li><code>bakerydemo/gramlot_urls.py</code>: Gramlot routes before the Wagtail catch-all.</li>
+<li><code>gramlot_pages/pages/breads.py</code>: Python Gramlot grid over
+<code>BreadPage.objects.live().public()</code>, with explicit <code>id/title/slug</code> projection.</li>
+</ul>
+<p>The isolated environment is <code>temp/django_lab/.venv</code>, with Django 6.0.8 and Wagtail
+8.0. It consumes a locally built, normally installed Gramlot wheel and public
+Python dependencies; no PYTHONPATH override was used to run Bakerydemo. The
+browser smoke used the wheel built before the simultaneous source version bump
+from 0.1.3 to 0.1.4. The final current-source wheel and browser distribution were
+subsequently rebuilt and their payload parity verified.</p>
+<p>Local server command, from the Gramlot repository:</p>
+<pre><code class="language-sh">temp/django_lab/.venv/bin/python temp/django_lab/bakerydemo/manage.py runserver \
+  127.0.0.1:8063 --noreload --settings=bakerydemo.settings.gramlot
+</code></pre>
+<p>Browser verification at <code>/gramlot/breads/</code>: initial remote Source, 11 published
+bread rows, Reload through Data RPC and the Python source panel all worked.
+Django <code>check</code> reported no issues. Wagtail content/revisions were not edited.
+The integration is local test material, excluded from distribution; its existing
+CMS frontend is a host application, while the new Gramlot page uses only Gramlot.</p>
+<h2>Verification and limits</h2>
+<ul>
+<li>Django integration suite: 18 passed on Django 5.2.17 and 18 on Django 6.0.8.
+Includes actual middleware/CSRF modes, authenticated writes, ORM projection,
+rollback, ASGI dispatch, access restrictions, typed RPC and asset traversal.</li>
+<li>Combined Django, FastAPI, GenroPy, page-service, Data RPC and browser-distribution
+contracts: 56 passed after rebuilding assets for source version 0.1.4.</li>
+<li>JavaScript runtime suite: 378 passed, including same-origin CSRF headers and
+native middleware HTTP rejection handling.</li>
+<li>Wheel/browser ZIP: 46 identical files; strict Sphinx build passed.</li>
+<li>Broader Python run: 168 passed, 1 skipped, 5 failed at that checkpoint.
+Four failures concern the separately developed relationTree catalogue/gallery
+contract (required table and missing standalone gallery case). The remaining
+manual-server test failed under sandbox port restrictions and passed when
+rerun with local port permission. These do not make the whole repository green.</li>
+</ul>
+<p>The source checkout changed concurrently: the relation-tree work was consolidated
+as <code>8be2f7a</code> and the owner changed the source version to 0.1.4. Those changes were
+preserved, and are distinct from this adapter implementation.</p>
+<p>The maintained customer example uses only Python Gramlot declarations for UI,
+state, requests and interaction. Small callback fragments only set Data/fire a
+reload. The source audit found no application-local fetch, DOM construction or
+manual DOM event wiring. Its standard Django admin is the host login mechanism.</p>
+<p>See <a href="#guide">the adapter guide</a> for supported APIs and explicit limits:
+public defaults, application-owned record authorization/pagination/transactions,
+process-local shared stores, explicit URL prefix and no custom CSP nonce support.</p>
+<h2>Public Bakerydemo explorer — subsequent owner request</h2>
+<p>The owner chose a public linked-grid explorer with an image that follows the
+selected product. The local copy now exposes <code>/products/explore/</code>, linked as
+<strong>Explore breads</strong> in both desktop and mobile public navigation.</p>
+<p>The optional <code>template_name</code> argument on <code>DjangoPageCollection</code> lets its document
+use a Django host template with the normal request context processors. Bakerydemo
+extends its existing <code>base.html</code>; all new catalogue UI is authored in the Python
+Gramlot page, with no iframe, custom application fetch or DOM event machinery.
+The adapter supplies escaped startup/import-map JSON and the packaged entry URL.</p>
+<p><code>public_products/pages/explore.py</code> selects only live/public BreadPages within the
+current site's tree. It materializes the small 11-product catalogue as Data Bags.
+A bread-type grid selects the product Bag; product selection drives image,
+description, ingredients and the native public detail link through two short
+Data controllers. First-row selection is explicit. This resident prototype does
+not issue one RPC per selection, so fast keyboard navigation cannot race stale
+HTTP replies. Large-catalogue pagination remains outside this local example.
+Images use Wagtail renditions generated in the copied media/database environment.</p>
+<p>Verified in the actual browser: home → mobile menu → Explore breads; all 11 rows;
+Anpan selection; ArrowDown changes photo/details to Appam; Flatbread filters to
+Bammy/Bolani and selects Bammy. The rendition files returned HTTP 200, and the
+photo was visually checked next to the grids. The page uses a responsive layout
+with a sticky detail panel at intermediate widths and stacked content on narrow
+screens. The Django adapter suite now has 19 passing tests, including custom
+host-template startup and CSRF. Original Bakerydemo files remain untouched;
+the earlier copy-equality checkpoint precedes these requested local edits.</p>
+<h2>Minimal schema admin PoC</h2>
+<p>The owner requested an admin tree of the complete installed Django model schema.
+The copied Bakery host now exposes <code>/spa_admin/models/</code>, wrapped with native
+<code>admin.site.admin_view</code>, with a staff-only menu link. Its Python page uses
+<code>dataRpc</code>, Data bindings and <code>storeTree</code>; no application DOM or fetch bypass.
+The reusable <code>DjangoPage.model_tree</code> endpoint is staff-only and requires explicit
+model opt-in. Lazy branches traverse app → model → fields → related model.</p>
+<p>Verified against the installed local wheel on Django 6/Wagtail 8: 78 models in
+22 apps, 1,253 field/relation entries, anonymous redirect, authenticated HTML and
+Source RPC. Browser expansion of breads → BreadPage → origin → Country shows
+scalar fields and reverse relations. The 21 Django adapter tests pass, including
+zero-query schema traversal, lazy descriptors, allowed roots and staff enforcement.
+The local host restores Django's normal password hashers because its inherited
+test settings accepted only MD5, whereas copied demo accounts use PBKDF2.
+No record editing, admin actions or model form generation is implemented.</p>
+<h2>SPA dashboard shell</h2>
+<p><code>/spa_admin/</code> now renders the Python-authored dashboard directly. The model
+explorer remains a child page at <code>/spa_admin/models/</code>. A split borderContainer
+hosts the navigation storeTree and a tabContainer with iframe content panes.
+The small explicit page registry includes Model Explorer, Breads grid and
+Product explorer. Tabs are declared once, initially hidden, and their iframe
+URLs are assigned on first selection. Subsequent selections reuse the same
+iframe and preserve its state. All interactions use Data bindings/controllers.
+The host permits same-origin frames on these explicit PoC routes; the dashboard
+and schema routes retain native staff authentication.</p>
+<p>Browser verification: root dashboard, navigation selection, two simultaneously
+open tabs, embedded bread grid with 11 rows, and returning to Model Explorer
+with the breads branch still expanded. This remains the existing Bakery host;
+a standalone Django project and generated CRUD dialogs are separate pending work.</p>
+<h2>Generated tables and record editor PoC</h2>
+<p>The dashboard now includes Tables (<code>/spa_admin/tables/</code>). The reusable
+<code>gramlot.contrib.django.tables.DjangoTablesPage</code> accepts an explicit <code>table_fields</code>
+map. The Bakery page enables Country (title, sort_order) and BreadType (title).
+It generates a model navigation tree, a text search, a bounded 100-record grid
+and a record editor with New, Save and Cancel. Table changes use remote Source;
+rows use rpcStore; editor state uses Data Bags and standard controllers/RPC.</p>
+<p>The grid now publishes <code>&lt;nodeId&gt;_onRowActivated</code> with <code>key</code> on double-click or
+Enter. This reusable framework event drives the Python-authored record dialog.
+Read/add/change permissions and active staff status are checked server-side.
+Saving uses an allowlisted Django ModelForm inside a transaction, returning
+field/non-field validation errors without writing invalid records.</p>
+<p>Verified: 22 Django adapter tests, including insert/update, required-field
+validation, search and denied writes; 14 grid tests including activation.
+Browser: Countries search for Japan, double-click editor, blank-title validation,
+cancel, switch to BreadType, double-click and save with grid refresh.</p>
+<p>Scope: scalar text/integer fields in the two explicit models; no relation widgets,
+delete action, pagination UI, optimistic concurrency detection, Wagtail revision
+workflow or general widget mapping yet. This is ordinary Django ORM/ModelForm
+editing in the copied host, not a replacement for Wagtail page publication.</p>
+<h2>Owner-directed consolidation</h2>
+<p>The owner requests commit and push of the Django work on develop. The source-only
+Bakery overlay is preserved under <code>docs/examples/django/bakery_overlay</code>; local
+data and media remain untracked. No release, tag or deployment is requested.</p>
+<p>Next architectural step: move the record editor shell and common lifecycle into
+base Gramlot components and the Python base page. Django specializes model
+metadata, validation, permissions and persistence. Backend capabilities may be
+Genropy-only; distinguish those from capabilities merely missing in an adapter.
+The current DjangoTablesPage remains a PoC pending that extraction.</p>
+</section><section id="overlay" role="tabpanel" aria-labelledby="tab-overlay" tabindex="0" hidden><div class="source">Source: docs/examples/django/bakery_overlay/README.md</div><h1>Bakery integration overlay</h1>
+<p>Source-only snapshot of the owner-requested local Bakery PoC. These files are
+an overlay for the supplied Bakerydemo Django 6 / Wagtail 8 checkout, not a
+standalone application. Database, media, accounts and the Bakery source tree
+are deliberately absent. Apply to a disposable copy of that checkout, install
+the Gramlot wheel with its Django extra, and use settings
+<code>bakerydemo.settings.gramlot</code>. The local dashboard entry is <code>/spa_admin/</code>.</p>
+<p>The snapshot retains the host menu/template customizations, public explorer,
+schema explorer and table editor pages. See the Django adapter checkpoint for
+verified behavior and limitations.</p>
+</section></main><footer>Documentation snapshot · 13 September 2026 · Experimental adapter and PoCs. Historical verification statements retain their original context. No external scripts, fonts or styles are required.</footer><script>
+const tabs=Array.from(document.querySelectorAll('[role=tab]'));
+function show(id,focus=false){const tab=tabs.find(t=>t.getAttribute('aria-controls')===id)||tabs[0];for(const item of tabs){const active=item===tab;item.setAttribute('aria-selected',String(active));item.tabIndex=active?0:-1;document.getElementById(item.getAttribute('aria-controls')).hidden=!active;}if(focus)tab.focus();history.replaceState(null,'','#'+tab.getAttribute('aria-controls'));}
+for(const tab of tabs){tab.addEventListener('click',()=>show(tab.getAttribute('aria-controls')));tab.addEventListener('keydown',event=>{let i=tabs.indexOf(tab);if(event.key==='ArrowRight')i=(i+1)%tabs.length;else if(event.key==='ArrowLeft')i=(i+tabs.length-1)%tabs.length;else if(event.key==='Home')i=0;else if(event.key==='End')i=tabs.length-1;else return;event.preventDefault();show(tabs[i].getAttribute('aria-controls'),true);});}
+document.addEventListener('click',event=>{const link=event.target.closest('a[href^="#"]');if(link&&tabs.some(t=>t.getAttribute('aria-controls')===link.hash.slice(1))){event.preventDefault();show(link.hash.slice(1));window.scrollTo(0,0);}});
+window.addEventListener('hashchange',()=>show(location.hash.slice(1)));document.getElementById('print').addEventListener('click',()=>window.print());show(location.hash.slice(1));
+</script></body></html>

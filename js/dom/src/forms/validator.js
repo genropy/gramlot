@@ -53,8 +53,13 @@ export class Validator {
         const empty=value==null || value==='';
         if (['nodup','exist','gridnodup'].includes(rule)) throw new Error(`validate_${rule} requires a separate database/grid adapter`);
         if (rule==='remote') {
-            if (typeof param!=='function') throw new Error('validate_remote requires an injected function, not an RPC method name');
-            return this._callback(node,param,{...config,value,signal:context.signal});
+            if (typeof param==='function') return this._callback(node,param,{...config,value,signal:context.signal});
+            if (typeof param!=='string' || !param) throw new Error('validate_remote requires a callback or RPC method name');
+            const params={};
+            for(const [key,item] of Object.entries(config)) {
+                if(key.startsWith('remote_') && !['remote_if','remote_error','remote_warning'].includes(key)) params[key.slice(7)]=item;
+            }
+            return this.application.server.call(param,{...params,value},{owner:node,signal:context.signal});
         }
         if (rule==='select') {
             const widget=context.widget;
@@ -102,7 +107,10 @@ export class Validator {
             : reply.iswarning ?? Boolean(config[rule+'_warning'] && !config[rule+'_error']);
         const severity=warning ? 'warning' : 'error';
         const message=reply.message || config[rule+'_'+reply.errorcode] || config[rule+'_'+severity]
-            || config[rule+'_'+(warning?'error':'warning')] || (rule==='notnull' ? 'A value is required.' : `${rule}: ${reply.errorcode}`);
+            || config[rule+'_'+(warning?'error':'warning')] || (rule==='notnull' ? 'A value is required.'
+                : rule==='min' ? `Enter a value greater than or equal to ${config.min}.`
+                : rule==='max' ? `Enter a value less than or equal to ${config.max}.`
+                : `${rule}: ${reply.errorcode}`);
         result.issues.push({rule,code:reply.errorcode,severity,message:String(message)});
     }
 }

@@ -4,6 +4,25 @@ import json
 
 
 class ResolverAuthoring:
+    def gramlotIde(self, **attributes):
+        """Mount the reusable document editor with an isolated default Data scope."""
+        if 'datapath' not in attributes:
+            serial = getattr(self.builder, '_ide_serial', 0) + 1
+            self.builder._ide_serial = serial
+            attributes['datapath'] = f'ide_{serial}'
+        return self._declaration('gramlotIde', **attributes)
+
+    def fileSystemTree(self, root, *, rpcmethod='directory_tree', path='', storepath=None, **attributes):
+        """Show a named server directory using lazy RPC directory resolvers."""
+        if 'store' in attributes:
+            raise TypeError('fileSystemTree owns its store; use storepath')
+        if storepath is None:
+            serial = getattr(self.builder, '_filesystem_tree_serial', 0) + 1
+            self.builder._filesystem_tree_serial = serial
+            storepath = f'_filesystemTrees.tree_{serial}'
+        self.dataRpc(storepath, rpcmethod, root=root, path=path, _on_start=True)
+        return self._declaration('fileSystemTree', store=f'^{storepath}', **attributes)
+
     def relationTree(self, table, *, rpcmethod='relation_tree', storepath=None,
                      omit='_', dosort=True, groupDescending=False, **attributes):
         """Declare an RPC-backed relationTree component in the current Data scope."""

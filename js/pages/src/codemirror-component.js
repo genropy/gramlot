@@ -1,10 +1,16 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
-import {registerComponentCollection, builtinComponents} from 'gramlot-dom';
+import {registerComponentCollection, builtinComponents, getCollection} from 'gramlot-dom';
 import {WidgetLabel} from '/_assets/dom/widget-label.js';
+import '/_assets/dom/collections/storetree.js';
+import '/_assets/dom/collections/layout.js';
+import {defineGramlotIde} from '/_assets/dom/collections/gramlot-ide.js';
 
 registerComponentCollection('labEditors', {
     components: builtinComponents('labEditors'),
     defineComponents() {
+        getCollection('storeTree').defineComponents();
+        getCollection('layout').defineComponents();
+        defineGramlotIde();
         if (customElements.get('gnr-codemirror')) { return; }
         class CodeMirrorElement extends HTMLElement {
             static get observedAttributes() { return ['value', 'language', 'readonly']; }
@@ -13,6 +19,7 @@ registerComponentCollection('labEditors', {
                 this.attachShadow({mode: 'open'});
                 this._value = '';
                 this._content = document.createElement('div');
+                this._content.style.height = '100%';
                 const style = document.createElement('style');
                 style.textContent = ':host{display:block;border:1px solid var(--gray-300,#d8d8dc);border-radius:3px;background:white}.cm-editor{height:var(--code-editor-height,280px);font-size:var(--code-editor-font-size,12px)}.cm-scroller{overflow:auto}textarea{box-sizing:border-box;width:100%;height:var(--code-editor-height,280px);font:var(--code-editor-font-size,13px) monospace}';
                 this.shadowRoot.append(style, this._content);
@@ -52,15 +59,17 @@ registerComponentCollection('labEditors', {
                             ? import('https://esm.sh/@codemirror/lang-python@6.2.1' + deps)
                             : this.getAttribute('language') === 'css'
                             ? import('https://esm.sh/@codemirror/lang-css@6.3.1' + deps)
-                            : this.getAttribute('language') === 'xml'
+                            : ['xml','html'].includes(this.getAttribute('language'))
                             ? import('https://esm.sh/@codemirror/lang-xml@6.1.0' + deps)
+                            : ['text','markdown'].includes(this.getAttribute('language'))
+                            ? Promise.resolve({})
                             : import('https://esm.sh/@codemirror/lang-javascript@6.2.3' + deps)
                     ]);
                     if (!this.isConnected || this.generation !== generation) { return; }
                     const readonly = this.hasAttribute('readonly');
                     this.fallback.remove();
                     this.editor = new EditorView({parent: this._content, doc: this._value,
-                        extensions: [basicSetup, oneDark, (language.python || language.css || language.xml || language.javascript)(),
+                        extensions: [basicSetup, oneDark, ...((language.python || language.css || language.xml || language.javascript) ? [(language.python || language.css || language.xml || language.javascript)()] : []),
                             EditorState.readOnly.of(readonly), EditorView.editable.of(!readonly),
                             EditorView.lineWrapping,
                             EditorView.contentAttributes.of({tabindex: '0', 'aria-label': this.getAttribute('aria-label') || 'Code'}),

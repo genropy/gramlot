@@ -245,7 +245,7 @@ export class BuilderBase {
         }
         for (const [k, v] of entries) {
             // Legacy grid structpath is a Data path, reactive without a ^ prefix.
-            if (node.nodeTag === 'grid' && k === 'structpath') {
+            if (['grid', 'chart'].includes(node.nodeTag) && k === 'structpath') {
                 const path = node.absDatapath(v);
                 this.handler._registerPath(node, path);
                 resolved.set(k, this.handler.data.getItem(path));

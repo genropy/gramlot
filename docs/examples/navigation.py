@@ -22,7 +22,10 @@ def catalogue(preview, database=False):
                                 group='Tutorial / ' + item['group']))
     entries += [dict(title=title, url=url, group='Applications') for title, url in (
         ('Hello', '/hello/hello/'), ('Alfa', '/hello/alfa/'), ('Beta', '/hello/beta/'),
-        ('Triangle RPC', '/page/triangle/'), ('OpenAPI Explorer', '/openapi/'),
+        ('Grid and chartBox', '/charts/chart/'), ('Triangle RPC', '/page/triangle/'), ('Remote Source', '/page/remote-source/'),
+        ('FileSystemTree', '/page/filesystem-tree/'),
+        ('Gramlot IDE', '/page/gramlot-ide/'),
+        ('OpenAPI Explorer', '/openapi/'),
     )]
     entries.append(dict(title='States, localities and customers', url='/database/states/',
                         group='Applications', disabled=not database))

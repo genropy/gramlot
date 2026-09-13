@@ -5,9 +5,10 @@
  * The host editor, never this helper, owns values and confirmation policy.
  */
 export class ControlTools {
-    constructor(host, control, {onLeave, onCancel} = {}) {
+    constructor(host, control, {onLeave, onCancel, isLocked} = {}) {
         if (!host.shadowRoot) throw new TypeError('ControlTools requires an open shadow root');
         this.host=host; this.control=control; this.onLeave=onLeave; this.onCancel=onCancel;
+        this.isLocked=isLocked;
         this.tools=new Set(); this.active=false; this.sequence=0;
         const doc=host.ownerDocument;
         this.element=doc.createElement('div'); this.element.className='gnr-control-tools';
@@ -41,7 +42,7 @@ export class ControlTools {
             else this.leave('pointer');
         };
     }
-    get locked() { return this.control.disabled || this.control.readOnly || this.host.hasAttribute('disabled') || this.host.hasAttribute('readonly'); }
+    get locked() { return this.isLocked ? this.isLocked() : this.control.disabled || this.control.readOnly || this.host.hasAttribute('disabled') || this.host.hasAttribute('readonly'); }
     contains(node) {
         if(!node) return false;
         // Focus is retargeted to the host outside its shadow; inside it, nested

@@ -161,6 +161,10 @@ export class ServerCallService {
         }
         const [, attr] = this.application.builder.runtimeValues(node);
         const kwargs = {...params};
+        if (node.store?.chunkSize) {
+            kwargs._offset ??= 0;
+            kwargs._limit = node.store.chunkSize;
+        }
         // Reserve before user hooks: a hook can itself trigger this provider.
         const state = {pending: true, promise: null};
         node._rpcState = state;
@@ -183,7 +187,7 @@ export class ServerCallService {
                 if (obsolete()) return {status: 'obsolete'};
                 let old;
                 this.application.live(() => {
-                    if (node.nodeTag === 'rpcStore') this.application.stores.accept(node, result);
+                    if (node.nodeTag === 'rpcStore') this.application.stores.accept(node, result, kwargs);
                     if (attr.destination) {
                         const path = node.absDatapath(attr.destination);
                         old = this.application.data.getItem(path);

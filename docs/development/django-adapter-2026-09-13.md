@@ -193,3 +193,82 @@ base Gramlot components and the Python base page. Django specializes model
 metadata, validation, permissions and persistence. Backend capabilities may be
 Genropy-only; distinguish those from capabilities merely missing in an adapter.
 The current DjangoTablesPage remains a PoC pending that extraction.
+
+## Minimal IDE components in the SPA
+
+Owner correction: the SPA uses `gramlotIde` directly inside its tab panes, without
+an IDE page wrapper, nested iframe or workspace selector. The main navigation
+has Source files entries for Django templates, SPA pages, public pages/CSS and
+bread grid pages. Each entry maps to an explicit named filesystem root and an
+independent editor Data scope. Django gates provider operations to active staff
+superusers; the shared filesystem provider owns bounded reads, revision checks
+and atomic saves. No arbitrary folder path is accepted by this integration.
+
+Verified in the browser: direct template tree, switching to the public source
+root and opening explore.py. The preceding provider integration also verified
+editing/saving a temporary template comment and restoring the original content.
+Focused Django/filesystem tests passed 27 cases. Python source saves do not
+hot-reload the current no-reload host; restart it to execute changed page code.
+HTML preview does not render Django template tags.
+
+## Server-rendered template preview
+
+The shared IDE now accepts a generic `previewmethod` endpoint. Django renders
+unsaved template text with application-provided context and request processors;
+Bakery supplies the first matching published/public page in the current site.
+The existing sandboxed preview iframe displays returned HTML with a host base
+URL. No file write occurs during preview. This supersedes the raw-template-only
+preview limitation above for supported page templates.
+
+Verification: 28 Django/filesystem tests and 7 IDE tests pass. A new regression
+checks unsaved rendering without file mutation, and a client regression checks
+stale results after edits/disposal. Actual browser rendering of bread_page.html
+shows Anadama, its photo, origin, bread type and ingredients, with assets HTTP 200.
+
+## Unified GramlotPages sources
+
+Owner correction: all Bakery Gramlot pages and their CSS now live together in
+`GramlotPages/pages/`. The IDE navigation exposes a single **GramlotPages** root
+beside Django templates. The three URL collections load that directory and keep
+explicit page subsets, preserving public/admin routing boundaries. This replaces
+the separate schema_admin, public_products and gramlot_pages source directories.
+Verified registry membership and the browser tree containing all seven source
+files. The complete Bakery snapshot and source overlay use the same layout.
+
+## validate_remote bridge
+
+The core validator now accepts a logical RPC method name in addition to the
+existing injected callback. Named remote parameters and the current candidate
+are sent through ServerCallService with the field's abort signal. Existing
+field generation/signature checks remain responsible for stale results.
+DjangoTablesPage now owns its draft in a Gramlot form, accepts custom ModelForms
+through table_forms, and validates remote candidates with the same factory as
+Save, without persisting the validation result.
+
+Verified: 25 Django tests and 24 JS form/validation tests. The custom ModelForm
+regression covers clean_name and cross-field clean, agreement with Save, and
+unchanged database values. Browser: empty title → blur → required-field error
+before Save; corrected title → blur → error removed; Cancel without writing.
+
+## Form presentation and richer sample
+
+The record editor now uses the shared groupBox (record caption), form and a
+two-column formlet with top-left labels. Textarea ModelForm widgets map to
+textBoxArea. The backdrop and SPA header use a light palette. LocationPage is
+explicitly exposed with seven scalar fields (title, slug, introduction, address,
+coordinates, title tag and meta description); creation is disabled on both the
+UI and server because Wagtail tree insertion belongs to its native admin.
+Existing row edits retain the PoC's ordinary ModelForm semantics, without Wagtail
+revision/publication handling. Remote validation waits for a loaded draft.
+Verified 25 Django tests and the Hof editor in the browser, including the titled
+GroupBox and seven aligned fields. No existing location was changed.
+
+### Automatic relation widgets and related tabs
+
+Exposed single relations now use dbSelect with identity/caption lookup backed by
+the ModelForm queryset. Reverse and many-to-many relations to explicitly exposed
+targets generate separate read-only grid tabs under the record. Bakery enables
+LocationPage.image, hours_of_operation, and breads under Country/BreadType.
+Unsaved parents do not query children. Saving scalar fields preserves M2M links.
+A shared select fix deduplicates repeated pending identity assignments and waits
+for identity lookup during select validation, including numeric ORM identities.

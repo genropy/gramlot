@@ -42,6 +42,21 @@ class BorderPage extends HtmlBuilder {
     }
 }
 
+test('tab close controls exist only for closable panes and preserve close guards',()=>{
+    class Page extends HtmlBuilder {
+        static wc_requires=['layout'];
+        main(root){const tabs=root.tabContainer();tabs.tab({title:'Fixed'});tabs.tab({title:'Document',closable:true});}
+    }
+    const {genro,host}=mountApp(Page);
+    const tabs=host.querySelector('gnr-tabcontainer');
+    assert.equal(tabs.shadowRoot.querySelectorAll('.tab-close').length,1);
+    assert.equal(tabs.shadowRoot.querySelector('.tab-close').getAttribute('aria-label'),'Close Document');
+    let closed=false;tabs.addEventListener('gnr-close-page',()=>{closed=true;});
+    tabs.addEventListener('gnr-before-close',e=>e.preventDefault(),{once:true});
+    tabs.closePage(1);assert.equal(closed,false);
+    tabs.closePage(1);assert.equal(closed,true);genro.dispose();
+});
+
 test('borderContainer builds the five region cells and applies the design', () => {
     const { host } = mountApp(BorderPage);
     const bc = host.querySelector('gnr-bordercontainer');

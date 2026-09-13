@@ -5,6 +5,14 @@
 
 # Open work retained from Pages
 
+## Recipe concept — minimal experiment, 2026-09-13
+
+The owner-authorized [box experiment](../examples/recipes/README.md) compares
+an imported Python function with an explicitly reactive standalone JS recipe.
+Review it before selecting registry/naming/manifest contracts or migrating the
+IDE. The manifesto includes actual Python source but has no generic loader yet.
+No automatic Python-to-JS conversion or full dynamic equivalence is promised.
+
 ## After 0.1.3 consolidation: customer dialog
 
 The owner requested opening a customer form in a dialog on row double-click, then
@@ -431,3 +439,34 @@ are intermittent (focused repeat: 3/6 passed). Investigate layout readiness and
 pointer targeting before attributing the cause to application or test code.
 Production health, lesson interactions and the site customer dbSelect passed.
 See [release checkpoint](../release.md) for deployed tags, CI runs and digests.
+
+## Remote Source compatibility investigation — 2026-09-13
+
+Owner requested detailed legacy analysis before remote construction experiments.
+See [remote Source audit](../development/remote-source-legacy-audit-2026-09-13.md)
+for verified source behavior, differences from the current prototype, failure
+risks and the proposed acceptance matrix. No remote policy change approved yet.
+
+## Grouplet-driven remote priorities — 2026-09-13
+
+The owner wants grouplets soon. The [focused legacy audit](../development/grouplet-remote-legacy-2026-09-13.md)
+traces the actual Grouplet → remoteBuilder → gr_loadGrouplet pipeline and the
+separate GroupletForm lifecycle. Start with resource/instance isolation, Data
+scope, guarded remote loading and post-install readiness. Full legacy variants
+remain out of the first slice; this is a proposal, not a completed port.
+
+## Before closing remote: all store integration levels — 2026-09-13
+
+Required by the owner: assess resident, RPC, DB selection, paged, filesystem,
+widget adapters and form-store families, plus their interaction with lazy Bags.
+Check ownership, scoped registration, load/save, replacement, teardown and
+multiple grouplet instances. Use the [integration checklist](../development/remote-store-integration-checklist-2026-09-13.md).
+The review does not imply implementing every legacy store before the first grouplet.
+
+## All legacy store families — owner scope expansion, 2026-09-13
+
+The owner now authorizes the broader store port plus FileSystemTree. The earlier
+review-only limit is superseded. See [implementation matrix and remaining work](../development/store-port-2026-09-13.md).
+Local entry points exist for selection/paged/filesystem collections and the form
+store families; the full virtual, persistence/navigation and remote/grouplet
+contracts remain incomplete. Do not describe the full migration as finished.

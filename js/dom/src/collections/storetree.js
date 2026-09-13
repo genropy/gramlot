@@ -22,6 +22,7 @@
  * checkbox tri-state, search/filter, drag & drop.
  */
 import { Bag } from 'genro-bag-js';
+import {fileIcon} from './file-icons.js';
 
 import {registerComponentCollection} from '../components/registry.js';
 import {builtinComponents} from '../components/builtin-components.js';
@@ -530,6 +531,21 @@ function defineComponents() {
         }
     }
     customElements.define('gnr-relationtree', GnrRelationTree);
+    customElements.define('gnr-filesystemtree', class FileSystemTree extends GnrStoreTree {
+        _caption(el, caption, path, node) {
+            super._caption(el, caption, path, node);
+            const info = {...node.getAttr()};
+            el.prepend(fileIcon(info.caption,info.is_directory));
+            el.addEventListener('click',()=>{
+                const pointer=this.getAttribute('data-selectedFile-pointer');
+                if(pointer)this.dispatchEvent(new CustomEvent('gnr-set',{bubbles:true,composed:true,detail:{pointer,value:info}}));
+            });
+            const open=()=>{if(!info.is_directory)this.dispatchEvent(new CustomEvent('filesystem-open',{bubbles:true,composed:true,detail:info}));};
+            el.addEventListener('dblclick',open);
+            el.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();open();}});
+            el.tabIndex=0;
+        }
+    });
 }
 
 registerComponentCollection('storeTree', { components: builtinComponents('storeTree'), defineComponents });

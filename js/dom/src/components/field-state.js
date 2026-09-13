@@ -6,6 +6,9 @@ export function setFieldState(widget, {invalid = false, pending = false, issues 
         input.setAttribute('aria-invalid',String(invalid));
         input.setAttribute('aria-busy',String(pending));
         widget.toggleAttribute('data-invalid',invalid);
+        widget.dispatchEvent(new widget.ownerDocument.defaultView.CustomEvent('gnr-field-state', {
+            bubbles:true, composed:true, detail:{invalid, pending, issues},
+        }));
         (widget.decoration || widget._widgetLabel)?.box?.classList.toggle('innerLblWrapper_error',invalid);
         if (widget.shadowRoot) {
             let message=widget.shadowRoot.querySelector('[data-validation-message]');
@@ -15,6 +18,17 @@ export function setFieldState(widget, {invalid = false, pending = false, issues 
                 message.setAttribute('aria-live','polite');widget.shadowRoot.appendChild(message);
                 const style=widget.ownerDocument.createElement('style');
                 style.textContent=':is(input,textarea)[aria-invalid=true]{background-color:var(--field-invalid-bg,#fff0f0)}[data-validation-message]{color:var(--field-error-color,#9e2525);font-size:12px}';
+                style.textContent += `
+                    :host([validationpresentation="tooltip"]){position:relative}
+                    :host([validationpresentation="tooltip"]) [data-validation-message]{
+                        position:absolute;bottom:calc(100% + 5px);right:0;z-index:20;
+                        width:max-content;max-width:260px;box-sizing:border-box;
+                        padding:5px 8px;border:1px solid #d6a3a3;border-radius:4px;
+                        background:#fff8f8;box-shadow:0 2px 5px #0002;
+                        white-space:normal;line-height:1.35;pointer-events:none;
+                    }
+                    :host([validationpresentation="tooltip"]) :is(#number-message,#choice-error){display:none!important}
+                `;
                 widget.shadowRoot.appendChild(style);
             }
             const text=issues.map(issue=>issue.message).join(' ');

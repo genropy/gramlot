@@ -91,11 +91,13 @@ const BORDER_CSS =
 
 const TABS_CSS =
     ':host { display: flex; flex-direction: column; min-height: 0; }'
-    + '.tabbar { display: flex; gap: 2px; border-bottom: 1px solid var(--tab-border,#c8c8c8); }'
-    + '.tab { padding: var(--tab-padding,4px 11px); color:var(--tab-color,inherit); border: 1px solid var(--tab-border,#c8c8c8); border-bottom: none;'
-    + '  background: var(--tab-background,#f4f4f4); cursor: pointer; border-radius: 3px 3px 0 0;'
+    + '.tabbar { display: flex; gap: 3px; padding:3px 3px 0; overflow-x:auto; border-bottom: 1px solid var(--tab-border,#dce1e7); background:var(--tabbar-background,#f5f6f8); }'
+    + '.tab-shell{display:inline-flex;align-items:center;flex:none;border-radius:5px 5px 0 0;position:relative;max-width:280px}.tab-shell:has(.active){background:var(--tab-active-background,#fff);box-shadow:inset 0 1px #e3e7ec,inset 1px 0 #e3e7ec,inset -1px 0 #e3e7ec}'
+    + '.tab { padding: var(--tab-padding,7px 10px); color:var(--tab-color,#68717e); border:0; min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
+    + '  background: transparent; cursor: pointer; border-radius: 5px 5px 0 0;'
     + '  font: inherit; font-size:var(--tab-font-size,inherit);font-weight:var(--tab-font-weight,normal); }'
-    + '.tab.active { color:var(--tab-active-color,inherit); background: var(--tab-active-background,#fff); font-weight: 600; margin-bottom: -1px; }'
+    + '.tab.active { color:var(--tab-active-color,#293442); font-weight:var(--tab-active-weight,500); }'
+    + '.tab-close{flex:none;width:19px;height:19px;margin-right:5px;padding:0;border:0;border-radius:4px;background:transparent;color:#87909c;font:15px/19px system-ui;cursor:pointer;opacity:0}.tab-shell:hover .tab-close,.tab-shell:focus-within .tab-close{opacity:1}.tab-close:hover{background:#e8ecf1;color:#374556}.tab:focus-visible,.tab-close:focus-visible{outline:2px solid #91a6c0;outline-offset:-2px}@media(hover:none){.tab-close{opacity:1}}'
     + '.panes { flex: 1; min-height: 0; overflow: auto; padding: var(--tab-pane-padding,8px 2px); }';
 
 function defineComponents() {
@@ -358,6 +360,7 @@ function defineComponents() {
             root.appendChild(style);
             this._bar = document.createElement('div');
             this._bar.className = 'tabbar';
+            this._bar.setAttribute('role','tablist');
             const panes = document.createElement('div');
             panes.className = 'panes';
             panes.appendChild(document.createElement('slot'));
@@ -409,20 +412,24 @@ function defineComponents() {
         _available(tab) { return tab && !this._flag(tab, 'hidden') && !this._flag(tab, 'disabled'); }
         _button(tab, index) {
             const shell = document.createElement('span');
+            shell.className = 'tab-shell';
             shell.style.display = this._flag(tab, 'hidden') ? 'none' : 'inline-flex';
             const button = document.createElement('button');
             button.className = 'tab'; button.type = 'button';
+            button.setAttribute('role','tab');
             button.dataset.key = this._pageName(tab, index);
             button.textContent = tab.getAttribute('title') || tab.getAttribute('label') || button.dataset.key;
+            button.title = tab.getAttribute('tooltip') || button.textContent;
             button.disabled = this._flag(tab, 'disabled');
             button.classList.toggle('active', this.value === button.dataset.key);
             button.setAttribute('aria-pressed', String(this.value === button.dataset.key));
+            button.setAttribute('aria-selected', String(this.value === button.dataset.key));
             button.addEventListener('click', () => this.selectIndex(index));
             shell.append(button);
             if (this._flag(tab, 'closable')) {
                 const close = document.createElement('button'); close.type = 'button';
                 close.textContent = '×'; close.setAttribute('aria-label', `Close ${button.textContent}`);
-                close.style.cssText = 'font:inherit;border:1px solid #c8c8c8;border-left:0;background:#f4f4f4;padding:2px 5px;cursor:pointer';
+                close.className = 'tab-close';
                 close.disabled = button.disabled;
                 close.addEventListener('click', () => this.closePage(index));
                 shell.append(close);
@@ -497,6 +504,7 @@ function defineComponents() {
                 this._bar.querySelectorAll('.tab').forEach(button => {
                     button.classList.remove('active');
                     button.setAttribute('aria-pressed', 'false');
+                    button.setAttribute('aria-selected', 'false');
                 });
                 this._value = null;
                 this.dispatchEvent(new CustomEvent('gnr-stack-selection', {detail:{index:null, pageName:null}}));
@@ -526,6 +534,7 @@ function defineComponents() {
             [...this._bar.querySelectorAll('.tab')].forEach((button, i) => {
                 button.classList.toggle('active', i === index);
                 button.setAttribute('aria-pressed', String(i === index));
+                button.setAttribute('aria-selected', String(i === index));
             });
             tabs.forEach((tab, i) => { tab.style.display = i === index ? '' : 'none'; });
             this.dispatchEvent(new CustomEvent('gnr-stack-selection', {detail:{index, pageName:this._value}}));

@@ -3,11 +3,48 @@ import assert from 'node:assert/strict';
 import {createDecimal, toTytx, fromTytx} from 'genro-tytx';
 import {Application, HtmlBuilder} from '../src/index.js';
 import {selectionBag} from '../src/stores/collection-stores.js';
+import {BagRows} from '../src/stores/bag-rows.js';
 import {setupDom} from './dom.js';
 import '../src/collections/grid.js';
 
 const reply = result => new Response(toTytx({ok:true,result}, 'json'));
 const selection = rows => ({rows, identifier:'code', metadata:{totalrows:rows.length}});
+
+test('resident sorting and filtering project without changing source order',()=>{
+    const bag=selectionBag(selection([{code:'b',name:'Beta'},{code:'a',name:'Alpha'}]),'code');
+    const store=new BagRows(bag,{identifier:'code',datamode:'attr'});
+    store.sort('name');assert.deepEqual(store.keys(),['a','b']);
+    assert.deepEqual(bag.getNodes().map(n=>n.getAttr('code')),['b','a']);
+    store.filter(row=>row.name==='Beta');assert.deepEqual(store.keys(),['b']);
+    store.resetFilter();assert.deepEqual(store.keys(),['a','b']);
+    store.sort(null);assert.deepEqual(store.keys(),['b','a']);store.dispose();
+});
+
+test('paged selection publishes one page, retains total and rejects invalid replacements', async t => {
+    setupDom();
+    let invalid=false;const calls=[];
+    t.mock.method(globalThis,'fetch',async (_url,opts)=>{
+        const kw=fromTytx(opts.body,'json');calls.push(kw);
+        return reply({rows:[{code:String(kw._offset),name:'Row'}],identifier:'code',metadata:{totalrows:invalid ? -1 : 5}});
+    });
+    class Page extends HtmlBuilder {
+        static wc_requires=['grid'];
+        main(root) {
+            root.rpcStore({storeCode:'paged',storepath:'rows',method:'rows',_identifier:'code',_chunkSize:2,_storeType:'VirtualSelection',_on_start:true});
+            root.grid({store:'paged',columns:[{field:'name'}]});
+        }
+    }
+    const app=new Application(document.body.appendChild(document.createElement('div')),new Page('main'),{rpc:'/rpc'});
+    t.after(()=>app.dispose());
+    const store=app.stores.get('paged');await store.storeNode._rpcPromise;
+    assert.equal(store.totalRows,5);assert.equal(store.pageIndex,0);
+    assert.equal((await store.loadPage(1)).status,'ready');
+    assert.deepEqual(calls[1],{_offset:2,_limit:2});
+    assert.equal(store.pageIndex,1);assert.equal(store.rowAt(0).key,'2');
+    const prior=store.getData();invalid=true;
+    assert.equal((await store.loadPage(2)).status,'error');assert.equal(store.getData(),prior);
+    assert.equal(store.pageIndex,1);assert.equal(store.totalRows,5);
+});
 function mount() {
     setupDom();
     class Page extends HtmlBuilder {

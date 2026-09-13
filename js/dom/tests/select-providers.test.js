@@ -27,3 +27,26 @@ test('callbackSelect works standalone with Promise results and identity lookup',
     assert.equal(el.options.length,0);
     app.dispose();
 });
+
+test('repeated identity binding shares pending lookup and selection validation waits', async () => {
+    setupDom();
+    class Page extends HtmlBuilder {
+        static wc_requires=['inputs'];
+        main(root) {
+            root.callbackSelect({value:'^selected',callback:`
+                return new Promise(resolve => setTimeout(() => resolve({rows: [{id: kw._id, label: 'Resolved'}], identifier:'id',caption:'label'}), 10));
+            `});
+        }
+    }
+    const host=document.createElement('div');document.body.append(host);
+    const app=new Application(host,new Page('main'));
+    const el=host.querySelector('gnr-callbackselect');
+    el.value=46;
+    const pending=el._resolvePromise;
+    el.value=46;
+    assert.equal(el._resolvePromise,pending);
+    assert.equal(await el.getSelectionValidity(46),true);
+    assert.equal(el._input.value,'Resolved');
+    assert.equal(el._input.validationMessage,'');
+    app.dispose();
+});

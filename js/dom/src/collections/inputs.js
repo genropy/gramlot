@@ -15,6 +15,7 @@
  * module needs no DOM.
  */
 import {defineDbSelect} from './db-select.js';
+import {defineCheckBoxText} from './checkbox-text.js';
 import {getComponentBases} from '../components/bases.js';
 import {defineDateCalendar} from './date-calendar.js';
 import {NumberEditor} from './number-editor.js';
@@ -176,12 +177,13 @@ function defineComponents() {
                     if (this._filtered[this._active]) this._choose(this._filtered[this._active]);
                 } else if (event.key === 'Escape' && this._opened) {
                     event.preventDefault(); event.stopPropagation(); this._close();
-                } else if (event.key === 'Tab') this._close();
+                } else if (event.key === 'Tab') { this._acceptOnExit(); this._close(); }
             });
-            input.addEventListener('blur', () => this._close());
+            input.addEventListener('blur', () => { this._acceptOnExit(); this._close(); });
             input.addEventListener('change', event => {
                 event.stopImmediatePropagation();
                 if (input.disabled || input.readOnly) return;
+                if (this._acceptOnExit()) return;
                 const text = input.value;
                 if (text !== '') this._nullState.setNull(false);
                 const matches = this._picked ? [this._picked] : this.options.filter(option => option.caption === text);
@@ -288,7 +290,9 @@ function defineComponents() {
             this._opened = true;
             this._input.setAttribute('aria-expanded', 'true');
             this._activate(this._filtered.findIndex(item => item.caption === this._input.value));
-            const outside = event => { if (!event.composedPath().includes(this)) this._close(); };
+            const outside = event => {
+                if (!event.composedPath().includes(this)) { this._acceptOnExit(); this._close(); }
+            };
             const scroll = event => { if (!event.composedPath().includes(this._choices)) this._close(); };
             const close = () => this._close();
             this.ownerDocument.addEventListener('pointerdown', outside, true);
@@ -308,6 +312,11 @@ function defineComponents() {
             });
             if (this._active >= 0) this._input.setAttribute('aria-activedescendant', `choice-${this._active}`);
             else this._input.removeAttribute('aria-activedescendant');
+        }
+        _acceptOnExit() { return false; }
+        readEditorCandidate() {
+            // The grid can confirm before the native blur/change event.
+            if (!this.constrained) return {ok:true, value:this._input.value || (this.isNullValue ? null : '')};
         }
         _choose(item) {
             this._nullState.setNull(false);
@@ -382,7 +391,17 @@ function defineComponents() {
         get value() { return this._symbolic.committed; }
         set value(value) { this._symbolic.setValue(value); }
     }
-    class GnrTimeTextBox extends GnrInput { get inputType() { return 'time'; } }
+    class GnrTimeTextBox extends GnrInput {
+        get inputType() { return 'time'; }
+        get value() {
+            const value = super.value;
+            // Native time inputs omit zero seconds; TYTX H requires them.
+            return /^\d{2}:\d{2}$/.test(value) ? `${value}:00` : value;
+        }
+        set value(value) {
+            super.value = value instanceof Date ? value.toISOString().slice(11, 23) : value;
+        }
+    }
     /** Legacy bounds and discreteValues expressed through a native range control. */
     class GnrHorizontalSlider extends GnrInput {
         static get observedAttributes() {
@@ -501,6 +520,7 @@ function defineComponents() {
     }
 
     customElements.define('gnr-textbox', GnrTextBox);
+    customElements.define('gnr-checkboxtext', defineCheckBoxText(GnrInput));
     customElements.define('gnr-textboxarea', GnrTextBoxArea);
     customElements.define('gnr-filteringselect', GnrFilteringSelect);
     customElements.define('gnr-dbselect', defineDbSelect(GnrFilteringSelect));

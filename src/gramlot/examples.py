@@ -5,11 +5,34 @@
 def example_panel(root, source_text: str, title: str):
     """Return a bordered live pane beside its exact read-only Python source."""
     root.styleSheet('''
-        .example-shell { padding:10px; box-sizing:border-box; font:13px system-ui,sans-serif; }
-        .example-heading { font:500 14px system-ui,sans-serif; margin:0 0 6px; }
-        .example-live-column { padding-right:4px; box-sizing:border-box; }
-        .example-live { border:1px solid #dce3ee; border-radius:5px; padding:10px;
+        .example-shell { padding:16px; box-sizing:border-box; font:13px/1.5 system-ui,sans-serif;
+            color:#263445; background:#f5f7fa; --accent-color:#356c97;
+            --field-border:#cbd5df; --field-focus-border:#356c97; --form-field-radius:5px;
+            --gnrfieldlabel-color:#536477; --form-label-font-size:12px; }
+        .example-heading { font:500 12px system-ui,sans-serif; color:#627387; margin:0 0 12px; }
+        .example-live-column { padding-right:12px; box-sizing:border-box; }
+        .example-live { border:1px solid #dce3ee; border-radius:8px; padding:24px;
             box-sizing:border-box; background:white; overflow:auto; }
+        .example-live h2 { font-size:20px; line-height:1.3; font-weight:600; margin:0 0 12px; letter-spacing:-.3px; }
+        .example-live h3 { font-size:15px; font-weight:600; margin:0 0 14px; }
+        .example-live p { color:#627387; line-height:1.6; margin:0 0 22px; max-width:70ch; }
+        .example-live button { font:500 12px/1.4 system-ui,sans-serif; color:#344b62;
+            background:#fff; border:1px solid #cbd5df; border-radius:5px; padding:7px 11px;
+            min-height:32px; cursor:pointer; }
+        .example-live button:hover:not(:disabled) { background:#edf3f8; border-color:#94adc2; }
+        .example-live button:active:not(:disabled) { background:#e0eaf3; }
+        .example-live button:disabled { opacity:.5; cursor:default; }
+        .example-live button:focus-visible { outline:2px solid #356c97; outline-offset:2px; }
+        .example-section { margin-top:26px; padding-top:24px; border-top:1px solid #e5eaf0; }
+        .example-fields { display:flex; flex-wrap:wrap; gap:20px 28px; align-items:start; margin:20px 0; }
+        .example-fields > * { min-width:0; max-width:100%; }
+        .example-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:16px 0; }
+        .example-state { display:flex; flex-wrap:wrap; gap:16px; margin:14px 0 0; }
+        .example-readout { padding:12px 14px; margin:16px 0; border:1px solid #e4eaf0;
+            border-radius:6px; background:#f7f9fb; color:#526579; font:12px/1.8 ui-monospace,monospace;
+            overflow-wrap:anywhere; }
+        .example-live .example-note { margin:22px 0 0; font-size:12px; }
+        @media(max-width:700px) { .example-shell{padding:8px} .example-live{padding:16px} }
         .example-code { background:#282c34; color:#abb2bf; border:1px solid #343b48;
             border-radius:5px; box-sizing:border-box; overflow:auto; }
         .example-code-label { padding:4px 10px; font:11px/1.4 system-ui,sans-serif; border-bottom:1px solid #343b48; }

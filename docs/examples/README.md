@@ -17,6 +17,7 @@ existing generated files, or `--port` to choose another port.
 | Visual builder | /builder/ |
 | Triangle Data RPC and remote Source | /page/triangle/ |
 | Hello page collection | /hello/ |
+| Shared grid and chartBox with structure palette | /charts/chart/ |
 | Python OpenAPI Explorer | /openapi/ |
 | States, localities and customers (optional DB) | /database/states/ |
 | Synthetic products and quotations API | /api/products, /api/quote |

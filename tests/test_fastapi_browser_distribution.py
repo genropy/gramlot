@@ -64,8 +64,27 @@ def test_prebuilt_entries_resources_compression_and_cache(bundled_package):
 def test_source_checkout_without_browser_manifest_keeps_source_entries(tmp_path, monkeypatch):
     monkeypatch.setattr(gramlot, '__file__', str(tmp_path / 'gramlot' / '__init__.py'))
     runtime = RuntimeAssets('/app')
-    assert runtime.entry_url == '/app/_runtime/common/entry.js'
-    assert runtime.import_map()['gramlot-dom'] == '/app/_runtime/dom/index.js'
+    assert runtime.base_url.startswith('/app/_runtime/dev-')
+    assert runtime.entry_url == runtime.base_url + 'common/entry.js'
+    assert runtime.import_map()['gramlot-dom'] == runtime.base_url + 'dom/index.js'
+    assert RuntimeAssets('/app').base_url != runtime.base_url
+
+
+def test_source_assets_revalidate_and_change_namespace_after_restart():
+    runtime = RuntimeAssets('/app')
+    if runtime.browser_manifest is not None:
+        pytest.skip('Source-checkout regression test')
+    app = FastAPI()
+    runtime.mount(app)
+    with TestClient(app) as client:
+        first = client.get(runtime.entry_url)
+        assert first.status_code == 200
+        assert first.headers['cache-control'] == 'no-cache'
+        cached = client.get(runtime.entry_url, headers={'If-None-Match': first.headers['etag']})
+        assert cached.status_code == 304
+        assert cached.headers['cache-control'] == 'no-cache'
+    restarted = RuntimeAssets('/app')
+    assert restarted.entry_url != runtime.entry_url
 
 
 @pytest.mark.parametrize('change', [

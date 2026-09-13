@@ -25,6 +25,7 @@ FIELDS = {
     'passwordbox': ("'demo-secret'", ""),
     'filteringSelect': ("'it'", ", values='it:Italy,en:England,fr:France'"),
     'comboBox': ("'Italy'", ", values='Italy,England,France'"),
+    'checkBoxText': ("'cost'", ", values='cost:Cost,revenue:Revenue', popup=True, cols=1"),
     'numberTextBox': ("Decimal('1234.56789')", ", dtype='N', places=2, locale='it-IT'"),
     'dateTextBox': ("date(2026, 9, 11)", ", dtype='D', locale='it-IT', symbolic=True, workdate='2026-09-11'"),
     'timeTextBox': ("time(14, 30)", ", dtype='H'"),

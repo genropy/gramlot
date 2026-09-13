@@ -161,10 +161,12 @@ export class Application {
 
     _writeMutation(node, value) {
         const [path, typed, fired] = this._mutationWrite(node, value);
+        const widget=this.target?._byId?.(this.builder.targetId(node));
+        const attributes=path.includes('?') ? null : widget?.mutationAttributes?.(typed);
         // bag-js setItem(path, value, attr, nodePosition, updattr,
         // removeNullAttributes, reason, fired) — reason = the origin node.
         this.handler.live(() => {
-            this.handler.data.setItem(path, typed, null, '>', false, true, node, fired);
+            this.handler.data.setItem(path, typed, attributes || null, '>', Boolean(attributes), !attributes, node, fired);
         });
         const name = node.pointerType(node.getAttr('value')) ? 'value' : 'checked';
         this.target?._recordValue?.(this.builder.targetId(node), name, typed);

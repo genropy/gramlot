@@ -17,6 +17,7 @@ async function explorer() {
  execFileSync(process.env.GRAMLOT_PYTHON || (existsSync(localPython)?localPython:'python3'),[new URL('build.py',folder).pathname]);
  let editor=await readFile(new URL('../../../js/pages/src/codemirror-component.js',import.meta.url),'utf8');
  editor=editor.replace("'gramlot-dom'",JSON.stringify(new URL('../src/index.js',import.meta.url).href)).replace("'/_assets/dom/widget-label.js'",JSON.stringify(new URL('../src/collections/decoration/widget-label.js',import.meta.url).href));
+ editor=editor.replaceAll(/'\/_assets\/dom\/([^']+)'/g,(_,path)=>JSON.stringify(new URL('../src/'+path,import.meta.url).href));
  await import(`data:text/javascript;base64,${Buffer.from(editor).toString('base64')}`);
  class PythonBuilder extends HtmlBuilder {static wc_requires=['layout','inputs','storeTree','grid','labEditors'];}
  const builder=new PythonBuilder('api');

@@ -15,6 +15,15 @@ class BrowserStaticFiles(StaticFiles):
         return response
 
 
+class SourceStaticFiles(StaticFiles):
+    """Development assets must be revalidated even within one host session."""
+
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        response.headers['Cache-Control'] = 'no-cache'
+        return response
+
+
 class RuntimeAssets(SharedRuntimeAssets):
     def mount(self, app: FastAPI) -> None:
         if self.browser_manifest is not None:
@@ -32,6 +41,6 @@ class RuntimeAssets(SharedRuntimeAssets):
         for name, directory in directories.items():
             app.mount(
                 self.base_url + name,
-                StaticFiles(directory=directory),
+                SourceStaticFiles(directory=directory),
                 name=f'{self.prefix}-{name}',
             )

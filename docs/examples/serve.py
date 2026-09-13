@@ -10,6 +10,7 @@ import sys
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, ConfigDict, Field
 from gramlot.contrib.fastapi import mount_gramlot
 
@@ -38,7 +39,14 @@ def create_app(preview: Path | None = None, *, genropy_application=None) -> Fast
     if len(versions) != 1:
         raise ValueError('Expected one generated runtime version; rebuild the examples.')
     app = FastAPI(title='Gramlot examples')
+    mount_gramlot(app, ROOT / 'tools/gramlot-ide', prefix='/ide', title='Gramlot IDE')
+
+    @app.get('/page/gramlot-ide-local/', include_in_schema=False)
+    def local_ide_redirect():
+        return RedirectResponse('/ide/index/')
+
     mount_gramlot(app, HERE / 'triangle-rpc', prefix='/page', title='Triangle RPC')
+    mount_gramlot(app, HERE / 'chartbox', prefix='/charts', title='Grid and chartBox')
     navigation_host = mount_gramlot(app, HERE / 'hello', prefix='/hello', title='Hello pages')
     spec = importlib.util.spec_from_file_location('gramlot_example_navigation', HERE / 'navigation.py')
     navigation = importlib.util.module_from_spec(spec)

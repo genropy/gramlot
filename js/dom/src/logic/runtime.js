@@ -8,7 +8,7 @@ export const DATA_ELEMENT_FIELDS = new Set([
 ]);
 export const RPC_ELEMENT_FIELDS = new Set([
     'destination', 'method', 'rpcmethod', '_on_start', '_onCalling', '_onResult', '_onError',
-    '_timeout', '_delay', '_lockScreen', 'storeCode', 'storepath', '_identifier',
+    '_timeout', '_delay', '_lockScreen', 'storeCode', 'storepath', '_identifier', '_storeType', '_chunkSize',
 ]);
 
 export class LogicRuntime {

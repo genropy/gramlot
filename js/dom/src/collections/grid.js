@@ -1,5 +1,6 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 /** Fixed-row-height, bounded-viewport grid over a resident Bag store. */
+import {GridEditor} from './grid-editor.js';
 import {registerComponentCollection} from '../components/registry.js';
 import {builtinComponents} from '../components/builtin-components.js';
 import {formatDisplay} from '../display-format.js';
@@ -9,7 +10,10 @@ import {gridCellValue, gridTemplate, normalizeGridColumns, layoutGridColumns, gr
 let structureSerial = 0;
 
 const CSS = `
-:host{display:flex;flex-direction:column;contain:content;font:var(--grid-font,13px/1.35 system-ui,sans-serif);color:var(--grid-color,#283340);height:var(--grid-height,260px);--grid-row-height:26px}
+:host{position:relative;display:flex;flex-direction:column;contain:layout style;font:var(--grid-font,13px/1.35 system-ui,sans-serif);color:var(--grid-color,#283340);height:var(--grid-height,260px);--grid-row-height:26px}
+.cell-editor{position:absolute;z-index:5;background:white;--field-border:transparent;--field-focus-border:transparent;--form-field-radius:0px}
+.cell.invalidCell,.cell-editor.invalidCell{background:var(--field-invalid-bg,#fff0f0);--field-bg:var(--field-invalid-bg,#fff0f0)}
+.cell-editor::after{content:"";position:absolute;inset:2px;pointer-events:none;box-shadow:inset 0 0 0 1px #527fa2}.cell-editor[hidden]{display:none}
 .frame{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;border:1px solid #c9d1d9;background:#fff;position:relative;box-sizing:border-box}
 .horizontal-scroll{flex:none;height:16px;overflow-x:scroll;overflow-y:hidden;background:#f5f7f9}
 .horizontal-scroll[hidden]{display:none}.horizontal-track{height:1px}
@@ -204,7 +208,7 @@ function defineComponents() {
                 this._resizeObserver.observe(this._frame);
             }
         }
-        disconnectedCallback() { this._clearStructureSubscriptions(); this._cancelResize?.(); this._resizeObserver?.disconnect(); this.changeManager?.dispose(); this.changeManager = null; this._unsubscribe?.(); this._unsubscribe = null; if (!this._sharedStore) this._store?.dispose(); this._store = this._sharedStore || null; }
+        disconnectedCallback() { this.gridEditor?.dispose(); this.gridEditor = null; this._clearStructureSubscriptions(); this._cancelResize?.(); this._resizeObserver?.disconnect(); this.changeManager?.dispose(); this.changeManager = null; this._unsubscribe?.(); this._unsubscribe = null; if (!this._sharedStore) this._store?.dispose(); this._store = this._sharedStore || null; }
 
         _storeChanged() {
             this._storeBag = this._store?.getData() || null;
@@ -311,7 +315,8 @@ function defineComponents() {
             const first = Math.max(0, Math.floor(this._frame.scrollTop / this._rowHeight) - this._overscan);
             const last = Math.min(count, Math.ceil((this._frame.scrollTop + viewport) / this._rowHeight) + this._overscan);
             for (let index=first; index<last; index++) this._body.append(this._row(this._store.rowAt(index), index));
-            if (focusedKey != null) Array.from(this._body.querySelectorAll('.row')).find(row => row._gridKey === focusedKey)?.focus({preventScroll:true});
+            this.gridEditor?.position();
+            if (focusedKey != null && !this.gridEditor?.active) Array.from(this._body.querySelectorAll('.row')).find(row => row._gridKey === focusedKey)?.focus({preventScroll:true});
         }
         _row(row, index) {
             const element = document.createElement('div'); element.className = 'row'; element.setAttribute('role','row');
@@ -324,7 +329,13 @@ function defineComponents() {
                 this.focusCell = {rowKey:row.key, columnId:event.target.closest('.cell')?.dataset.columnId || this._columns[0].id};
                 this._choose(row.key, 'pointer');
             });
-            element.addEventListener('dblclick', () => this._activate(row.key));
+            element.addEventListener('dblclick', event => {
+                const id = event.target.closest('.cell')?.dataset.columnId;
+                if (this._columns.find(c => c.id === id)?.edit) {
+                    this.gridEditor ||= new GridEditor(this);
+                    this.gridEditor.open(row.key, id);
+                } else this._activate(row.key);
+            });
             element.addEventListener('keydown', event => {
                 if (event.key === 'Enter') { event.preventDefault(); this._activate(row.key); return; }
                 if (!['ArrowDown','ArrowUp'].includes(event.key)) return;
@@ -345,6 +356,7 @@ function defineComponents() {
             for (const column of this._columns) {
                 const value = gridCellValue(row, column, this._store); const cell = document.createElement('div'); cell.className = 'cell';
                 cell.setAttribute('role','gridcell'); cell.dataset.columnId = column.id;
+                this.gridEditor?.decorateCell(cell, row.key, column.id);
                 cell.classList.toggle('numeric', ['N','L','I','R','F'].includes(column.dtype) || typeof value === 'number');
                 cell.classList.toggle('boolean', column.dtype === 'B' || typeof value === 'boolean');
                 if (column.cellClasses) cell.classList.add(...column.cellClasses.split(/\s+/).filter(Boolean));

@@ -116,6 +116,34 @@ class LogicDeclarations:
         return self._declaration('bagStore', storeCode=storeCode, storepath=storepath,
                                  _identifier=_identifier, datamode=datamode)
 
+    def selectionStore(self, rpcmethod, *, chunkSize=None, **params):
+        """Declare a backend-independent selection, optionally loaded in pages."""
+        if chunkSize is not None:
+            if isinstance(chunkSize, bool) or not isinstance(chunkSize, int) or chunkSize < 1:
+                raise ValueError('chunkSize must be a positive integer')
+            params['_chunkSize'] = chunkSize
+        return self.rpcStore(rpcmethod, _storeType='VirtualSelection' if chunkSize else 'Selection', **params)
+
+    def formStore(self, storeType='memory', *, loadmethod=None, savemethod=None, **attributes):
+        """Configure the enclosing form's memory, item, collection or RPC store."""
+        from genro_builders.builder import SourceBagNode
+        if not isinstance(self.node, SourceBagNode) or self.node.node_tag != 'form':
+            raise TypeError('formStore must be configured on a form')
+        if storeType not in ('memory', 'item', 'collection', 'subform', 'hierarchical', 'record'):
+            raise ValueError('Unknown form store type')
+        if storeType == 'record':
+            if loadmethod is None or savemethod is None:
+                raise TypeError('Record store requires loadmethod and savemethod')
+            attributes.update(loadmethod=self._page_method_reference(loadmethod, 'data'),
+                              savemethod=self._page_method_reference(savemethod, 'data'))
+        self.node.attr.update(storeType=storeType, **attributes)
+        return self
+
+    def fsStore(self, *, root, path='', rpcmethod='directory_selection', **params):
+        """Declare a flat, read-only directory collection."""
+        params.setdefault('_identifier', 'path')
+        return self.rpcStore(rpcmethod, root=root, path=path, _storeType='FileSystem', **params)
+
     def remote(self, method, **params):
         """Configure this existing contentPane with server-built Source.
 

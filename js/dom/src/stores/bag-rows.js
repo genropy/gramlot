@@ -53,6 +53,17 @@ export class BagRows {
     }
     get size() { return this._rows.length; }
     keys() { return this._rows.map(row => row.key); }
+    filter(predicate=null) {
+        if (predicate !== null && typeof predicate !== 'function') throw new TypeError('Filter must be a function or null');
+        this._filter = predicate;
+        this._refresh({type:'filter'});
+    }
+    resetFilter() { this.filter(null); }
+    sort(field=null, descending=false) {
+        if (field !== null && typeof field !== 'string') throw new TypeError('Sort field must be a string or null');
+        this._sortField=field;this._sortDescending=descending;
+        this._refresh({type:'sort'});
+    }
     rowAt(index) { return this._rows[index] || null; }
     row(key) { return this._byKey.get(key) || null; }
 
@@ -111,10 +122,28 @@ export class BagRows {
     _subscribeBags() {
         this._unsubscribeBags();
         if (!this._bag) return;
+        // Existing nested Bags are not recursively adopted by bag-js setBackref.
+        // Link detached row branches before subscribing, so cell writes also reach
+        // application Data bindings (not only this store's private listeners).
+        const adopt = bag => {
+            for (const node of bag.getNodes()) {
+                const value = node.getValue();
+                if (!(value instanceof Bag)) continue;
+                if (value._parent == null) {
+                    value.delParentRef();
+                    value.setBackref(node, bag);
+                    adopt(value);
+                } else if (value._parent === bag) adopt(value);
+            }
+        };
+        if (this._datamode === 'bag') adopt(this._bag);
         const bags = [this._bag];
-        for (const row of this._rows) {
+        for (const node of this._bag.getNodes()) {
             // Rows inserted after root backrefs are enabled already bubble to root.
-            if (this._datamode === 'bag' && row.value._parent !== this._bag) bags.push(row.value);
+            if (this._datamode === 'bag') {
+                const value = node.getValue();
+                if (value instanceof Bag && value._parent !== this._bag) bags.push(value);
+            }
         }
         bags.forEach((bag, index) => {
             const id = `${this._subscriber}-${index}`;
@@ -162,7 +191,17 @@ export class BagRows {
             rows.push(row);
             byKey.set(key, row);
         }
-        return [rows,byKey];
+        const record = row => datamode === 'attr' ? {...row.node.getAttr()}
+            : {...row.node.getAttr(), ...Object.fromEntries(row.value.getNodes().map(n=>[n.label,n.getValue()]))};
+        let visible = this._filter ? rows.filter(row => this._filter(record(row))) : rows;
+        if (this._sortField) {
+            const field=this._sortField, direction=this._sortDescending ? -1 : 1;
+            visible = [...visible].sort((a,b)=>{
+                const left=record(a)[field], right=record(b)[field];
+                return direction * (left === right ? 0 : left == null ? -1 : right == null ? 1 : left < right ? -1 : 1);
+            });
+        }
+        return [visible,new Map(visible.map(row=>[row.key,row]))];
     }
 
     _notify(change) { for (const listener of this._listeners) listener(change); }

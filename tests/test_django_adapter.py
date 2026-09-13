@@ -384,3 +384,142 @@ def test_generated_tables_validate_and_enforce_permissions(host):
     page._django_request.user = get_user_model().objects.get(pk=user.pk)
     with pytest.raises(PermissionDenied):
         page.save_record('gramlot_demo.customer', {'name': 'Denied', 'city': 'Rome'})
+
+
+def test_django_ide_reuses_provider_with_superuser_boundary(host, tmp_path):
+    from types import SimpleNamespace
+    from django.core.exceptions import PermissionDenied
+    from gramlot.contrib.django.ide import DjangoIdePage
+    from gramlot.builder import GramlotBuilder
+    folder = tmp_path / 'templates'
+    folder.mkdir()
+    file = folder / 'hello.html'
+    file.write_text('<h1>Hello</h1>')
+    page = DjangoIdePage()
+    page.filesystem_roots = {'templates': folder}
+    page.filesystem_writable_roots = ('templates',)
+    user = get_user_model().objects.create_superuser('ide-admin', password='test')
+    page._django_request = SimpleNamespace(user=user)
+    document = page.document_read('templates', 'hello.html')
+    page.document_save('templates', 'hello.html', '<h1>Edited</h1>', document['revision'])
+    assert file.read_text() == '<h1>Edited</h1>'
+    with pytest.raises(ValueError, match='changed on disk'):
+        page.document_save('templates', 'hello.html', 'stale', document['revision'])
+    with pytest.raises(ValueError):
+        page.document_read('templates', '../outside.html')
+    with pytest.raises(ValueError):
+        page.document_read('unknown', 'hello.html')
+    page.main(GramlotBuilder('ide').root)
+    user.is_superuser = False
+    for call in (
+        lambda: page.main(GramlotBuilder('denied').root),
+        lambda: page.directory_tree('templates'),
+        lambda: page.document_read('templates', 'hello.html'),
+        lambda: page.document_save('templates', 'hello.html', 'denied', document['revision']),
+    ):
+        with pytest.raises(PermissionDenied):
+            call()
+    assert file.read_text() == '<h1>Edited</h1>'
+
+
+def test_ide_template_preview_renders_unsaved_text_without_writing(host, tmp_path):
+    from django.test import RequestFactory
+    from gramlot.contrib.django.ide import DjangoIdePage
+    folder = tmp_path / 'templates'
+    folder.mkdir()
+    file = folder / 'page.html'
+    file.write_text('original')
+    page = DjangoIdePage()
+    page.filesystem_roots = {'templates': folder}
+    request = RequestFactory().get('/')
+    request.user = get_user_model().objects.create_superuser('preview-admin', password='test')
+    page._django_request = request
+    page.template_preview_context = lambda root, path: {'title': 'Sample <page>'}
+    with override_settings(TEMPLATES=[{'BACKEND': 'django.template.backends.django.DjangoTemplates'}]):
+        result = page.document_preview('templates', 'page.html', '<html><head></head><body>{{ title }}</body></html>')
+    assert 'Sample &lt;page&gt;' in result['html']
+    assert '<base href="http://testserver/">' in result['html']
+    assert file.read_text() == 'original'
+
+
+def test_remote_model_form_clean_matches_save_without_writes(host):
+    from types import SimpleNamespace
+    from django import forms
+    from gramlot.contrib.django.tables import DjangoTablesPage
+    class CustomerForm(forms.ModelForm):
+        class Meta:
+            model = Customer
+            fields = ['name', 'city']
+        def clean_name(self):
+            value = self.cleaned_data['name']
+            if value == 'Reserved':
+                raise forms.ValidationError('This name is reserved.')
+            return value
+        def clean(self):
+            data = super().clean()
+            if data.get('name') == 'Ada' and data.get('city') != 'Rome':
+                raise forms.ValidationError('Ada must be in Rome.')
+            return data
+    page = DjangoTablesPage()
+    page.table_fields = {'gramlot_demo.customer': ['name', 'city']}
+    page.table_forms = {'gramlot_demo.customer': CustomerForm}
+    page._django_request = SimpleNamespace(user=get_user_model().objects.create_superuser('remote-admin', password='test'))
+    record = Customer.objects.get(name='Ada')
+    invalid = page.validate_record_field('gramlot_demo.customer', 'name', 'Reserved', {'name':'Ada','city':'Rome'}, key=record.pk)
+    assert invalid['message'] == 'This name is reserved.'
+    cross = page.validate_record_field('gramlot_demo.customer', 'city', 'Milan', {'name':'Ada','city':'Rome'}, key=record.pk)
+    assert cross['message'] == 'Ada must be in Rome.'
+    assert page.validate_record_field('gramlot_demo.customer','city','Rome',{'name':'Ada','city':'Milan'},key=record.pk) is True
+    saved = page.save_record('gramlot_demo.customer', {'name':'Reserved','city':'Rome'},key=record.pk)
+    assert saved['ok'] is False
+    record.refresh_from_db()
+    assert (record.name, record.city) == ('Ada','Rome')
+
+
+def test_automatic_relation_choices_and_related_grid_boundaries(host):
+    from types import SimpleNamespace
+    from django.contrib.auth.models import Group
+    from django.contrib.contenttypes.models import ContentType
+    from django.core.exceptions import PermissionDenied
+    from gramlot.contrib.django.tables import DjangoTablesPage
+    from gramlot.builder import GramlotBuilder
+    page = DjangoTablesPage()
+    page.table_fields = {
+        'auth.permission': ['name', 'codename', 'content_type'],
+        'contenttypes.contenttype': ['app_label', 'model'],
+        'auth.group': ['name', 'permissions'],
+    }
+    page.table_related_fields = {'auth.permission': ['name', 'codename']}
+    user = get_user_model().objects.create_superuser('relations-admin', password='test')
+    page._django_request = SimpleNamespace(user=user)
+    content_type = ContentType.objects.get_for_model(Customer)
+    permission = Permission.objects.filter(content_type=content_type).first()
+    choices = page.relation_choices('auth.permission', 'content_type', _id=content_type.pk)
+    assert choices['rows'] == [{'id': content_type.pk, 'caption': str(content_type)}]
+    assert page.load_record('auth.permission', permission.pk).get_item('content_type') == content_type.pk
+    with pytest.raises(PermissionDenied):
+        page.relation_choices('auth.permission', 'codename')
+    with pytest.raises(PermissionDenied):
+        page.relation_choices('auth.permission', 'unknown')
+    relations = page.related_relations('contenttypes.contenttype')
+    relation = next(name for name, value in relations.items() if value[0] is Permission)
+    rows = page.related_rows('contenttypes.contenttype', relation, content_type.pk)['rows']
+    assert {row['id'] for row in rows} == set(Permission.objects.filter(content_type=content_type).values_list('pk', flat=True))
+    assert all(set(row) == {'id', 'name', 'codename'} for row in rows)
+    assert page.related_rows('contenttypes.contenttype', relation)['rows'] == []
+    with pytest.raises(PermissionDenied):
+        page.related_rows('contenttypes.contenttype', 'private', content_type.pk)
+    group = Group.objects.create(name='Sample')
+    group.permissions.add(permission)
+    assert page.related_rows('auth.group', 'permissions', group.pk)['rows'][0]['id'] == permission.pk
+    # Saving the scalar form must not clear the read-only many-to-many grid.
+    assert page.save_record('auth.group', {'name': 'Renamed'}, group.pk)['ok']
+    assert list(group.permissions.all()) == [permission]
+    page.table_view(GramlotBuilder('relations').root, 'auth.permission')
+    page.related_view(GramlotBuilder('many').root, 'auth.group', group.pk)
+    user.is_superuser = False
+    user.save()
+    user.user_permissions.add(Permission.objects.get(codename='view_permission'))
+    page._django_request.user = get_user_model().objects.get(pk=user.pk)
+    with pytest.raises(PermissionDenied):
+        page.relation_choices('auth.permission', 'content_type', _id=content_type.pk)

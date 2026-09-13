@@ -1,5 +1,43 @@
 # Gramlot project memory
 
+**Recipe composition experiment — 2026-09-13:** the owner distinguishes single-node
+adapted Web Components from recipes expanding ordinary Source nodes, with a
+standalone JS implementation and reusable Python source in the manifesto. The tiny
+box experiment is built and verified before any IDE migration. See
+[the experiment and semantic limits](../examples/recipes/README.md).
+
+**Legacy WSGI Hello World — 2026-09-13:** pages remain in `webpages/`; ordinary
+`GramlotPage` inheritance selects a separate path before legacy dynamic mixins.
+The local `test_invoice_pg` PoC renders and binds through Gramlot with `.site`
+and `.db`. RPC/authentication integration is deferred. See the
+[implementation and verification](../development/legacy-gramlot-hello-2026-09-13.md).
+
+**Legacy grid check/radio audit — 2026-09-13:** checkboxcell, checkboxcolumn,
+runtime insertion, per-row choice sets and external userSets are mapped in
+[the source audit](../development/grid-checkbox-radio-legacy-audit-2026-09-13.md).
+Radio appearance, row exclusivity and per-row choice groups are distinct.
+This is inspection evidence, not an implemented port.
+
+**checkBoxText — 2026-09-13:** reusable inline/popup multi-selection now has a
+Python example, reactive string/Bag options, shared validation and popup tools,
+and `_displayedValue` metadata. See [API and legacy differences](../examples/checkboxtext/README.md).
+No chart multi-series renderer, release or push is included.
+
+**chartBox in use — 2026-09-13:** owner authorizes ordinary use of the bounded
+bar/pie component. Data and structure are separate Bags, selection is shared
+with the grid, and its gear opens the live structure palette. The example now
+uses editable grid cells. See [usage and limits](../examples/chartbox/README.md).
+
+**Model-aware field/select proposal — 2026-09-13:** legacy `field`/`fieldcell`,
+code search versus displayed caption, and an optional GenropyPage-only capability
+boundary are documented in [the proposal](../development/model-fields-and-select-capabilities-2026-09-13.md).
+This records an owner-suggested direction, not an approved API or implementation.
+
+**Local editable-grid experiment — 2026-09-13:** a stable slotted Source editor
+reuses normal controls and FormField validation over resident rows. Python demo,
+verification and explicit limits: [grid editor experiment](../examples/grid-editor/README.md).
+Collection persistence and full legacy GridEditor parity remain unimplemented.
+
 **Local select providers — 2026-09-13:** `remoteSelect` and `callbackSelect`
 share the identity/caption contract, with a package/table/field cascade example.
 Callback supports synchronous and Promise results without requiring a server.
@@ -260,3 +298,9 @@ Latest textBox checkpoint: [legacy compatibility audit, 2026-09-10](../developme
 Maintain the [intentional legacy differences register](legacy-differences.md) for owner-approved exceptions, including continuous-update naming and label placement. It separates approved decisions from pending implementation and unresolved spelling.
 
 See [module, gallery and progressive-learning analysis](../development/module-gallery-learning-organization.md) for the proposed organization around inputs, labledBox, formlet, validation and form. It is analysis, not an approved module migration.
+
+**Local GramlotIde — 2026-09-13:** reusable labEditors component with Data Bag
+documents, tabs, lazy filesystem tree, CodeMirror and optional revision-checked
+Save. The example uses a temporary writable workspace. See
+[contract and limits](../guides/gramlot-ide.md). HTML visual editing and execution
+are not implemented; no publication.

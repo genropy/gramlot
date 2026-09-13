@@ -61,9 +61,26 @@ export class HtmlRenderer extends RendererBase {
             runtimeAttrs = attrs;
         }
         const el = document.createElement(tag);
+        const propertyAttributes = node._getMeta('propertyAttributes');
+        if (propertyAttributes) {
+            el.sourceNode = node;
+            el._gramlotProperties = {};
+            runtimeAttrs = {...runtimeAttrs};
+            for (const name of propertyAttributes) {
+                el[name] = runtimeAttrs[name];
+                el._gramlotProperties[name] = runtimeAttrs[name];
+                delete runtimeAttrs[name];
+            }
+        }
         if (['gnr-dbselect', 'gnr-remoteselect', 'gnr-callbackselect'].includes(tag)) {
             if (tag !== 'gnr-callbackselect') node.handler.application.server.requireCapability();
             el.sourceNode = node;
+        }
+        if (tag === 'gnr-chart') {
+            const {store, structpath:struct, identifier, datamode, selectedKey, ...attrs} = runtimeAttrs;
+            el.configure({store, struct, identifier, datamode, selectedKey});
+            runtimeAttrs = attrs;
+            item = null;
         }
         if (tag === 'gnr-grid') {
             el.sourceNode = node;
@@ -108,8 +125,9 @@ export class HtmlRenderer extends RendererBase {
                 });
             });
             runtimeAttrs = attrs;
-            item = null;
+            if (!Array.isArray(item)) item = null;
         }
+        if (tag === 'gnr-gramlotide') el.sourceNode = node;
         if (node._getMeta('dataScope')) el.readDataScope = createDataScopeReader(node);
         if (node._getMeta('dataWidget') && 'store' in runtimeAttrs) {
             // data-widget (GnrStoreBag channel): hand the resolved Bag branch

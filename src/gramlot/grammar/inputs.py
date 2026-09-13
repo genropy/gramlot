@@ -12,6 +12,11 @@ class InputDeclarations:
     @element(sub_tags='', _meta={'webcomponent': True, 'render_tag': 'gnr-textboxarea'})
     def textBoxArea(self, **kwargs): ...
 
+    @element(sub_tags='', _meta={'propertyAttributes': ['values'], 'webcomponent': True, 'render_tag': 'gnr-checkboxtext', 'docline': 'Select multiple codes through inline or popup checkboxes.', 'parameters': [{'name': 'value', 'docline': 'Bound comma-separated codes; no selection is null.', 'required': False, 'type': 'str | None', 'default': None}, {'name': 'values', 'docline': 'Code:label string or Bag of options; reactive bindings supported.', 'required': False, 'type': 'str | Bag', 'default': None}, {'name': 'identifier', 'docline': 'Bag row field/attribute containing the code; defaults to node label.', 'required': False, 'type': 'str | None', 'default': None}, {'name': 'labelAttribute', 'docline': 'Bag row field/attribute containing the caption; defaults to node label.', 'required': False, 'type': 'str | None', 'default': None}, {'name': 'popup', 'docline': 'False for inline checkboxes; true for a readonly display field with popup.', 'required': False, 'type': 'bool', 'default': False}, {'name': 'cols', 'docline': 'Number of checkbox columns; defaults to 1.', 'required': False, 'type': 'int', 'default': 1}, {'name': 'disabled', 'docline': 'Disable user interaction.', 'required': False, 'type': 'bool', 'default': False}, {'name': 'readonly', 'docline': 'Prevent user changes while preserving the displayed selection.', 'required': False, 'type': 'bool', 'default': False}], 'examples': [{'title': 'Multiple dataset selection', 'language': 'python', 'code': "pane.checkBoxText(value='^.datasetFields', values='cost:Cost,revenue:Revenue', popup=True, cols=1)"}], 'notes': ['The bound Data node carries _displayedValue as comma-separated labels, or null.', 'Unknown selected codes are retained and displayed literally; option updates never silently discard selection.', 'No text filtering, remote/table options, hierarchical mode or valuesCb in this version.']})
+    def checkBoxText(self, **kwargs):
+        'Select multiple codes through inline or popup checkboxes.'
+        ...
+
     @element(sub_tags='', _meta={'webcomponent': True, 'render_tag': 'gnr-filteringselect'})
     def filteringSelect(self, **kwargs): ...
 

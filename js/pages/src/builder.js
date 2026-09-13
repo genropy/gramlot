@@ -7,9 +7,11 @@ import '/_assets/dom/collections/forms.js';
 import '/_assets/dom/collections/colorpicker.js';
 import '/_assets/dom/collections/storetree.js';
 import '/_assets/dom/collections/grid.js';
+import '/_assets/dom/collections/chart.js';
 
 import '/_assets/dom/collections/palette.js';
 import '/_assets/dom/collections/clipboard.js';
+import './codemirror-component.js';
 
 export class GramlotBuilder extends HtmlBuilder {
     attachApplication(application) {
@@ -19,5 +21,5 @@ export class GramlotBuilder extends HtmlBuilder {
     }
     get root() { return this.source; }
     static data_recipe_alias = true;
-    static wc_requires = ['inputs', 'layout', 'forms', 'colorpicker', 'storeTree', 'grid', 'palette', 'clipboard'];
+    static wc_requires = ['inputs', 'layout', 'forms', 'colorpicker', 'storeTree', 'grid', 'chart', 'palette', 'clipboard', 'labEditors'];
 }

@@ -25,6 +25,8 @@ export function defineDbSelect(Base, {callback = false} = {}) {
             super.disconnectedCallback();
         }
         _open(query) {
+            // A pending query must never accept the previous query's highlight.
+            this._close();
             clearTimeout(this._searchTimer);
             const generation = this._generation = (this._generation || 0) + 1;
             this._searchTimer = setTimeout(async () => {
@@ -36,12 +38,27 @@ export function defineDbSelect(Base, {callback = false} = {}) {
                 super._open('');
             }, Number(this.getAttribute('searchdelay') ?? 300));
         }
-        async _resolve(value) {
+        getSelectionValidity(value) {
+            if (this._resolvePromise && String(value) === this._resolvingValue) {
+                return this._resolvePromise.then(() => super.getSelectionValidity(value == null ? value : String(value)));
+            }
+            return super.getSelectionValidity(value == null ? value : String(value));
+        }
+        _resolve(value) {
+            // Binding updates can assign the same identity more than once while
+            // the lookup is pending. Share it without invalidating its generation.
+            if (this._resolvePromise && this._resolvingValue === String(value)) return this._resolvePromise;
             const generation = this._generation = (this._generation || 0) + 1;
-            const rows = await this._request({_id:value}, generation);
-            if (!rows || !this.isConnected || generation !== this._generation) return;
-            this._options = rows;
-            super.value = value;
+            this._resolvingValue = String(value);
+            const pending = this._request({_id:value}, generation).then(rows => {
+                if (!rows || !this.isConnected || generation !== this._generation) return;
+                this._options = rows;
+                super.value = value;
+            }).finally(() => {
+                if (this._resolvePromise === pending) this._resolvePromise = null;
+            });
+            this._resolvePromise = pending;
+            return pending;
         }
         async _request(params, generation) {
             const node = this.sourceNode, app = node.handler.application;
@@ -80,6 +97,14 @@ export function defineDbSelect(Base, {callback = false} = {}) {
                 node._dbSelectPending = false;
                 this.removeAttribute('aria-busy');
             }
+        }
+        _acceptOnExit() {
+            if (!this._opened || this._input.disabled || this._input.readOnly) return false;
+            const item = this._filtered[this._active] ||
+                (this._filtered.length === 1 ? this._filtered[0] : null);
+            if (!item) return false;
+            this._choose(item);
+            return true;
         }
         _choose(item) {
             super._choose(item);

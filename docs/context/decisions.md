@@ -1,5 +1,33 @@
 # Recorded decisions and corrections
 
+## Components and recipes — owner discussion, 2026-09-13
+
+Components wrap/adapt Web Components and occupy one node in the caller's Source
+Bag. Recipes compose HTML, components and other recipes, contributing their
+constituent Source nodes. The owner classifies Gnr IDE as a recipe and requests
+a tiny box with two or three widgets before attempting an IDE conversion.
+
+JavaScript recipes must work in standalone pages without Python. Python reuse can
+be ordinary imported functions/methods; writing Python does not automatically
+provide JavaScript. The manifesto should publish reusable Python source to copy
+and customize, alongside parameters, descriptions and examples. Python construction
+decisions use values available then; JS recipes can depend on browser Bag values.
+Python-created bindings can still be live. A blanket claim of dynamic equivalence
+between the two implementations is therefore inappropriate.
+
+The owner authorized the [small experiment](../examples/recipes/README.md), now
+locally verified. Exact naming, manifest schema, registration and automatic
+translation remain open. This is not authorization for the IDE migration or
+broader component/recipe architecture implementation.
+
+## Minimum visual quality for examples — owner direction, 2026-09-13
+
+Examples and proposals must use a coherent minimal shared style: readable
+typography, spacing, aligned controls and styled buttons. Functional verification
+alone is insufficient. Use the shared example-panel styles and layout classes;
+inspect the rendered result before presenting it. Do not deliver an unstyled
+collection of native controls as a finished proposal.
+
 ## Collection-store continuity — owner direction, 2026-09-12
 
 Recover the power of legacy collection stores, preserving APIs where possible
@@ -765,3 +793,19 @@ This supersedes the earlier deferred-Django note. The adapter remains optional;
 core imports and installations stay server-independent. The current implementation
 and local verification are recorded in [the Django checkpoint](../development/django-adapter-2026-09-13.md).
 The copied host is local test material, not a Genro ASGI dependency or publication.
+
+## Remote completion requires store integration review — 2026-09-13
+
+The owner asks to retain the remote/grouplet findings and evaluate integration
+with all store types before finishing remote content. This expands the review
+scope, not the first PoC's implementation scope. Prioritize usable grouplets;
+record implemented, tested, partial and absent behavior separately. See the
+[review checklist](../development/remote-store-integration-checklist-2026-09-13.md).
+
+## Store migration and FileSystemTree — 2026-09-13
+
+The owner requests all legacy store families and a FileSystemTree component
+backed by a directory resolver. Preserve the database-independent core and
+shared typed RPC. This expands the prior limited store review into implementation
+scope. Track actual behavior separately from legacy API names; see the
+[store migration matrix](../development/store-port-2026-09-13.md).

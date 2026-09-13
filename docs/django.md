@@ -203,3 +203,62 @@ Double-click or Enter activates a grid row. Server-side ModelForms validate
 allowlisted fields; each operation checks active staff status and Django model
 permissions. The first projection uses text inputs for scalar fields only.
 Relations, deletion and custom widget mapping are not implemented in this slice.
+
+## Django template preview in the IDE
+
+`DjangoIdePage.document_preview` renders the unsaved HTML template through the
+Django template backend and request context processors. Override
+`template_preview_context(root, path)` to supply application example data.
+The provider requires an active staff superuser, an existing file in a named
+allowlisted root and bounded HTML text. It does not save the submitted content.
+Declare `gramlotIde(..., previewmethod='document_preview')` in the common UI.
+
+The Bakery dashboard matches page templates to a published/public Wagtail page
+within the current site and uses that page's context. `breads/bread_page.html`
+was verified with Anadama, including inherited layout, CSS, image and ingredients.
+Partials, unmatched templates and app shells requiring extra startup data need
+an explicit preview context; they return an explanatory error. The preview is
+sandboxed, so scripts and interactive menus do not execute. Click Preview again
+after edits to render the current text; changes to included templates use their
+saved versions on disk.
+
+## Remote field validation and custom clean methods
+
+`DjangoTablesPage.table_forms` maps an exposed model label to a custom ModelForm
+class. Both remote validation and saving use that class, restricted to
+`table_fields`. Its `clean_<field>()`, form `clean()` and model validation run
+through the ordinary Django `is_valid()` lifecycle.
+
+Generated fields use the shared `validate_remote='validate_record_field'` RPC
+bridge. `validate_remote_<name>` attributes supply request parameters; the
+candidate `value` is authoritative. The form sends its current record values
+and identity, replaces the selected field with the candidate, and returns that
+field's errors plus non-field errors to Gramlot's validation UI. Dependency
+changes revalidate against the other draft fields. Validation does not save;
+Save independently repeats the complete ModelForm validation.
+
+Custom clean methods must remain free of persistence side effects, as they may
+run repeatedly during editing. Cross-field errors appear on the validating
+field and in the form's validation summary; save-time errors retain the existing
+field/non-field mapping. This does not translate Python clean methods to JS.
+
+### Automatic relations in table forms
+
+`DjangoTablesPage` maps exposed ForeignKey and OneToOne fields to the shared
+`dbSelect`, using the ModelForm queryset for search and identity lookup. The
+related model must grant Django view permission; ModelForm validation still
+checks the submitted identity on save and during remote validation.
+
+Reverse one-to-many and many-to-many relations automatically become separate
+`tabContainer` panes below the form when their target model is exposed through
+`table_fields` or `table_related_fields`. The latter mapping declares read-only
+related columns without adding a table to the navigation. Only scalar allowlisted
+columns are projected. Each grid filters through the selected parent's relation,
+returns at most 100 rows and checks parent and target view permissions on every
+request. An unsaved parent displays a save-first message.
+
+The Bakery example exposes an image dbSelect and operating-hours grid for
+LocationPage, and related bread grids for countries and bread types. Related
+grids are currently read-only; saving the parent preserves existing many-to-many
+links. These declarations use shared Gramlot components; ORM discovery and
+permission checks belong to the Django adapter.

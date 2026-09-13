@@ -27,6 +27,8 @@ def test_every_catalogued_recipe_accepts_runtime_attributes():
             required = {'rpcmethod': 'lookup'} if component['name'] in ('dbSelect', 'remoteSelect') else {}
             if component['name'] == 'relationTree':
                 required = {'table': 'invc.customer'}
+            if component['name'] == 'fileSystemTree':
+                required = {'root': 'files'}
             node = getattr(builder.root, component['name'])(value='^record.value', extension_flag=True, **required)
             assert node.node.node_tag == component['name']
             assert node.node.attr['value'] == '^record.value'

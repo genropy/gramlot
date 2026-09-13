@@ -78,7 +78,15 @@ export class DomTarget extends TargetWrapper {
             'gnr-bordercontainer', 'gnr-panel', 'gnr-box', 'gnr-stackcontainer', 'gnr-contentpane'].includes(el.localName);
         const names = new Set([...prior.attributes, ...next.attributes].map(a => a.name));
         const changes = [...names].filter(name => prior.getAttribute(name) !== next.getAttribute(name));
-        if (el.localName === 'gnr-storetree' || el.localName === 'gnr-relationtree') {
+        if (next._gramlotProperties) {
+            this._patchAttributes(el, next, prior, names);
+            for (const [name,value] of Object.entries(next._gramlotProperties)) el[name] = value;
+            el._gramlotProperties = next._gramlotProperties;
+            this.recipes.set(el,next.cloneNode(false));
+            return true;
+        }
+        const treeClass = globalThis.customElements?.get('gnr-storetree');
+        if (treeClass && el instanceof treeClass) {
             this._patchAttributes(el, next, prior, names);
             // A store supplied by the recipe participates in reconciliation.
             // Tools may instead attach a live Bag directly (the inspector does);
@@ -89,6 +97,11 @@ export class DomTarget extends TargetWrapper {
             }
             if (changes.includes('labelattribute')) el._render();
             el._widgetLabel?.apply();
+            return true;
+        }
+        if (el.localName === 'gnr-chart') {
+            this._patchAttributes(el, next, prior, names);
+            el.configure(next._config);
             return true;
         }
         if (el.localName === 'gnr-grid') {
@@ -104,6 +117,14 @@ export class DomTarget extends TargetWrapper {
             el.frozenColumns = next.frozenColumns;
             el.rowHeight = next.rowHeight;
             el.selectedKey = next.selectedKey;
+            // Grid-owned Source editor children occupy a stable shadow slot.
+            const wanted = new Set([...next.children].map(child => child.id));
+            for (const child of [...el.children]) if (!wanted.has(child.id)) child.remove();
+            for (const fresh of [...next.children]) {
+                const current = [...el.children].find(child => child.id === fresh.id);
+                if (!current) { this._remember(fresh); el.append(fresh); }
+                else if (!this._reconcile(current, fresh)) { this._remember(fresh); current.replaceWith(fresh); }
+            }
             return true;
         }
         const decorationChanges = changes.filter(name => !(

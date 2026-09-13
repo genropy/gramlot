@@ -1,5 +1,13 @@
 # Gramlot release status
 
+## Current source version: 0.1.4 — unpublished
+
+The owner assigned 0.1.4 on 2026-09-13 after the relation-tree consolidation
+(commit `8be2f7a`). Python and internal JavaScript package versions are aligned.
+This is a local source version: no push, tag or publication is authorized by
+this version change. The latest published framework release remains v0.1.3.
+Gramlot remains pre-alpha; 0.2.0 beta is the development target.
+
 ## Published GitHub prerelease: 0.1.3
 
 Published on 2026-09-12 from tag `v0.1.3`, commit `8c12313`.
@@ -72,7 +80,7 @@ A focused three-repeat run passed 3/6, confirming intermittent behavior rather
 than a clean public pass. Both had passed local and tag CI runs. These two
 pointer/layout interactions remain open; do not report all public tests green.
 
-## Current source version: 0.1.3
+## Previous source checkpoint: 0.1.3
 
 The owner assigned **0.1.3** on 2026-09-12 and authorized commit and push to
 `develop`, without a tag or publication. Python and internal JavaScript metadata

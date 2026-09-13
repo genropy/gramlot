@@ -3,6 +3,7 @@
  * restoreBaseline restores data, unlike legacy reset (tracking only). */
 import {Bag} from 'genro-bag-js';
 import {MemoryStore} from './value-snapshot.js';
+import {formStore} from './stores.js';
 
 export class FormController {
     constructor(service,node) {
@@ -37,7 +38,8 @@ export class FormController {
     initialize() {
         this.baseline=this.service.snapshot.copy(this.data);
         const store=this.attrs.store;
-        this.store=store==null || store==='memory' ? new MemoryStore(this.baseline) : store;
+        this.store=this.attrs.storeType ? formStore(this, this.attrs.storeType)
+            : store==null || store==='memory' ? new MemoryStore(this.baseline) : store;
         if (typeof this.store?.load!=='function' || typeof this.store?.save!=='function') throw new Error('A form store must provide load and save');
     }
     async restoreBaseline() {

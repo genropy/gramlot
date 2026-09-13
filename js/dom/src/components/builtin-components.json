@@ -29,6 +29,94 @@
           ]
         },
         {
+          "name": "checkBoxText",
+          "tag": "gnr-checkboxtext",
+          "subTags": "",
+          "pythonGroup": "InputDeclarations",
+          "capabilities": [
+            "control",
+            "decoration",
+            "null",
+            "field-state"
+          ],
+          "meta": {
+            "propertyAttributes": [
+              "values"
+            ]
+          },
+          "docline": "Select multiple codes through inline or popup checkboxes.",
+          "parameters": [
+            {
+              "name": "value",
+              "docline": "Bound comma-separated codes; no selection is null.",
+              "required": false,
+              "type": "str | None",
+              "default": null
+            },
+            {
+              "name": "values",
+              "docline": "Code:label string or Bag of options; reactive bindings supported.",
+              "required": false,
+              "type": "str | Bag",
+              "default": null
+            },
+            {
+              "name": "identifier",
+              "docline": "Bag row field/attribute containing the code; defaults to node label.",
+              "required": false,
+              "type": "str | None",
+              "default": null
+            },
+            {
+              "name": "labelAttribute",
+              "docline": "Bag row field/attribute containing the caption; defaults to node label.",
+              "required": false,
+              "type": "str | None",
+              "default": null
+            },
+            {
+              "name": "popup",
+              "docline": "False for inline checkboxes; true for a readonly display field with popup.",
+              "required": false,
+              "type": "bool",
+              "default": false
+            },
+            {
+              "name": "cols",
+              "docline": "Number of checkbox columns; defaults to 1.",
+              "required": false,
+              "type": "int",
+              "default": 1
+            },
+            {
+              "name": "disabled",
+              "docline": "Disable user interaction.",
+              "required": false,
+              "type": "bool",
+              "default": false
+            },
+            {
+              "name": "readonly",
+              "docline": "Prevent user changes while preserving the displayed selection.",
+              "required": false,
+              "type": "bool",
+              "default": false
+            }
+          ],
+          "notes": [
+            "The bound Data node carries _displayedValue as comma-separated labels, or null.",
+            "Unknown selected codes are retained and displayed literally; option updates never silently discard selection.",
+            "No text filtering, remote/table options, hierarchical mode or valuesCb in this version."
+          ],
+          "examples": [
+            {
+              "title": "Multiple dataset selection",
+              "language": "python",
+              "code": "pane.checkBoxText(value='^.datasetFields', values='cost:Cost,revenue:Revenue', popup=True, cols=1)"
+            }
+          ]
+        },
+        {
           "name": "filteringSelect",
           "tag": "gnr-filteringselect",
           "subTags": "",
@@ -786,6 +874,54 @@
           "meta": {
             "dataWidget": true
           }
+        },
+        {
+          "name": "fileSystemTree",
+          "tag": "gnr-filesystemtree",
+          "subTags": "",
+          "pythonGroup": "AdjacentWidgetDeclarations",
+          "capabilities": [
+            "data-widget"
+          ],
+          "meta": {
+            "dataWidget": true
+          },
+          "docline": "Browse a named server directory through lazy RPC directory resolvers.",
+          "serverRequired": true,
+          "parameters": [
+            {
+              "name": "root",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "docline": "Name declared in filesystem_roots on the page; never an arbitrary server path."
+            },
+            {
+              "name": "path",
+              "type": "string",
+              "required": false,
+              "default": "",
+              "docline": "Relative subdirectory within that root."
+            },
+            {
+              "name": "rpcmethod",
+              "type": "endpoint name",
+              "required": false,
+              "default": "directory_tree",
+              "docline": "Provider for the initial level. Nested resolver descriptors identify their own endpoint."
+            },
+            {
+              "name": "storepath",
+              "type": "Data path",
+              "required": false,
+              "default": null,
+              "docline": "Data destination; generated per declaration if omitted."
+            }
+          ],
+          "notes": [
+            "Read-only. Symbolic links are not exposed. Directory children are loaded on expansion. File contents and file mutations are not exposed."
+          ],
+          "examples": []
         }
       ]
     },
@@ -814,6 +950,102 @@
           "capabilities": [
             "adapter"
           ]
+        },
+        {
+          "name": "gramlotIde",
+          "tag": "gnr-gramlotide",
+          "subTags": "",
+          "pythonGroup": "AdjacentWidgetDeclarations",
+          "capabilities": [
+            "adapter"
+          ],
+          "docline": "Edit documents in Data Bags, with optional filesystem navigation and conflict-aware Save.",
+          "serverRequired": false,
+          "parameters": [
+            {
+              "name": "datapath",
+              "type": "Data path",
+              "required": false,
+              "default": null,
+              "docline": "Document state scope. Python generates an isolated scope when omitted."
+            },
+            {
+              "name": "root",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "docline": "Named server workspace. Omit for local document editing without RPC."
+            },
+            {
+              "name": "initialpath",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "docline": "Workspace file opened initially."
+            },
+            {
+              "name": "writable",
+              "type": "boolean",
+              "required": false,
+              "default": false,
+              "docline": "Enable Save; the server must independently allow writing the workspace."
+            },
+            {
+              "name": "treemethod",
+              "type": "endpoint name",
+              "required": false,
+              "default": "directory_tree",
+              "docline": "Directory provider."
+            },
+            {
+              "name": "readmethod",
+              "type": "endpoint name",
+              "required": false,
+              "default": "document_read",
+              "docline": "Read provider returning content, revision, language and writable."
+            },
+            {
+              "name": "savemethod",
+              "type": "endpoint name",
+              "required": false,
+              "default": "document_save",
+              "docline": "Save provider receiving root, path, content and revision."
+            },
+            {
+              "name": "content",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "docline": "Initial standalone document content."
+            },
+            {
+              "name": "filename",
+              "type": "string",
+              "required": false,
+              "default": "scratch.py",
+              "docline": "Name of the standalone initial document."
+            },
+            {
+              "name": "language",
+              "type": "string",
+              "required": false,
+              "default": "python",
+              "docline": "Language of the standalone initial document."
+            }
+          ],
+          "notes": [
+            "Documents, active tab, saved baseline and revision live in Data Bags. Closing a dirty document requires explicit discard. Save errors retain edits.",
+            "The default provider edits existing UTF-8 files only, limited to 2 MiB. No code execution, new files, rename, delete or rich-text HTML editor is implemented.",
+            "HTML currently opens as source; visual HTML editing requires a separate rich-text component and is deferred.",
+            "CodeMirror uses the existing pinned external modules and retains a textarea if they are unavailable."
+          ],
+          "examples": [
+            {
+              "title": "Standalone scratch document",
+              "language": "python",
+              "code": "from gramlot.page import WebPage\n\nclass Page(WebPage):\n    def main(self, root):\n        root.gramlotIde(content='print(42)', filename='scratch.py')\n"
+            }
+          ]
         }
       ]
     },
@@ -823,6 +1055,20 @@
         {
           "name": "grid",
           "tag": "gnr-grid",
+          "subTags": "",
+          "pythonGroup": "AdjacentWidgetDeclarations",
+          "capabilities": [
+            "adapter"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chart",
+      "components": [
+        {
+          "name": "chart",
+          "tag": "gnr-chart",
           "subTags": "",
           "pythonGroup": "AdjacentWidgetDeclarations",
           "capabilities": [

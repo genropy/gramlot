@@ -4,6 +4,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import shutil
+import subprocess
 
 
 class AssetPreparation:
@@ -26,6 +27,10 @@ class AssetPreparation:
             shutil.rmtree(target)
         for source, destination in copies.items():
             shutil.copytree(source, target / destination)
+        # Keep native ESM source serving self-contained as well as the final bundle.
+        subprocess.run([str(modules / '.bin/esbuild'),
+                        str(root / 'js/dom/src/charts/d3.js'), '--bundle', '--format=esm',
+                        '--minify', '--outfile=' + str(target / 'gramlot-dom/src/charts/d3.js')], check=True)
         # Build the inspector from its authoritative Python recipe, not a second JS UI.
         import sys
         sys.path.insert(0, str(root / "src"))
@@ -68,7 +73,10 @@ class AssetPreparation:
                 )
             verify_source_types(inspector.source, from_tytx(encoded, transport="json"))
             (target / "pages" / filename).write_text(encoded)
-        for package in ("genro-bag-js", "genro-tytx", "@msgpack/msgpack", "decimal.js"):
+        for package in ("genro-bag-js", "genro-tytx", "@msgpack/msgpack", "decimal.js",
+                        "d3-scale", "d3-selection", "d3-axis", "d3-array", "d3-color",
+                        "d3-format", "d3-interpolate", "d3-time", "d3-time-format", "internmap",
+                        "d3-shape", "d3-path"):
             source = modules / package
             destination = target / "licenses" / package
             destination.mkdir(parents=True)

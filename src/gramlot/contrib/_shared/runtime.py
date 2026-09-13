@@ -6,6 +6,7 @@ configure them. This optional adapter owns this wheel-specific knowledge.
 
 import json
 import re
+from uuid import uuid4
 from html import escape
 from pathlib import Path, PurePosixPath
 
@@ -56,6 +57,11 @@ class RuntimeAssets:
         if self.browser_manifest is not None:
             self.base_url += self.browser_manifest['buildId'] + '/'
             self.entry_url = self.base_url + self.browser_manifest['entryPoints']['gramlot-page-startup']
+        else:
+            # Source modules change without a release/build ID. Give each host
+            # instance a fresh namespace, including every transitive import.
+            self.base_url += 'dev-' + uuid4().hex + '/'
+            self.entry_url = self.base_url + 'common/entry.js'
 
     def _load_browser_manifest(self):
         manifest_path = self.browser_directory / 'manifest.json'

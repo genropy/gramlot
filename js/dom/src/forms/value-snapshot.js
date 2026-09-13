@@ -2,11 +2,13 @@
 /** Detached typed Bag snapshots. Compare persisted structure, never loose scalar
  * equality. Runtime validation metadata does not participate in persistence. */
 import {Bag} from 'genro-bag-js';
+import {isDecimal} from 'genro-tytx';
 
 const TRANSIENT = new Set(['_validationError','_validationWarnings','_displayedValue','_formattedValue','_loadedValue']);
 export class ValueSnapshot {
     copy(value, seen=new Set()) {
         if (value == null || typeof value !== 'object') return value;
+        if (isDecimal(value)) return new value.constructor(value.toString());
         if (seen.has(value)) throw new Error('Cyclic form data is unsupported');
         seen.add(value);
         try {
@@ -34,6 +36,7 @@ export class ValueSnapshot {
     equal(a,b) {
         if (Object.is(a,b)) return true;
         if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false;
+        if (isDecimal(a) || isDecimal(b)) return isDecimal(a) && isDecimal(b) && a.eq(b);
         if (a instanceof Date || b instanceof Date) {
             return a instanceof Date && b instanceof Date && a.getTime()===b.getTime()
                 && this.equal({...a},{...b});

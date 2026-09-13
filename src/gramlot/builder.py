@@ -6,6 +6,7 @@ from genro_builders.contrib.html.html_builder import HtmlBuilder
 
 from .grammar.resources import ResourceDeclarations, ResourceAuthoring
 from .grammar.grid import GridAuthoring
+from .grammar.chart import ChartAuthoring
 from .grammar.resolvers import ResolverAuthoring
 
 from .grammar import (
@@ -63,7 +64,7 @@ class GramlotBuilder(
         """Browser runtime owns execution of declarative logic."""
 
 
-class AuthoringNode(GridAuthoring, ResolverAuthoring, ResourceAuthoring, LogicDeclarations):
+class AuthoringNode(ChartAuthoring, GridAuthoring, ResolverAuthoring, ResourceAuthoring, LogicDeclarations):
     """Recipe facade: names do not replace properties on generic source nodes.
 
     Pass this surface to helpers to build into an existing parent. ``node`` is

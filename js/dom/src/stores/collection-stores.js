@@ -54,7 +54,17 @@ export class CollectionStores {
         });
         store.storeNode = node;
         store.storepath = path;
-        store.storeType = rpc ? 'RpcBase' : 'BagRows';
+        store.storeType = attr._storeType || (rpc ? 'RpcBase' : 'BagRows');
+        store.pageIndex = 0;
+        store.totalRows = null;
+        store.chunkSize = attr._chunkSize || null;
+        store.loadPage = (pageIndex) => {
+            if (!store.chunkSize || !Number.isInteger(pageIndex) || pageIndex < 0) throw new TypeError('Expected a nonnegative page index on a paged store');
+            if (store.disposed) throw new Error(`Disposed collection store: ${code}`);
+            return this.application.server.invokeProvider(node, {
+                ...node.builder._bindings(node), _offset:pageIndex * store.chunkSize, _limit:store.chunkSize,
+            });
+        };
         store.metadata = {};
         store.loadError = null;
         store.loadData = () => {
@@ -70,10 +80,19 @@ export class CollectionStores {
         this.entries.set(code, {node, store, subscription, path});
         node.store = store;
     }
-    accept(node, result) {
+    accept(node, result, params={}) {
         const entry = this.entries.get(node.getAttr('storeCode'));
         if (entry?.node !== node) throw new Error('RPC store is no longer registered');
         const bag = selectionBag(result, entry.store.identifier);
+        if (entry.store.chunkSize) {
+            const total = result.metadata?.totalrows;
+            if (!Number.isInteger(total) || total < 0 || result.rows.length > entry.store.chunkSize
+                    || (result.rows.length && params._offset + result.rows.length > total)) {
+                throw new TypeError('Paged selection requires valid totalrows and bounded rows');
+            }
+            entry.store.totalRows = total;
+            entry.store.pageIndex = params._offset / entry.store.chunkSize;
+        }
         entry.store.metadata = {...result.metadata};
         entry.store.loadError = null;
         this.application.data.setItem(entry.path, bag);

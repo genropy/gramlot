@@ -1,0 +1,13 @@
+:root {font: 15px/1.5 system-ui, sans-serif; color: #283340; background: #f5f7fa}
+body {margin: 0; padding: 28px}
+main {max-width: 1400px; margin: auto}
+h1 {font-size: 26px; margin: 0 0 8px} h2 {font-size: 18px}
+p {color: #58657a} a {color: #285d96}
+.columns {display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 20px 0}
+.message-box {display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 18px; margin: 14px 0; border: 1px solid #cbd5df; border-radius: 8px; background: white}
+.box-title, .detail {grid-column: 1 / -1} .box-title {font-weight: 600}
+.detail {margin: 0; border-top: 1px solid #e3e8ed; padding-top: 10px}
+button {font: inherit; padding: 4px 14px; border: 1px solid #c6ced6; border-radius: 4px; background: #f8fafb; color: inherit; cursor: pointer}
+button:hover {background: #edf2f6} button:focus-visible {outline: 2px solid #527fa2; outline-offset: 1px}
+pre {font: 12px/1.6 ui-monospace, monospace; overflow: auto; max-height: 440px; padding: 18px; background: #182432; color: #e5edf7; border-radius: 8px}
+@media (max-width: 800px) {.columns {grid-template-columns: 1fr} body {padding: 16px}}

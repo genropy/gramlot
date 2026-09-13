@@ -5,13 +5,17 @@ from django.views.decorators.clickjacking import xframe_options_sameorigin
 from gramlot.contrib.django import DjangoPageCollection
 from .urls import urlpatterns as bakery_urls
 
-pages = DjangoPageCollection(Path(__file__).resolve().parent.parent / 'gramlot_pages',
+pages = DjangoPageCollection(Path(__file__).resolve().parent.parent / 'GramlotPages',
                              prefix='/gramlot', title='Bakerydemo with Gramlot')
-products = DjangoPageCollection(Path(__file__).resolve().parent.parent / 'public_products',
+products = DjangoPageCollection(Path(__file__).resolve().parent.parent / 'GramlotPages',
                                 prefix='/products', title='Explore our breads',
                                 template_name='breads/product_explorer.html')
-schema = DjangoPageCollection(Path(__file__).resolve().parent.parent / 'schema_admin',
+schema = DjangoPageCollection(Path(__file__).resolve().parent.parent / 'GramlotPages',
                               prefix='/spa_admin', title='SPA admin')
+# Shared source directory; expose only each collection's intended pages.
+pages.page_classes = {name: pages.page_classes[name] for name in ('breads',)}
+products.page_classes = {name: products.page_classes[name] for name in ('explore',)}
+schema.page_classes = {name: schema.page_classes[name] for name in ('dashboard', 'models', 'tables', 'ide')}
 schema_urls = schema.urls
 for pattern in schema_urls:
     pattern.callback = admin.site.admin_view(xframe_options_sameorigin(pattern.callback))
