@@ -504,6 +504,8 @@ function defineComponents() {
     customElements.define('gnr-textboxarea', GnrTextBoxArea);
     customElements.define('gnr-filteringselect', GnrFilteringSelect);
     customElements.define('gnr-dbselect', defineDbSelect(GnrFilteringSelect));
+    customElements.define('gnr-remoteselect', defineDbSelect(GnrFilteringSelect));
+    customElements.define('gnr-callbackselect', defineDbSelect(GnrFilteringSelect, {callback:true}));
     customElements.define('gnr-combobox', GnrComboBox);
     customElements.define('gnr-passwordbox', GnrPasswordbox);
     customElements.define('gnr-numbertextbox', GnrNumberTextBox);

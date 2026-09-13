@@ -49,6 +49,452 @@ export const BUILTIN_COMPONENTS = [
           "decoration",
           "null",
           "field-state"
+        ],
+        "docline": "Select a record identity through an explicit database lookup endpoint.",
+        "serverRequired": true,
+        "parameters": [
+          {
+            "name": "rpcmethod",
+            "type": "@endpoint method | logical method name",
+            "required": true,
+            "default": null,
+            "docline": "Explicitly exposed data endpoint. Python accepts the decorated bound method or its logical name."
+          },
+          {
+            "name": "value",
+            "type": "identity | Data binding",
+            "required": false,
+            "default": null,
+            "docline": "Selected identity, not caption. Use ^path for two-way Data binding. Identity is normalized to a string in the browser; null clears the selection."
+          },
+          {
+            "name": "kw_*",
+            "type": "any | Data binding",
+            "required": false,
+            "default": null,
+            "docline": "Provider parameters: the prefix is removed and bindings are resolved on each request. Use =path for dependent scope. Clear dependent selections explicitly when that scope changes."
+          },
+          {
+            "name": "searchdelay",
+            "type": "number",
+            "required": false,
+            "default": 300,
+            "docline": "Debounce delay in milliseconds before text search."
+          },
+          {
+            "name": "selectedCaption",
+            "type": "Data path",
+            "required": false,
+            "default": null,
+            "docline": "Destination receiving the caption when the user chooses a row."
+          },
+          {
+            "name": "selected_*",
+            "type": "Data path",
+            "required": false,
+            "default": null,
+            "docline": "Destination receiving the selected record field named after the prefix. A missing field writes null. These outputs are not automatically cleared when value is cleared."
+          },
+          {
+            "name": "lbl",
+            "type": "string",
+            "required": false,
+            "default": null,
+            "docline": "Field label through the shared control decoration."
+          },
+          {
+            "name": "placeholder",
+            "type": "string",
+            "required": false,
+            "default": null,
+            "docline": "Hint shown by the empty input."
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "required": false,
+            "default": false,
+            "docline": "Disable user interaction."
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "required": false,
+            "default": false,
+            "docline": "Prevent user editing."
+          },
+          {
+            "name": "width",
+            "type": "CSS length",
+            "required": false,
+            "default": null,
+            "docline": "Width through standard Gramlot styling."
+          }
+        ],
+        "providerRequest": [
+          {
+            "name": "_querystring",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "docline": "Search text supplied by the widget. The provider owns matching and result limits."
+          },
+          {
+            "name": "_id",
+            "type": "identity",
+            "required": false,
+            "default": null,
+            "docline": "Exact identity lookup instead of text search, used to restore the caption of a stored value."
+          }
+        ],
+        "providerResponse": [
+          {
+            "name": "rows",
+            "type": "array of records",
+            "required": true,
+            "default": null,
+            "docline": "Rows with unique nonempty identities and non-null captions."
+          },
+          {
+            "name": "identifier",
+            "type": "string",
+            "required": true,
+            "default": null,
+            "docline": "Name of the identity field in every row."
+          },
+          {
+            "name": "caption",
+            "type": "string",
+            "required": true,
+            "default": null,
+            "docline": "Name of the display-caption field in every row."
+          },
+          {
+            "name": "metadata",
+            "type": "object",
+            "required": false,
+            "default": {},
+            "docline": "Optional metadata retained on the component as resultMetadata."
+          }
+        ],
+        "notes": [
+          "Uses filteringSelect keyboard and constrained identity selection behavior. Standard Gramlot bindings, field state and layout attributes remain available; this parameter list documents the provider contract and common controls.",
+          "At most one provider request is in flight per SourceNode. Another request is refused with busy feedback, without queue or replay. Obsolete results are discarded. Clearing value invalidates cached choices and pending results.",
+          "Providers must implement both text search and exact identity lookup. No SQL/table inference, automatic paging, legacy headers/data response, or multi-column popup is provided.",
+          "These metadata describe the current runtime; they do not introduce strict parameter type validation.",
+          "The example requires the optional FastAPI\u2013GenroPy host and test_invoice_pg model. The component itself is database-agnostic; the endpoint owns database access and authorization."
+        ],
+        "examples": [
+          {
+            "title": "Minimal dbSelect",
+            "language": "python",
+            "code": "from gramlot.contrib.fastapi_genropy import GenropyPage\nfrom gramlot.page import endpoint\n\n\nclass Page(GenropyPage):\n    def main(self, root):\n        root.dbSelect(value='^customer_id', rpcmethod=self.customers, lbl='Customer')\n\n    @endpoint\n    def customers(self, _querystring='', _id=None):\n        where = '$id=:key' if _id is not None else '$account_name ILIKE :text'\n        rows = self.db.table('invc.customer').query(\n            columns='$id,$account_name', where=where, key=_id,\n            text=f'%{_querystring}%', order_by='$account_name,$id', limit=10).fetch()\n        return dict(self.selection_result(rows, identifier='id'), caption='account_name')\n"
+          }
+        ]
+      },
+      {
+        "name": "remoteSelect",
+        "tag": "gnr-remoteselect",
+        "subTags": "",
+        "pythonGroup": "InputDeclarations",
+        "capabilities": [
+          "control",
+          "decoration",
+          "null",
+          "field-state"
+        ],
+        "docline": "Select an identity from an arbitrary server endpoint.",
+        "serverRequired": true,
+        "parameters": [
+          {
+            "name": "rpcmethod",
+            "type": "@endpoint method | logical method name",
+            "required": true,
+            "default": null,
+            "docline": "Explicitly exposed data endpoint. Python accepts the decorated bound method or its logical name."
+          },
+          {
+            "name": "value",
+            "type": "identity | Data binding",
+            "required": false,
+            "default": null,
+            "docline": "Selected identity, not caption. Use ^path for two-way Data binding. Identity is normalized to a string in the browser; null clears the selection."
+          },
+          {
+            "name": "kw_*",
+            "type": "any | Data binding",
+            "required": false,
+            "default": null,
+            "docline": "Provider parameters: the prefix is removed and bindings are resolved on each request. Use =path for dependent scope. Clear dependent selections explicitly when that scope changes."
+          },
+          {
+            "name": "searchdelay",
+            "type": "number",
+            "required": false,
+            "default": 300,
+            "docline": "Debounce delay in milliseconds before text search."
+          },
+          {
+            "name": "selectedCaption",
+            "type": "Data path",
+            "required": false,
+            "default": null,
+            "docline": "Destination receiving the caption when the user chooses a row."
+          },
+          {
+            "name": "selected_*",
+            "type": "Data path",
+            "required": false,
+            "default": null,
+            "docline": "Destination receiving the selected record field named after the prefix. A missing field writes null. These outputs are not automatically cleared when value is cleared."
+          },
+          {
+            "name": "lbl",
+            "type": "string",
+            "required": false,
+            "default": null,
+            "docline": "Field label through the shared control decoration."
+          },
+          {
+            "name": "placeholder",
+            "type": "string",
+            "required": false,
+            "default": null,
+            "docline": "Hint shown by the empty input."
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "required": false,
+            "default": false,
+            "docline": "Disable user interaction."
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "required": false,
+            "default": false,
+            "docline": "Prevent user editing."
+          },
+          {
+            "name": "width",
+            "type": "CSS length",
+            "required": false,
+            "default": null,
+            "docline": "Width through standard Gramlot styling."
+          }
+        ],
+        "providerRequest": [
+          {
+            "name": "_querystring",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "docline": "Search text supplied by the widget. The provider owns matching and result limits."
+          },
+          {
+            "name": "_id",
+            "type": "identity",
+            "required": false,
+            "default": null,
+            "docline": "Exact identity lookup instead of text search, used to restore the caption of a stored value."
+          }
+        ],
+        "providerResponse": [
+          {
+            "name": "rows",
+            "type": "array of records",
+            "required": true,
+            "default": null,
+            "docline": "Rows with unique nonempty identities and non-null captions."
+          },
+          {
+            "name": "identifier",
+            "type": "string",
+            "required": true,
+            "default": null,
+            "docline": "Name of the identity field in every row."
+          },
+          {
+            "name": "caption",
+            "type": "string",
+            "required": true,
+            "default": null,
+            "docline": "Name of the display-caption field in every row."
+          },
+          {
+            "name": "metadata",
+            "type": "object",
+            "required": false,
+            "default": {},
+            "docline": "Optional metadata retained on the component as resultMetadata."
+          }
+        ],
+        "notes": [
+          "Uses filteringSelect keyboard and constrained identity selection behavior. Standard Gramlot bindings, field state and layout attributes remain available; this parameter list documents the provider contract and common controls.",
+          "At most one provider request is in flight per SourceNode. Another request is refused with busy feedback, without queue or replay. Obsolete results are discarded. Clearing value invalidates cached choices and pending results.",
+          "Providers must implement both text search and exact identity lookup. No SQL/table inference, automatic paging, legacy headers/data response, or multi-column popup is provided.",
+          "These metadata describe the current runtime; they do not introduce strict parameter type validation."
+        ],
+        "examples": [
+          {
+            "title": "Minimal remoteSelect",
+            "language": "python",
+            "code": "from gramlot.page import WebPage, endpoint\n\n\nclass Page(WebPage):\n    def main(self, root):\n        root.remoteSelect(value='^choice', rpcmethod=self.choices, lbl='Choice')\n\n    @endpoint\n    def choices(self, _querystring='', _id=None):\n        rows = [dict(id='a', name='Alpha'), dict(id='b', name='Beta')]\n        rows = [r for r in rows if (r['id'] == _id if _id is not None\n                                   else _querystring.lower() in r['name'].lower())]\n        return dict(rows=rows, identifier='id', caption='name')\n"
+          }
+        ]
+      },
+      {
+        "name": "callbackSelect",
+        "tag": "gnr-callbackselect",
+        "subTags": "",
+        "pythonGroup": "InputDeclarations",
+        "capabilities": [
+          "control",
+          "decoration",
+          "null",
+          "field-state"
+        ],
+        "docline": "Select an identity through a browser callback, synchronous or asynchronous.",
+        "serverRequired": false,
+        "parameters": [
+          {
+            "name": "callback",
+            "type": "JavaScript body | function",
+            "required": true,
+            "default": null,
+            "docline": "Browser code receiving kw and this=SourceNode; return the selection object or a Promise of it."
+          },
+          {
+            "name": "value",
+            "type": "identity | Data binding",
+            "required": false,
+            "default": null,
+            "docline": "Selected identity, not caption. Use ^path for two-way Data binding. Identity is normalized to a string in the browser; null clears the selection."
+          },
+          {
+            "name": "kw_*",
+            "type": "any | Data binding",
+            "required": false,
+            "default": null,
+            "docline": "Provider parameters: the prefix is removed and bindings are resolved on each request. Use =path for dependent scope. Clear dependent selections explicitly when that scope changes."
+          },
+          {
+            "name": "searchdelay",
+            "type": "number",
+            "required": false,
+            "default": 300,
+            "docline": "Debounce delay in milliseconds before text search."
+          },
+          {
+            "name": "selectedCaption",
+            "type": "Data path",
+            "required": false,
+            "default": null,
+            "docline": "Destination receiving the caption when the user chooses a row."
+          },
+          {
+            "name": "selected_*",
+            "type": "Data path",
+            "required": false,
+            "default": null,
+            "docline": "Destination receiving the selected record field named after the prefix. A missing field writes null. These outputs are not automatically cleared when value is cleared."
+          },
+          {
+            "name": "lbl",
+            "type": "string",
+            "required": false,
+            "default": null,
+            "docline": "Field label through the shared control decoration."
+          },
+          {
+            "name": "placeholder",
+            "type": "string",
+            "required": false,
+            "default": null,
+            "docline": "Hint shown by the empty input."
+          },
+          {
+            "name": "disabled",
+            "type": "boolean",
+            "required": false,
+            "default": false,
+            "docline": "Disable user interaction."
+          },
+          {
+            "name": "readOnly",
+            "type": "boolean",
+            "required": false,
+            "default": false,
+            "docline": "Prevent user editing."
+          },
+          {
+            "name": "width",
+            "type": "CSS length",
+            "required": false,
+            "default": null,
+            "docline": "Width through standard Gramlot styling."
+          }
+        ],
+        "providerRequest": [
+          {
+            "name": "_querystring",
+            "type": "string",
+            "required": false,
+            "default": "",
+            "docline": "Search text supplied by the widget. The provider owns matching and result limits."
+          },
+          {
+            "name": "_id",
+            "type": "identity",
+            "required": false,
+            "default": null,
+            "docline": "Exact identity lookup instead of text search, used to restore the caption of a stored value."
+          }
+        ],
+        "providerResponse": [
+          {
+            "name": "rows",
+            "type": "array of records",
+            "required": true,
+            "default": null,
+            "docline": "Rows with unique nonempty identities and non-null captions."
+          },
+          {
+            "name": "identifier",
+            "type": "string",
+            "required": true,
+            "default": null,
+            "docline": "Name of the identity field in every row."
+          },
+          {
+            "name": "caption",
+            "type": "string",
+            "required": true,
+            "default": null,
+            "docline": "Name of the display-caption field in every row."
+          },
+          {
+            "name": "metadata",
+            "type": "object",
+            "required": false,
+            "default": {},
+            "docline": "Optional metadata retained on the component as resultMetadata."
+          }
+        ],
+        "notes": [
+          "Uses filteringSelect keyboard and constrained identity selection behavior. Standard Gramlot bindings, field state and layout attributes remain available; this parameter list documents the provider contract and common controls.",
+          "At most one provider request is in flight per SourceNode. Another request is refused with busy feedback, without queue or replay. Obsolete results are discarded. Clearing value invalidates cached choices and pending results.",
+          "Providers must implement both text search and exact identity lookup. No SQL/table inference, automatic paging, legacy headers/data response, or multi-column popup is provided.",
+          "These metadata describe the current runtime; they do not introduce strict parameter type validation.",
+          "Works without a server. Callback code is trusted application code, not user-supplied JavaScript."
+        ],
+        "examples": [
+          {
+            "title": "Minimal callbackSelect",
+            "language": "python",
+            "code": "from gramlot.page import WebPage\n\n\nclass Page(WebPage):\n    def main(self, root):\n        root.callbackSelect(value='^choice', lbl='Choice', callback=\"\"\"\n            const rows = [{id: 'a', name: 'Alpha'}, {id: 'b', name: 'Beta'}];\n            return {rows: rows.filter(r => kw._id != null ? r.id === kw._id\n                : r.name.toLowerCase().includes((kw._querystring || '').toLowerCase())),\n                identifier: 'id', caption: 'name'};\n        \"\"\")\n"
+          }
         ]
       },
       {

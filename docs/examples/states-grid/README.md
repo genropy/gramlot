@@ -1,5 +1,9 @@
 # States grid through a GenroPy database
 
+The same optional host also serves `/database/model-selects/`, comparing
+`remoteSelect` and `callbackSelect` for package → table → field metadata.
+See [the provider contract](../../guides/select-providers.md).
+
 This Python-authored example runs under the common FastAPI host. It reads
 `invc.state` from `GnrApp('test_invoice_pg')`, using `query(...).fetch()` and
 `GenropyPage.selection_result`. The RPC collection constructs attribute-backed

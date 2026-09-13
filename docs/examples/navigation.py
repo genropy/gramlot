@@ -30,6 +30,8 @@ def catalogue(preview, database=False):
                         group='Applications', disabled=not database))
     entries.append(dict(title='Customer relation tree', url='/database/relation-tree/',
                         group='Applications', disabled=not database))
+    entries.append(dict(title='Model remote and callback selects', url='/database/model-selects/',
+                        group='Applications', disabled=not database))
     entries.append(dict(title='Visual Source builder', url='/builder/', group='Tools'))
     return entries
 

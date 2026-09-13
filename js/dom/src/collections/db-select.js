@@ -1,17 +1,22 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 /** Remote identity/caption choice. SQL and authorization belong to the endpoint. */
-export function defineDbSelect(Base) {
+export function defineDbSelect(Base, {callback = false} = {}) {
     return class GnrDbSelect extends Base {
         get options() { return this._options || []; }
         get value() { return this._committed; }
         set value(value) {
+            if (value == null || value === '') {
+                this._generation = (this._generation || 0) + 1;
+                this._options = [];
+                clearTimeout(this._searchTimer);
+            }
             super.value = value;
             if (this.isConnected && value != null && value !== '' &&
                 !this.options.some(item => item.id === String(value))) this._resolve(value);
         }
         connectedCallback() {
             super.connectedCallback();
-            this.sourceNode.handler.application.server.requireCapability();
+            if (!callback) this.sourceNode.handler.application.server.requireCapability();
         }
         disconnectedCallback() {
             clearTimeout(this._searchTimer);
@@ -44,7 +49,13 @@ export function defineDbSelect(Base) {
             node._dbSelectPending = true;
             this.setAttribute('aria-busy','true');
             try {
-                const result = await app.server.call(this.getAttribute('rpcmethod'), params, {owner:this});
+                const [, attributes] = node.builder.runtimeValues(node);
+                const kw = {...Object.fromEntries(Object.entries(attributes).filter(([key]) => key.startsWith('kw_')).map(([key, value]) => [key.slice(3), value])), ...params};
+                const result = callback
+                    ? await (typeof attributes.callback === 'function'
+                        ? attributes.callback.call(node, kw)
+                        : app._recipeRuntime.evaluate(node, attributes.callback, {kw}))
+                    : await app.server.call(this.getAttribute('rpcmethod'), kw, {owner:this});
                 if (generation !== this._generation || !this.isConnected) return null;
                 if (!result || !Array.isArray(result.rows) || typeof result.identifier !== 'string' ||
                     typeof result.caption !== 'string') throw new Error('Invalid dbSelect selection response');

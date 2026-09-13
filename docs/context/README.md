@@ -1,5 +1,10 @@
 # Gramlot project memory
 
+**Local select providers — 2026-09-13:** `remoteSelect` and `callbackSelect`
+share the identity/caption contract, with a package/table/field cascade example.
+Callback supports synchronous and Promise results without requiring a server.
+See [contract and limits](../guides/select-providers.md). No publication.
+
 **Local relation-tree RPC experiment — 2026-09-13:** legacy relation branches are
 adapted into normal Bag RPC descriptors and expanded lazily by `storeTree`.
 The customer example and nested FastAPI/browser path are verified; no deployment.

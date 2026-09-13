@@ -40,6 +40,7 @@ See :doc:`guide/fastapi`.
    reference/textbox-area
    reference/inspector
    reference/local-logic
+   reference/select-providers
 
 For a first runnable example, follow :doc:`guide/first-page`. For an existing
 FastAPI project, go directly to :doc:`guide/fastapi`.

@@ -12,7 +12,8 @@ def test_catalogue_generation_matches_checked_in_sources(tmp_path):
     spec = importlib.util.spec_from_file_location('generate_components', ROOT/'scripts/generate_components.py')
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    module.generate(ROOT/'js/dom/src/components/builtin-components.json', tmp_path/'components.js', tmp_path/'python')
+    module.generate(ROOT/'js/dom/src/components/builtin-components.json', tmp_path/'components.js', tmp_path/'python', tmp_path/'select-providers.rst')
+    assert (tmp_path/'select-providers.rst').read_bytes() == (ROOT/'docs/source/reference/select-providers.rst').read_bytes()
     assert (tmp_path/'components.js').read_bytes() == (ROOT/'js/dom/src/components/builtin-components.js').read_bytes()
     for path in (tmp_path/'python').iterdir():
         assert path.read_bytes() == (ROOT/'src/gramlot/grammar'/path.name).read_bytes()
@@ -23,10 +24,16 @@ def test_every_catalogued_recipe_accepts_runtime_attributes():
     builder = GramlotBuilder()
     for collection in catalog['collections']:
         for component in collection['components']:
-            required = {'rpcmethod': 'lookup'} if component['name'] == 'dbSelect' else {}
+            required = {'rpcmethod': 'lookup'} if component['name'] in ('dbSelect', 'remoteSelect') else {}
+            if component['name'] == 'relationTree':
+                required = {'table': 'invc.customer'}
             node = getattr(builder.root, component['name'])(value='^record.value', extension_flag=True, **required)
             assert node.node.node_tag == component['name']
             assert node.node.attr['value'] == '^record.value'
             assert node.node.attr['extension_flag'] is True
             schema = builder._class_schema.get_node(component['name'])
             assert schema.attr['_meta']['render_tag'] == component['tag']
+            if component.get('docline'):
+                assert schema.attr['_meta']['parameters'] == component['parameters']
+                for example in component['examples']:
+                    compile(example['code'], component['name'], 'exec')

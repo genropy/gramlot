@@ -61,8 +61,8 @@ export class HtmlRenderer extends RendererBase {
             runtimeAttrs = attrs;
         }
         const el = document.createElement(tag);
-        if (tag === 'gnr-dbselect') {
-            node.handler.application.server.requireCapability();
+        if (['gnr-dbselect', 'gnr-remoteselect', 'gnr-callbackselect'].includes(tag)) {
+            if (tag !== 'gnr-callbackselect') node.handler.application.server.requireCapability();
             el.sourceNode = node;
         }
         if (tag === 'gnr-grid') {

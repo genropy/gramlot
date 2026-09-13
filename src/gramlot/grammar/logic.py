@@ -73,6 +73,9 @@ class LogicDeclarations:
     def dbSelect(self, *, rpcmethod, **attrs):
         return self._declaration("dbSelect", rpcmethod=self._page_method_reference(rpcmethod, "data"), **attrs)
 
+    def remoteSelect(self, *, rpcmethod, **attrs):
+        return self._declaration("remoteSelect", rpcmethod=self._page_method_reference(rpcmethod, "data"), **attrs)
+
     def dataRpc(self, destination, method=None, **params):
         """Call an explicitly exposed server method through the shared RPC service.
 
