@@ -4,6 +4,23 @@ import json
 
 
 class ResolverAuthoring:
+    def relationTree(self, table, *, rpcmethod='relation_tree', storepath=None,
+                     omit='_', dosort=True, groupDescending=False, **attributes):
+        """Declare an RPC-backed relationTree component in the current Data scope."""
+        if not isinstance(table, str) or not table.strip():
+            raise TypeError('relationTree requires a table name or binding')
+        if 'store' in attributes:
+            raise TypeError('relationTree owns its store; use storepath to choose the Data path')
+        if storepath is None:
+            serial = getattr(self.builder, '_relation_tree_serial', 0) + 1
+            self.builder._relation_tree_serial = serial
+            storepath = f'_relationTrees.tree_{serial}'
+        if not isinstance(storepath, str) or not storepath or storepath.startswith(('^', '=')):
+            raise TypeError('storepath must be an unbound Data path')
+        self.dataRpc(storepath, rpcmethod, table=table, omit=omit, dosort=dosort,
+                     groupDescending=groupDescending, _on_start=True)
+        return self._declaration('relationTree', table=table, store=f'^{storepath}', **attributes)
+
     def _http_resolver(self, kind, destination, url, **options):
         if not isinstance(destination, str) or not destination:
             raise TypeError('Resolver destination must be a nonempty Data path')

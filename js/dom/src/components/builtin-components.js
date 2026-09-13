@@ -327,6 +327,18 @@ export const BUILTIN_COMPONENTS = [
         "meta": {
           "dataWidget": true
         }
+      },
+      {
+        "name": "relationTree",
+        "tag": "gnr-relationtree",
+        "subTags": "",
+        "pythonGroup": "AdjacentWidgetDeclarations",
+        "capabilities": [
+          "adapter"
+        ],
+        "meta": {
+          "dataWidget": true
+        }
       }
     ]
   },

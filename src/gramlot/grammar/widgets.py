@@ -15,6 +15,9 @@ class AdjacentWidgetDeclarations:
     @element(sub_tags='', _meta={'dataWidget': True, 'webcomponent': True, 'render_tag': 'gnr-storetree'})
     def storeTree(self, **kwargs): ...
 
+    @element(sub_tags='', _meta={'dataWidget': True, 'webcomponent': True, 'render_tag': 'gnr-relationtree'})
+    def relationTree(self, **kwargs): ...
+
     @element(sub_tags='', _meta={'webcomponent': True, 'render_tag': 'gnr-codemirror'})
     def codeMirror(self, **kwargs): ...
 

@@ -7,6 +7,7 @@ modified. Authoring wrappers never enter the wire payload.
 from genro_bag import Bag
 from genro_builders.builder import SourceBag
 from genro_tytx import register_class, to_tytx as encode
+from gramlot.resolvers import RpcResolver
 
 
 @register_class
@@ -18,7 +19,13 @@ def snapshot(value):
     if isinstance(value, Bag):
         result = SourceSnapshot() if isinstance(value, SourceBag) else Bag()
         for node in value:
-            result.set_item(node.label, snapshot(node.value), node_tag=node.node_tag,
+            if node.resolver is not None:
+                if type(node.resolver) is not RpcResolver:
+                    raise TypeError('Only RpcResolver descriptions can travel through Gramlot RPC')
+                item = RpcResolver(**node.resolver.serialize()['kwargs'])
+            else:
+                item = snapshot(node.get_value(static=True))
+            result.set_item(node.label, item, node_tag=node.node_tag,
                             _attributes={key: snapshot(item) for key, item in node.attr.items()})
         return result
     if isinstance(value, dict):

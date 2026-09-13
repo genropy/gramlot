@@ -215,7 +215,11 @@ export class InspectorEditor {
     toggleRemoval(row) {
         if (row.dataset.complex === 'true') return;
         row.dataset.removed = String(row.dataset.removed !== 'true');
-        row.querySelector('[data-cell="remove"]').textContent = row.dataset.removed === 'true' ? '↶' : '−';
+        const remove = row.querySelector('[data-cell="remove"]');
+        const removed = row.dataset.removed === 'true';
+        remove.textContent = removed ? '↶' : '🗑';
+        remove.title = removed ? 'Undo removal' : 'Remove attribute';
+        remove.setAttribute('aria-label', `${removed ? 'Restore' : 'Remove'} ${row.dataset.name || 'new attribute'}`);
         this.dirty = true;
         this.setStatus('Unsaved changes');
     }

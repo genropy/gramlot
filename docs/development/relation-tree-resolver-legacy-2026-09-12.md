@@ -1,5 +1,8 @@
 # Legacy relation tree and explorer
 
+Follow-up: [local RPC/tree implementation, 2026-09-13](relation-tree-rpc-2026-09-13.md).
+The implementation-status statements below describe the original audit checkpoint.
+
 Source investigation, 2026-09-12, resumed after the first RPC-backed grid example.
 This is verified source behavior and a design interpretation, not a new Gramlot
 implementation or authorization to migrate the full explorer.

@@ -46,6 +46,6 @@ def build_view(pane, kind):
     choice = cell.select(**{"data-cell": "type"})
     for dtype in ("string", "number", "boolean", "date", "time", "datetime"):
         choice.option(dtype, value=dtype)
-    cell.button("−", type="button", **{"data-cell": "remove", "title": "Remove attribute"})
+    cell.button("🗑", type="button", **{"data-cell": "remove", "title": "Remove attribute"})
     pane.data(f"{kind}Detail", "Select a node")
     pane.pre(f"^{kind}Detail", hidden=True, **{"data-inspector": f"{kind}-detail"})

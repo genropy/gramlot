@@ -20,8 +20,9 @@ Once the current grid work is finished, inspect `RelationTreeResolver` in
 The owner deferred this until after the grid. Following the completed first
 states-grid experiment and the instruction to proceed, the source investigation
 is now recorded in [the relation-tree audit](../development/relation-tree-resolver-legacy-2026-09-12.md).
-No explorer implementation has started. Review the separate model, metadata and
-browser expansion contracts before selecting a new slice.
+The first lazy relation-tree RPC slice is now implemented locally and verified;
+see [contract and limits](../development/relation-tree-rpc-2026-09-13.md).
+Permission filtering, relationExplorer enrichment and grid configuration remain open.
 
 ## Collection-store design review — 2026-09-12
 

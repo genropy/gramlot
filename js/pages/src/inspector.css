@@ -15,7 +15,13 @@
 .inspector-editor select { width:72px; flex:none; font-family:inherit; font-size:11px; color:var(--inspector-muted,#737f8d); background:transparent; border:0; padding:3px 0; margin:0 3px; }
 .inspector-editor button { min-height:24px; padding:2px 7px; margin:0; font-family:inherit;line-height:1.4; font-size:12px; color:var(--inspector-text,#526171); border:1px solid var(--inspector-line,#c7ced7); border-radius:3px; background:var(--inspector-bg,#fff); cursor:pointer; }
 .inspector-editor button:hover { background:var(--inspector-selected,#e7eef5); }
-.inspector-property-value button { border:0; width:25px; flex:none; font-size:17px; background:transparent; color:#9c6663; }
+.inspector-property-value button { border:0; width:25px; flex:none; font-size:13px; background:transparent; color:var(--inspector-muted,#727b87); }
+.inspector-property-value [data-cell="remove"] { margin-left:auto; opacity:0; pointer-events:none; }
+.inspector-property-row:hover [data-cell="remove"],
+.inspector-property-row:focus-within [data-cell="remove"],
+.inspector-property-row[data-removed="true"] [data-cell="remove"] { opacity:.65; pointer-events:auto; }
+.inspector-property-value [data-cell="remove"]:is(:hover,:focus-visible) { opacity:1; }
+@media (hover:none) { .inspector-property-value [data-cell="remove"] { opacity:.65; pointer-events:auto; } }
 .inspector-editor [hidden] { display:none!important; }
 .inspector-editor :disabled { color:#89929e; cursor:default; }
 .inspector-editor :is(button,select):focus-visible { outline:2px solid #3977aa; outline-offset:-1px; }

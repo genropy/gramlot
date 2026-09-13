@@ -78,7 +78,7 @@ export class DomTarget extends TargetWrapper {
             'gnr-bordercontainer', 'gnr-panel', 'gnr-box', 'gnr-stackcontainer', 'gnr-contentpane'].includes(el.localName);
         const names = new Set([...prior.attributes, ...next.attributes].map(a => a.name));
         const changes = [...names].filter(name => prior.getAttribute(name) !== next.getAttribute(name));
-        if (el.localName === 'gnr-storetree') {
+        if (el.localName === 'gnr-storetree' || el.localName === 'gnr-relationtree') {
             this._patchAttributes(el, next, prior, names);
             // A store supplied by the recipe participates in reconciliation.
             // Tools may instead attach a live Bag directly (the inspector does);

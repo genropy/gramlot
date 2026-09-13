@@ -6,17 +6,106 @@ import inspect
 from decimal import Decimal
 from datetime import date, datetime, time
 import math
+import re
 from pathlib import Path
 
 from fastapi import FastAPI
 from genro_bag import Bag
 
 from gramlot.contrib.fastapi.application import PageCollection
-from gramlot.page import WebPage
+from gramlot.page import WebPage, endpoint
+from gramlot.resolvers import RpcResolver
 
 
 class GenropyPage(WebPage):
     """A fresh Gramlot page with lazy, invocation-scoped ``self.db`` access."""
+
+    relation_roots = ()
+
+    @endpoint
+    def relation_tree(self, table, path=None, omit='_', dosort=True, groupDescending=False):
+        """Return one model level; only declared roots and actual relations are valid.
+
+        This exposes model metadata, not records or legacy Page permission rules.
+        Applications needing column permissions must override and redecorate it.
+        """
+        if not isinstance(table, str) or table not in self.relation_roots:
+            raise ValueError('Table is not an exposed relation root')
+        if not isinstance(omit, str) or not isinstance(dosort, bool):
+            raise ValueError('Expected an omit string and a boolean dosort')
+        if not isinstance(groupDescending, bool):
+            raise ValueError('Expected a boolean groupDescending')
+        path = [] if path is None else path
+        if (not isinstance(path, list) or len(path) > 32
+                or any(not isinstance(label, str) or not label for label in path)):
+            raise ValueError('Expected a relation path of at most 32 labels')
+        from gnr.sql.gnrsqlmodel.resolvers import RelationTreeResolver
+
+        current_table = table
+        relation_captions = []
+        branch = self.db.table(table).model.relations
+        for label in path:
+            node = next((node for node in branch.nodes if node.label == label), None)
+            if node is None or not isinstance(node.resolver, RelationTreeResolver):
+                raise ValueError('Path must follow model relations')
+            relation_captions.append('@' + self._genropy_application.localizer.translate(
+                node.attr.get('caption') or node.attr.get('name_long') or node.label).lstrip('@'))
+            current_table = f'{node.resolver.pkg_name}.{node.resolver.tbl_name}'
+            branch = node.getValue()
+            if branch is None:
+                return Bag()
+        result = Bag()
+        for node in branch.nodes:
+            attrs = {key: legacy_to_gramlot(value) for key, value in node.attr.items()}
+            attrs['caption'] = self._genropy_application.localizer.translate(
+                attrs.get('caption') or attrs.get('name_long') or node.label)
+            if node.resolver is not None:
+                if not isinstance(node.resolver, RelationTreeResolver):
+                    raise TypeError('Unsupported model resolver')
+                attrs['caption'] = '@' + attrs['caption'].lstrip('@')
+                joiner = attrs['joiner']
+                attrs['group'] = (joiner.get('one_group') if joiner['mode'] == 'O'
+                                  else joiner.get('many_group') or 'zz')
+                attrs['dtype'] = self.db.model.column(joiner['many_relation']).attributes.get('dtype', 'A')
+                attrs['relation_direction'] = 'ascending' if joiner['mode'] == 'O' else 'descending'
+                value = RpcResolver(method='relation_tree',
+                                    params={'table': table, 'path': [*path, node.label],
+                                            'omit': omit, 'dosort': dosort,
+                                            'groupDescending': groupDescending})
+            else:
+                value = legacy_to_gramlot(node.getValue(mode='static'))
+            attrs['fieldpath'] = '.'.join([*path, node.label])
+            result.set_item(node.label, value, _attributes=attrs)
+        model = self.db.table(current_table).model
+        # Legacy subtables generate boolean formulas for record subsets, not fields.
+        subtable_columns = {f'subtable_{name}' for name in (model.subtables or {}).keys()}
+        for name, column in model.virtual_columns.items():
+            if name in subtable_columns:
+                continue
+            attrs = {key: legacy_to_gramlot(value) for key, value in column.attributes.items()}
+            kind = ('composite' if attrs.get('composed_of') else
+                    'alias' if attrs.get('relation_path') else
+                    'python' if attrs.get('py_method') else
+                    'formula' if any(key in attrs for key in ('sql_formula', 'select', 'exists'))
+                    else 'virtual')
+            attrs['column_kind'] = kind
+            reasons = column_subquery_paths(model, name)
+            if reasons:
+                attrs['subquery_paths'] = reasons
+            attrs['dtype'] = attrs.get('dtype') or self.db.table(current_table).column(name).attributes.get('dtype', 'T')
+            attrs['caption'] = self._genropy_application.localizer.translate(attrs.get('name_long') or name)
+            attrs['fieldpath'] = '.'.join([*path, name])
+            result.set_item(name, None, _attributes=attrs)
+        table_caption = self._genropy_application.localizer.translate(
+            self.db.table(table).attributes.get('name_long') or table)
+        for item in result:
+            item.attr['fullcaption'] = '.'.join([*relation_captions, item.attr['caption']])
+            item.attr['root_table_caption'] = table_caption
+        groups = {key[6:]: self._genropy_application.localizer.translate(value)
+                  for key, value in self.db.table(current_table).attributes.items()
+                  if key.startswith('group_')}
+        return group_relation_fields(result, groups, omit=omit, dosort=dosort,
+                                     group_descending=groupDescending)
 
     def selection_result(self, rows, *, identifier, metadata=None):
         """Materialize fetched named rows as a portable TYTX selection result."""
@@ -104,6 +193,79 @@ class GenropyPageCollection(PageCollection):
         if isinstance(page, GenropyPage):
             return legacy_to_gramlot(result)
         return result
+
+
+def column_subquery_paths(model, name, trail=()):
+    """Conservative static hints, not execution-time estimates or a SQL parser."""
+    key = (model.fullname, name)
+    if key in trail or len(trail) >= 32:
+        return []
+    column = model.column(name)
+    if column is None:
+        return []
+    attrs = column.attributes
+    sql = attrs.get('sql_formula')
+    sql = sql if isinstance(sql, str) else ''
+    # Ignore quoted literals and SQL comments when looking for SELECT/references.
+    sql = re.sub(r"'([^']|'')*'|--[^\n]*|/\*.*?\*/", ' ', sql, flags=re.S)
+    direct = (attrs.get('subquery') or attrs.get('select') or attrs.get('exists')
+              or any(k.startswith('select_') and v for k, v in attrs.items())
+              or re.search(r'\bSELECT\b', sql, re.I))
+    if direct:
+        return [name]
+    refs = re.findall(r'\$([A-Za-z_][\w]*|@[\w@.]+)', sql)
+    if attrs.get('relation_path'):
+        refs.append(attrs['relation_path'])
+    paths = []
+    for ref in dict.fromkeys(refs):
+        target = model.column(ref)
+        if target is None:
+            continue
+        for dependency in column_subquery_paths(target.table, target.name, (*trail, key)):
+            paths.append(f'{name} → {ref}' + (f' → {dependency}' if dependency != target.name else ''))
+    return list(dict.fromkeys(paths))
+
+
+def group_relation_fields(fields, groups, *, omit='_', dosort=True, group_descending=False):
+    """Legacy presentation rules, preserving lazy nodes and logical field paths.
+
+    This is UI filtering, not column authorization. Group nesting never enters
+    a resolver's model path. No resolver is read during sorting or grouping.
+    """
+    entries = []
+    for node in fields:
+        attrs = dict(node.attr)
+        group = attrs.get('group') or ' '
+        if '%' in group:
+            group %= {key[9:]: value for key, value in attrs.items() if key.startswith('subgroup_')}
+        if group[0] in omit:
+            continue
+        if group[0] in '*_':
+            group = group[1:]
+        attrs['group'] = group.strip() if group == ' ' else group
+        entries.append((node, attrs))
+    if dosort:
+        entries.sort(key=lambda entry: entry[1]['group'].split('.'))
+    result = Bag()
+    for node, attrs in entries:
+        target = result
+        parts = attrs['group'].split('.')
+        if parts[-1].isdigit():
+            parts.pop()
+        grouped = group_descending or attrs.get('relation_direction') != 'descending'
+        if grouped and dosort and parts and parts[0] in groups:
+            for index, part in enumerate(parts):
+                current = target.get_node(part)
+                if current is None:
+                    label = groups.get('.'.join(parts[:index + 1]), part)
+                    target.set_item(part, Bag(), _attributes={'caption': label, 'node_kind': 'group'})
+                    current = target.get_node(part)
+                target = current.get_value(static=True)
+                if not isinstance(target, Bag):
+                    raise ValueError('Field and group names collide')
+        value = node.resolver if node.resolver is not None else node.get_value(static=True)
+        target.set_item(node.label, value, _attributes=attrs)
+    return result
 
 
 def legacy_to_gramlot(value):

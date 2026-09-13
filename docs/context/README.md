@@ -1,5 +1,10 @@
 # Gramlot project memory
 
+**Local relation-tree RPC experiment — 2026-09-13:** legacy relation branches are
+adapted into normal Bag RPC descriptors and expanded lazily by `storeTree`.
+The customer example and nested FastAPI/browser path are verified; no deployment.
+See [contract and limits](../development/relation-tree-rpc-2026-09-13.md).
+
 **Site PostgreSQL/Genropy checkpoint:** site `v0.1.5` is deployed with the complete
 fictional invoice database (18 application tables, 17,511 rows). Database pages
 use `GenropyPage` and `GnrApp` against dedicated PostgreSQL. This supersedes the

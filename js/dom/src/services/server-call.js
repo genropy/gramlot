@@ -1,5 +1,6 @@
 // Copyright 2026 Softwell S.r.l. - SPDX-License-Identifier: Apache-2.0
 import {fromTytx, toTytx} from 'genro-tytx';
+import {bindRpcResolvers} from '../resolvers/rpc.js';
 
 const TYTX_MEDIA_TYPE = 'application/vnd.tytx+json';
 
@@ -124,7 +125,7 @@ export class ServerCallService {
                     details: envelope?.error || null,
                 });
             }
-            return envelope.result;
+            return bindRpcResolvers(envelope.result, this, owner);
         } catch (error) {
             if (error instanceof ServerCallError) throw error;
             if (controller.signal.aborted) {

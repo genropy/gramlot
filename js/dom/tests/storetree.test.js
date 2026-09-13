@@ -197,3 +197,141 @@ test('optional row actions emit node and path without selecting the row', () => 
     assert.equal(el.shadowRoot.querySelector('.actions'), null);
     genro.dispose();
 });
+
+test('lazy nodes load only on expansion, coalesce and reuse cached results', async () => {
+    const {BagResolver} = await import('genro-bag-js');
+    const {genro, el} = mount();
+    let calls = 0;
+    let finish;
+    class Lazy extends BagResolver {
+        static classKwargs = {cacheTime:300, readOnly:false, asBag:false};
+        load() { calls++; return new Promise(resolve => { finish = resolve; }); }
+    }
+    const bag = new Bag();
+    bag.setItem('lazy', new Lazy(), {caption:'Lazy relation'});
+    el.storeBag = bag;
+    assert.equal(calls, 0);
+    let details = el.shadowRoot.querySelector('details');
+    details.open = true;
+    details.dispatchEvent(new window.Event('toggle'));
+    details.dispatchEvent(new window.Event('toggle'));
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.equal(calls, 1);
+    const children = new Bag();
+    children.setItem('field', null, {caption:'Child field'});
+    finish(children);
+    await new Promise(resolve => setTimeout(resolve, 10));
+    assert.match(el.shadowRoot.textContent, /Child field/);
+    details = el.shadowRoot.querySelector('details');
+    details.open = false;
+    details.dispatchEvent(new window.Event('toggle'));
+    details.open = true;
+    details.dispatchEvent(new window.Event('toggle'));
+    await new Promise(resolve => setTimeout(resolve, 10));
+    assert.equal(calls, 1, 'reopening uses the resolver cache');
+    genro.dispose();
+});
+
+test('lazy tree errors are visible and reopening retries', async () => {
+    const {BagResolver} = await import('genro-bag-js');
+    const {genro, el} = mount();
+    let calls = 0;
+    class Failing extends BagResolver {
+        async load() { if (++calls === 1) throw new Error('Offline'); return new Bag(); }
+    }
+    const bag = new Bag(); bag.setItem('lazy', new Failing()); el.storeBag = bag;
+    const details = el.shadowRoot.querySelector('details');
+    details.open = true; details.dispatchEvent(new window.Event('toggle'));
+    await new Promise(resolve => setTimeout(resolve, 10));
+    assert.match(el.shadowRoot.textContent, /Offline/);
+    details.open = false; details.dispatchEvent(new window.Event('toggle'));
+    details.open = true; details.dispatchEvent(new window.Event('toggle'));
+    await new Promise(resolve => setTimeout(resolve, 10));
+    assert.equal(calls, 2); assert.doesNotMatch(el.shadowRoot.textContent, /Offline/);
+    genro.dispose();
+});
+
+test('relationTree receives updated Data and owns compact dtype presentation', () => {
+    setupDom();
+    class RelationPage extends HtmlBuilder {
+        static wc_requires = ['storeTree'];
+        main(root) { root.relationTree({store:'^model'}); }
+    }
+    const host = document.createElement('div'); document.body.append(host);
+    const app = new Application(host, new RelationPage('main'));
+    const el = host.querySelector('gnr-relationtree');
+    const bag = new Bag();
+    bag.setItem('state', null, {caption:'State', dtype:'A', relation_direction:'ascending'});
+    bag.setItem('invoices', null, {caption:'Invoices', dtype:'A', relation_direction:'descending'});
+    app.live(() => app.data.setItem('main.model',bag));
+    assert.equal(el.storeBag,bag);
+    assert.equal(el.style.getPropertyValue('--tree-line-height'),'20px');
+    assert.equal(el.shadowRoot.querySelector('[data-direction="ascending"]').textContent,'A');
+    assert.equal(el.shadowRoot.querySelector('[data-direction="descending"]').textContent,'A');
+    app.dispose();
+});
+
+test('relation info displays attributes as text without reading the node value', () => {
+    setupDom();
+    class InfoPage extends HtmlBuilder {
+        static wc_requires = ['storeTree'];
+        main(root) { root.relationTree({store:'^model'}); }
+    }
+    const host=document.createElement('div'); document.body.append(host);
+    const app=new Application(host,new InfoPage('main'));
+    const bag=new Bag(); bag.setItem('formula',null,{dtype:'N',column_kind:'formula',sql_formula:'<script>unsafe</script>'});
+    app.live(()=>app.data.setItem('main.model',bag));
+    const el=host.querySelector('gnr-relationtree');
+    const info=el.shadowRoot.querySelector('.node-info');
+    info.dispatchEvent(new window.Event('mouseenter'));
+    const popup=el.shadowRoot.querySelector('.node-attributes');
+    assert.equal(popup.hidden,false);
+    assert.match(popup.textContent,/<script>unsafe<\/script>/);
+    assert.equal(popup.querySelector('script'),null);
+    info.dispatchEvent(new window.KeyboardEvent('keydown',{key:'Escape'}));
+    assert.equal(popup.hidden,true);
+    app.dispose();
+});
+
+test('relation favorites persist by table, retain field paths, and toggle without selecting', () => {
+    const dom = setupDom();
+    dom.reconfigure({url:'http://localhost/'});
+    class FavoritePage extends HtmlBuilder {
+        static wc_requires = ['storeTree'];
+        main(root) { root.relationTree({store:'^model', table:'invc.customer'}); }
+    }
+    const host=document.createElement('div'); document.body.append(host);
+    const app=new Application(host,new FavoritePage('main'));
+    const el=host.querySelector('gnr-relationtree');
+    const bag=new Bag();
+    bag.setItem('address',new Bag(),{caption:'Address',node_kind:'group'});
+    bag.setItem('address.name',null,{caption:'Name',dtype:'A',fieldpath:'@state.name',fullcaption:'@State.Name'});
+    app.live(()=>app.data.setItem('main.model',bag));
+    assert.equal(el.shadowRoot.querySelector('.favorites'),null);
+    const heart=el.shadowRoot.querySelector('.favorite-button');
+    assert.equal(heart.nextElementSibling.className,'node-info');
+    heart.click();
+    assert.equal(el._selectedPath,null);
+    const branch=el.shadowRoot.querySelector('.favorites');
+    assert.equal(branch.open,false);
+    assert.ok(!branch.classList.contains('field-group'));
+    assert.ok(branch.querySelector('.favorite-remove svg'));
+    assert.equal(el.shadowRoot.querySelector('.table-root > summary').textContent,'invc.customer');
+    assert.equal(el.shadowRoot.querySelector('.tree-root').querySelector('ul').querySelector('details'),branch);
+    assert.equal(branch.querySelector('.leaf').title,'@state.name');
+    assert.equal(branch.querySelector('.leaf .caption').textContent,'@State.Name');
+    assert.equal(JSON.parse(window.localStorage.getItem('gramlot.relationTree.favorites.v1:invc.customer'))[0].fieldpath,'@state.name');
+    const toggle=el.shadowRoot.querySelector('.tree-toolbar input');
+    toggle.checked=true; toggle.dispatchEvent(new window.Event('change'));
+    assert.equal(el.shadowRoot.querySelector('.favorites .caption:not(.group-caption)').textContent,'@state.name');
+    const restored=document.createElement('gnr-relationtree');
+    restored.setAttribute('table','invc.customer'); document.body.append(restored);
+    assert.ok(restored.shadowRoot.querySelector('.favorites .leaf'));
+    const other=document.createElement('gnr-relationtree');
+    other.setAttribute('table','invc.invoice'); document.body.append(other);
+    assert.equal(other.shadowRoot.querySelector('.favorites'),null);
+    restored.shadowRoot.querySelector('.favorite-button').click();
+    assert.equal(restored.shadowRoot.querySelector('.favorites'),null);
+    assert.deepEqual(JSON.parse(window.localStorage.getItem('gramlot.relationTree.favorites.v1:invc.customer')),[]);
+    restored.remove(); other.remove(); app.dispose();
+});
