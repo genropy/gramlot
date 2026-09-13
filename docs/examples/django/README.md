@@ -25,3 +25,9 @@ local demonstration, not a deployment configuration.
 
 See [the adapter guide](../../django.md) for existing-project integration,
 authentication, CSRF, typed selections and lifecycle limits.
+
+## Complete Bakery PoC
+
+The adapted Bakerydemo source, media and compressed SQLite SQL dump are in
+[bakerydemo](bakerydemo/GRAMLOT.md). The earlier `bakery_overlay` directory is
+retained as the source-only integration snapshot.
